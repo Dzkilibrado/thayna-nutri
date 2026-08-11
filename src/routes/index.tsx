@@ -43,10 +43,10 @@ function Home() {
           <img
             src={settings.avatar_url}
             alt={settings.brand_name}
-            className="mx-auto size-28 rounded-full border-2 border-primary/60 object-cover"
+            className="accent-glow mx-auto size-48 rounded-full border-2 border-primary/60 object-cover sm:size-56"
           />
         ) : (
-          <div className="mx-auto flex size-28 items-center justify-center rounded-full border-2 border-primary/60 bg-surface font-display text-4xl">
+          <div className="mx-auto flex size-48 items-center justify-center rounded-full border-2 border-primary/60 bg-surface font-display text-6xl sm:size-56">
             {(settings?.brand_name ?? "T").slice(0, 1)}
           </div>
         )}
