@@ -1,7 +1,8 @@
 import type { ContentBlock, SiteSettings } from "@/lib/site";
+import { BackButton } from "@/components/site/back-button";
+import { LinkBlock } from "@/components/site/link-block";
 import { PageShell } from "@/components/site/page-shell";
 import { VideoEmbed } from "@/components/site/video-embed";
-import { LinkBlock } from "@/components/site/link-block";
 import { whatsappLink } from "@/lib/site";
 
 export function ContentPage({
@@ -21,7 +22,10 @@ export function ContentPage({
 
   return (
     <PageShell settings={settings}>
-      <header className="hero-surface -mx-5 -mt-8 rounded-b-3xl px-5 pb-8 pt-12">
+      <div className="mb-4 flex items-center justify-between">
+        <BackButton to="/" label="Voltar" />
+      </div>
+      <header className="hero-surface -mx-5 -mt-4 rounded-b-3xl px-5 pb-8 pt-12">
         {kicker ? (
           <p className="text-xs uppercase tracking-[0.3em] text-primary">{kicker}</p>
         ) : null}

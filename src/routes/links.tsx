@@ -1,5 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 
+import { BackButton } from "@/components/site/back-button";
 import { LinkBlock } from "@/components/site/link-block";
 import { PageShell } from "@/components/site/page-shell";
 import { getSiteData } from "@/lib/site.functions";
@@ -33,6 +34,9 @@ function LinksPage() {
 
   return (
     <PageShell settings={settings}>
+      <div className="flex items-center justify-between">
+        <BackButton to="/" label="Voltar" />
+      </div>
       <header className="text-center">
         <h1 className="text-3xl">Links</h1>
         <p className="mx-auto mt-2 max-w-md text-sm text-muted-foreground">

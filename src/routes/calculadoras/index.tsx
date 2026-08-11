@@ -1,6 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { ArrowRight } from "lucide-react";
 
+import { BackButton } from "@/components/site/back-button";
 import { PageShell } from "@/components/site/page-shell";
 import { CALCULATORS } from "@/lib/calculators";
 import { getSiteData } from "@/lib/site.functions";
@@ -36,6 +37,9 @@ function CalculatorsIndex() {
 
   return (
     <PageShell settings={settings}>
+      <div className="flex items-center justify-between">
+        <BackButton to="/" label="Voltar" showHome />
+      </div>
       <header className="text-center">
         <h1 className="text-3xl">Calculadoras</h1>
         <p className="mx-auto mt-2 max-w-md text-sm text-muted-foreground">

@@ -1,6 +1,7 @@
-import { Link } from "@tanstack/react-router";
+import { Link, useRouterState } from "@tanstack/react-router";
 import type { ReactNode } from "react";
 
+import { HomeButton } from "@/components/site/back-button";
 import { ThemeVars } from "@/components/site/theme-vars";
 import type { SiteSettings } from "@/lib/site";
 import { whatsappLink } from "@/lib/site";
@@ -12,6 +13,9 @@ export function PageShell({
   settings: SiteSettings | null;
   children: ReactNode;
 }) {
+  const pathname = useRouterState({ select: (s) => s.location.pathname });
+  const isHome = pathname === "/";
+
   return (
     <div className="min-h-screen bg-background">
       <ThemeVars settings={settings} />
@@ -44,6 +48,7 @@ export function PageShell({
             >
               Agendar
             </a>
+            {!isHome ? <HomeButton /> : null}
           </nav>
         </div>
       </header>
@@ -61,7 +66,6 @@ export function PageShell({
           </Link>
         </p>
       </footer>
-
     </div>
   );
 }
