@@ -442,8 +442,8 @@ function BlockCard({
   block: ContentBlock;
   isFirst: boolean;
   isLast: boolean;
-  neighbour?: ContentBlock;
-  next?: ContentBlock;
+  neighbour?: ContentBlock | undefined;
+  next?: ContentBlock | undefined;
 }) {
   const queryClient = useQueryClient();
   const [form, setForm] = useState<ContentBlock>(block);
