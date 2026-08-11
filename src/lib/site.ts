@@ -75,6 +75,13 @@ export function toEmbedUrl(raw: string | null | undefined): {
   const ig = url.match(/instagram\.com\/(?:p|reel|tv)\/([\w-]+)/);
   if (ig) return { type: "iframe", src: `https://www.instagram.com/reel/${ig[1]}/embed` };
 
+  if (/facebook\.com|fb\.watch/i.test(url)) {
+    return {
+      type: "iframe",
+      src: `https://www.facebook.com/plugins/video.php?height=476&show_text=false&href=${encodeURIComponent(url)}`,
+    };
+  }
+
   if (/\.(mp4|webm|ogg|mov)(\?|$)/i.test(url)) return { type: "video", src: url };
 
   return { type: "iframe", src: url };
