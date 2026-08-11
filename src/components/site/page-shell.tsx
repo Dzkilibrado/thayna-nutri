@@ -20,14 +20,22 @@ export function PageShell({
           <Link to="/" className="font-display text-xl uppercase tracking-wider">
             {settings?.brand_name ?? "Thaynan"}
           </Link>
-          <nav className="flex items-center gap-4 text-sm">
-            <Link
-              to="/sobre"
-              className="text-muted-foreground transition-colors hover:text-foreground"
-              activeProps={{ className: "text-foreground" }}
-            >
-              Sobre mim
-            </Link>
+          <nav className="flex items-center gap-3 text-sm">
+            {[
+              { to: "/links", label: "Links" },
+              { to: "/videos", label: "Vídeos" },
+              { to: "/calculadoras", label: "Calculadoras" },
+              { to: "/sobre", label: "Sobre" },
+            ].map((item) => (
+              <Link
+                key={item.to}
+                to={item.to}
+                className="text-muted-foreground transition-colors hover:text-foreground"
+                activeProps={{ className: "text-foreground" }}
+              >
+                {item.label}
+              </Link>
+            ))}
             <a
               href={whatsappLink(settings?.whatsapp ?? "", settings?.whatsapp_message ?? "")}
               target="_blank"
@@ -47,7 +55,13 @@ export function PageShell({
           {settings?.brand_name ?? "Thaynan"} — {settings?.brand_tagline ?? "Nutrição & Performance"}
         </p>
         <p className="mt-1">Atendimento {settings?.hours ?? "09:00 - 20:00"}</p>
+        <p className="mt-3">
+          <Link to="/auth" className="underline underline-offset-4 hover:text-foreground">
+            Acesso administrativo
+          </Link>
+        </p>
       </footer>
+
     </div>
   );
 }

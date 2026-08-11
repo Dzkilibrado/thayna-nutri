@@ -16,6 +16,7 @@ import { Route as LinksRouteImport } from './routes/links'
 import { Route as OnlineRouteImport } from './routes/online'
 import { Route as PresencialRouteImport } from './routes/presencial'
 import { Route as SobreRouteImport } from './routes/sobre'
+import { Route as VideosRouteImport } from './routes/videos'
 import { Route as AuthenticatedAdminRouteImport } from './routes/_authenticated/admin'
 import { Route as CalculadorasIndexRouteImport } from './routes/calculadoras/index'
 import { Route as CalculadorasSlugRouteImport } from './routes/calculadoras/$slug'
@@ -54,6 +55,11 @@ const SobreRoute = SobreRouteImport.update({
   path: '/sobre',
   getParentRoute: () => rootRouteImport,
 } as any)
+const VideosRoute = VideosRouteImport.update({
+  id: '/videos',
+  path: '/videos',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AuthenticatedAdminRoute = AuthenticatedAdminRouteImport.update({
   id: '/admin',
   path: '/admin',
@@ -77,6 +83,7 @@ export interface FileRoutesByFullPath {
   '/online': typeof OnlineRoute
   '/presencial': typeof PresencialRoute
   '/sobre': typeof SobreRoute
+  '/videos': typeof VideosRoute
   '/admin': typeof AuthenticatedAdminRoute
   '/calculadoras/$slug': typeof CalculadorasSlugRoute
   '/calculadoras/': typeof CalculadorasIndexRoute
@@ -88,6 +95,7 @@ export interface FileRoutesByTo {
   '/online': typeof OnlineRoute
   '/presencial': typeof PresencialRoute
   '/sobre': typeof SobreRoute
+  '/videos': typeof VideosRoute
   '/admin': typeof AuthenticatedAdminRoute
   '/calculadoras/$slug': typeof CalculadorasSlugRoute
   '/calculadoras': typeof CalculadorasIndexRoute
@@ -101,6 +109,7 @@ export interface FileRoutesById {
   '/online': typeof OnlineRoute
   '/presencial': typeof PresencialRoute
   '/sobre': typeof SobreRoute
+  '/videos': typeof VideosRoute
   '/_authenticated/admin': typeof AuthenticatedAdminRoute
   '/calculadoras/$slug': typeof CalculadorasSlugRoute
   '/calculadoras/': typeof CalculadorasIndexRoute
@@ -114,6 +123,7 @@ export interface FileRouteTypes {
     | '/online'
     | '/presencial'
     | '/sobre'
+    | '/videos'
     | '/admin'
     | '/calculadoras/$slug'
     | '/calculadoras/'
@@ -125,6 +135,7 @@ export interface FileRouteTypes {
     | '/online'
     | '/presencial'
     | '/sobre'
+    | '/videos'
     | '/admin'
     | '/calculadoras/$slug'
     | '/calculadoras'
@@ -137,6 +148,7 @@ export interface FileRouteTypes {
     | '/online'
     | '/presencial'
     | '/sobre'
+    | '/videos'
     | '/_authenticated/admin'
     | '/calculadoras/$slug'
     | '/calculadoras/'
@@ -150,6 +162,7 @@ export interface RootRouteChildren {
   OnlineRoute: typeof OnlineRoute
   PresencialRoute: typeof PresencialRoute
   SobreRoute: typeof SobreRoute
+  VideosRoute: typeof VideosRoute
   CalculadorasSlugRoute: typeof CalculadorasSlugRoute
   CalculadorasIndexRoute: typeof CalculadorasIndexRoute
 }
@@ -205,6 +218,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof SobreRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/videos': {
+      id: '/videos'
+      path: '/videos'
+      fullPath: '/videos'
+      preLoaderRoute: typeof VideosRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/_authenticated/admin': {
       id: '/_authenticated/admin'
       path: '/admin'
@@ -248,6 +268,7 @@ const rootRouteChildren: RootRouteChildren = {
   OnlineRoute: OnlineRoute,
   PresencialRoute: PresencialRoute,
   SobreRoute: SobreRoute,
+  VideosRoute: VideosRoute,
   CalculadorasSlugRoute: CalculadorasSlugRoute,
   CalculadorasIndexRoute: CalculadorasIndexRoute,
 }
