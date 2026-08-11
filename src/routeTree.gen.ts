@@ -20,7 +20,6 @@ import { Route as VideosRouteImport } from './routes/videos'
 import { Route as AuthenticatedAdminRouteImport } from './routes/_authenticated/admin'
 import { Route as CalculadorasIndexRouteImport } from './routes/calculadoras/index'
 import { Route as CalculadorasSlugRouteImport } from './routes/calculadoras/$slug'
-import { Route as ApiPublicSeedAdminRouteImport } from './routes/api/public/seed-admin'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -76,11 +75,6 @@ const CalculadorasSlugRoute = CalculadorasSlugRouteImport.update({
   path: '/calculadoras/$slug',
   getParentRoute: () => rootRouteImport,
 } as any)
-const ApiPublicSeedAdminRoute = ApiPublicSeedAdminRouteImport.update({
-  id: '/api/public/seed-admin',
-  path: '/api/public/seed-admin',
-  getParentRoute: () => rootRouteImport,
-} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -93,7 +87,6 @@ export interface FileRoutesByFullPath {
   '/admin': typeof AuthenticatedAdminRoute
   '/calculadoras/$slug': typeof CalculadorasSlugRoute
   '/calculadoras/': typeof CalculadorasIndexRoute
-  '/api/public/seed-admin': typeof ApiPublicSeedAdminRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -106,7 +99,6 @@ export interface FileRoutesByTo {
   '/admin': typeof AuthenticatedAdminRoute
   '/calculadoras/$slug': typeof CalculadorasSlugRoute
   '/calculadoras': typeof CalculadorasIndexRoute
-  '/api/public/seed-admin': typeof ApiPublicSeedAdminRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -121,7 +113,6 @@ export interface FileRoutesById {
   '/_authenticated/admin': typeof AuthenticatedAdminRoute
   '/calculadoras/$slug': typeof CalculadorasSlugRoute
   '/calculadoras/': typeof CalculadorasIndexRoute
-  '/api/public/seed-admin': typeof ApiPublicSeedAdminRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -136,7 +127,6 @@ export interface FileRouteTypes {
     | '/admin'
     | '/calculadoras/$slug'
     | '/calculadoras/'
-    | '/api/public/seed-admin'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -149,7 +139,6 @@ export interface FileRouteTypes {
     | '/admin'
     | '/calculadoras/$slug'
     | '/calculadoras'
-    | '/api/public/seed-admin'
   id:
     | '__root__'
     | '/'
@@ -163,7 +152,6 @@ export interface FileRouteTypes {
     | '/_authenticated/admin'
     | '/calculadoras/$slug'
     | '/calculadoras/'
-    | '/api/public/seed-admin'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -177,7 +165,6 @@ export interface RootRouteChildren {
   VideosRoute: typeof VideosRoute
   CalculadorasSlugRoute: typeof CalculadorasSlugRoute
   CalculadorasIndexRoute: typeof CalculadorasIndexRoute
-  ApiPublicSeedAdminRoute: typeof ApiPublicSeedAdminRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -259,13 +246,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof CalculadorasSlugRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/api/public/seed-admin': {
-      id: '/api/public/seed-admin'
-      path: '/api/public/seed-admin'
-      fullPath: '/api/public/seed-admin'
-      preLoaderRoute: typeof ApiPublicSeedAdminRouteImport
-      parentRoute: typeof rootRouteImport
-    }
   }
 }
 
@@ -291,7 +271,6 @@ const rootRouteChildren: RootRouteChildren = {
   VideosRoute: VideosRoute,
   CalculadorasSlugRoute: CalculadorasSlugRoute,
   CalculadorasIndexRoute: CalculadorasIndexRoute,
-  ApiPublicSeedAdminRoute: ApiPublicSeedAdminRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
