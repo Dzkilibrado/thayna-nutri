@@ -30,16 +30,19 @@ export type ContentBlock = {
   icon: string | null;
   sort_order: number;
   published: boolean;
+  featured: boolean;
 };
 
 export const SETTINGS_COLUMNS =
   "brand_name, brand_tagline, headline, bio, avatar_url, whatsapp, whatsapp_message, email, address, maps_url, hours, instagram_url, youtube_url, intro_video_url, color_background, color_surface, color_accent, color_foreground";
 
 export const BLOCK_COLUMNS =
-  "id, page, kind, title, subtitle, body, url, icon, sort_order, published";
+  "id, page, kind, title, subtitle, body, url, icon, sort_order, published, featured";
 
 export const PAGES = [
   { value: "home", label: "Início (links)" },
+  { value: "links", label: "Links" },
+  { value: "videos", label: "Vídeos" },
   { value: "sobre", label: "Sobre mim" },
   { value: "presencial", label: "Consulta presencial" },
   { value: "online", label: "Consulta online" },
