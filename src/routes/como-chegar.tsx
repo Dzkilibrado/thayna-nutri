@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { MapPin, Clock, Phone } from "lucide-react";
+import { MapPin, Clock, Phone, Navigation as NavIcon, Car, MessageCircle } from "lucide-react";
 
 import { BackButton } from "@/components/site/back-button";
 import { PageShell } from "@/components/site/page-shell";
