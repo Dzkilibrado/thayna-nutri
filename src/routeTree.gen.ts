@@ -10,12 +10,18 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as OnlineRouteImport } from './routes/online'
 import { Route as PresencialRouteImport } from './routes/presencial'
 import { Route as SobreRouteImport } from './routes/sobre'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const OnlineRoute = OnlineRouteImport.update({
+  id: '/online',
+  path: '/online',
   getParentRoute: () => rootRouteImport,
 } as any)
 const PresencialRoute = PresencialRouteImport.update({
@@ -31,30 +37,34 @@ const SobreRoute = SobreRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/online': typeof OnlineRoute
   '/presencial': typeof PresencialRoute
   '/sobre': typeof SobreRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/online': typeof OnlineRoute
   '/presencial': typeof PresencialRoute
   '/sobre': typeof SobreRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/online': typeof OnlineRoute
   '/presencial': typeof PresencialRoute
   '/sobre': typeof SobreRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/presencial' | '/sobre'
+  fullPaths: '/' | '/online' | '/presencial' | '/sobre'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/presencial' | '/sobre'
-  id: '__root__' | '/' | '/presencial' | '/sobre'
+  to: '/' | '/online' | '/presencial' | '/sobre'
+  id: '__root__' | '/' | '/online' | '/presencial' | '/sobre'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  OnlineRoute: typeof OnlineRoute
   PresencialRoute: typeof PresencialRoute
   SobreRoute: typeof SobreRoute
 }
@@ -66,6 +76,13 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/online': {
+      id: '/online'
+      path: '/online'
+      fullPath: '/online'
+      preLoaderRoute: typeof OnlineRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/presencial': {
@@ -87,6 +104,7 @@ declare module '@tanstack/react-router' {
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  OnlineRoute: OnlineRoute,
   PresencialRoute: PresencialRoute,
   SobreRoute: SobreRoute,
 }
