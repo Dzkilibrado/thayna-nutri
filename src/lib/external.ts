@@ -14,15 +14,6 @@ export function openExternal(url: string) {
     return;
   }
 
-  try {
-    if (window.top) {
-      window.top.location.href = url;
-      return;
-    }
-  } catch {
-    /* cross-origin top: fall through */
-  }
-  window.location.href = url;
 }
 
 export function externalLinkProps(url: string) {
@@ -30,8 +21,9 @@ export function externalLinkProps(url: string) {
     href: url,
     target: "_blank" as const,
     rel: "noreferrer noopener",
-    onClick: (event: { preventDefault: () => void }) => {
+    onClick: (event: { preventDefault: () => void; stopPropagation: () => void }) => {
       event.preventDefault();
+      event.stopPropagation();
       openExternal(url);
     },
   };
