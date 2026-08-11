@@ -17,16 +17,6 @@ export function openExternal(url: string) {
 }
 
 export function externalLinkProps(url: string) {
-  const isWhatsApp = /^https:\/\/(?:wa\.me|api\.whatsapp\.com|web\.whatsapp\.com)\//i.test(url);
-
-  if (isWhatsApp) {
-    return {
-      href: url,
-      target: "_top" as const,
-      rel: "noreferrer noopener",
-    };
-  }
-
   return {
     href: url,
     target: "_blank" as const,
