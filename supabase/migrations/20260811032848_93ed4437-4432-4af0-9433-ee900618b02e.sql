@@ -1,0 +1,1 @@
+ALTER TABLE public.content_blocks ADD COLUMN IF NOT EXISTS featured boolean NOT NULL DEFAULT false;
