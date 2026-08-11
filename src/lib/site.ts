@@ -30,16 +30,19 @@ export type ContentBlock = {
   icon: string | null;
   sort_order: number;
   published: boolean;
+  featured: boolean;
 };
 
 export const SETTINGS_COLUMNS =
   "brand_name, brand_tagline, headline, bio, avatar_url, whatsapp, whatsapp_message, email, address, maps_url, hours, instagram_url, youtube_url, intro_video_url, color_background, color_surface, color_accent, color_foreground";
 
 export const BLOCK_COLUMNS =
-  "id, page, kind, title, subtitle, body, url, icon, sort_order, published";
+  "id, page, kind, title, subtitle, body, url, icon, sort_order, published, featured";
 
 export const PAGES = [
   { value: "home", label: "Início (links)" },
+  { value: "links", label: "Links" },
+  { value: "videos", label: "Vídeos" },
   { value: "sobre", label: "Sobre mim" },
   { value: "presencial", label: "Consulta presencial" },
   { value: "online", label: "Consulta online" },
@@ -71,6 +74,13 @@ export function toEmbedUrl(raw: string | null | undefined): {
 
   const ig = url.match(/instagram\.com\/(?:p|reel|tv)\/([\w-]+)/);
   if (ig) return { type: "iframe", src: `https://www.instagram.com/reel/${ig[1]}/embed` };
+
+  if (/facebook\.com|fb\.watch/i.test(url)) {
+    return {
+      type: "iframe",
+      src: `https://www.facebook.com/plugins/video.php?height=476&show_text=false&href=${encodeURIComponent(url)}`,
+    };
+  }
 
   if (/\.(mp4|webm|ogg|mov)(\?|$)/i.test(url)) return { type: "video", src: url };
 

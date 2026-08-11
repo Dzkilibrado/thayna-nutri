@@ -32,7 +32,9 @@ function Home() {
     blocks: ContentBlock[];
   };
   const links = blocks.filter((b) => b.page === "home" && b.kind === "link");
-  const videos = blocks.filter((b) => b.page === "home" && b.kind === "video");
+  const videos = blocks.filter(
+    (b) => b.kind === "video" && (b.page === "home" || b.featured),
+  );
 
   return (
     <PageShell settings={settings}>

@@ -18,6 +18,7 @@ export type Database = {
         Row: {
           body: string | null
           created_at: string
+          featured: boolean
           icon: string | null
           id: string
           kind: string
@@ -32,6 +33,7 @@ export type Database = {
         Insert: {
           body?: string | null
           created_at?: string
+          featured?: boolean
           icon?: string | null
           id?: string
           kind?: string
@@ -46,6 +48,7 @@ export type Database = {
         Update: {
           body?: string | null
           created_at?: string
+          featured?: boolean
           icon?: string | null
           id?: string
           kind?: string

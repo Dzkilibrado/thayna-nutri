@@ -12,10 +12,14 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as AuthRouteImport } from './routes/auth'
+import { Route as LinksRouteImport } from './routes/links'
 import { Route as OnlineRouteImport } from './routes/online'
 import { Route as PresencialRouteImport } from './routes/presencial'
 import { Route as SobreRouteImport } from './routes/sobre'
+import { Route as VideosRouteImport } from './routes/videos'
 import { Route as AuthenticatedAdminRouteImport } from './routes/_authenticated/admin'
+import { Route as CalculadorasIndexRouteImport } from './routes/calculadoras/index'
+import { Route as CalculadorasSlugRouteImport } from './routes/calculadoras/$slug'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -29,6 +33,11 @@ const AuthenticatedRouteRoute = AuthenticatedRouteRouteImport.update({
 const AuthRoute = AuthRouteImport.update({
   id: '/auth',
   path: '/auth',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LinksRoute = LinksRouteImport.update({
+  id: '/links',
+  path: '/links',
   getParentRoute: () => rootRouteImport,
 } as any)
 const OnlineRoute = OnlineRouteImport.update({
@@ -46,61 +55,116 @@ const SobreRoute = SobreRouteImport.update({
   path: '/sobre',
   getParentRoute: () => rootRouteImport,
 } as any)
+const VideosRoute = VideosRouteImport.update({
+  id: '/videos',
+  path: '/videos',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AuthenticatedAdminRoute = AuthenticatedAdminRouteImport.update({
   id: '/admin',
   path: '/admin',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const CalculadorasIndexRoute = CalculadorasIndexRouteImport.update({
+  id: '/calculadoras/',
+  path: '/calculadoras/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CalculadorasSlugRoute = CalculadorasSlugRouteImport.update({
+  id: '/calculadoras/$slug',
+  path: '/calculadoras/$slug',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
+  '/links': typeof LinksRoute
   '/online': typeof OnlineRoute
   '/presencial': typeof PresencialRoute
   '/sobre': typeof SobreRoute
+  '/videos': typeof VideosRoute
   '/admin': typeof AuthenticatedAdminRoute
+  '/calculadoras/$slug': typeof CalculadorasSlugRoute
+  '/calculadoras/': typeof CalculadorasIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
+  '/links': typeof LinksRoute
   '/online': typeof OnlineRoute
   '/presencial': typeof PresencialRoute
   '/sobre': typeof SobreRoute
+  '/videos': typeof VideosRoute
   '/admin': typeof AuthenticatedAdminRoute
+  '/calculadoras/$slug': typeof CalculadorasSlugRoute
+  '/calculadoras': typeof CalculadorasIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
   '/auth': typeof AuthRoute
+  '/links': typeof LinksRoute
   '/online': typeof OnlineRoute
   '/presencial': typeof PresencialRoute
   '/sobre': typeof SobreRoute
+  '/videos': typeof VideosRoute
   '/_authenticated/admin': typeof AuthenticatedAdminRoute
+  '/calculadoras/$slug': typeof CalculadorasSlugRoute
+  '/calculadoras/': typeof CalculadorasIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/auth' | '/online' | '/presencial' | '/sobre' | '/admin'
+  fullPaths:
+    | '/'
+    | '/auth'
+    | '/links'
+    | '/online'
+    | '/presencial'
+    | '/sobre'
+    | '/videos'
+    | '/admin'
+    | '/calculadoras/$slug'
+    | '/calculadoras/'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/auth' | '/online' | '/presencial' | '/sobre' | '/admin'
+  to:
+    | '/'
+    | '/auth'
+    | '/links'
+    | '/online'
+    | '/presencial'
+    | '/sobre'
+    | '/videos'
+    | '/admin'
+    | '/calculadoras/$slug'
+    | '/calculadoras'
   id:
     | '__root__'
     | '/'
     | '/_authenticated'
     | '/auth'
+    | '/links'
     | '/online'
     | '/presencial'
     | '/sobre'
+    | '/videos'
     | '/_authenticated/admin'
+    | '/calculadoras/$slug'
+    | '/calculadoras/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AuthenticatedRouteRoute: typeof AuthenticatedRouteRouteWithChildren
   AuthRoute: typeof AuthRoute
+  LinksRoute: typeof LinksRoute
   OnlineRoute: typeof OnlineRoute
   PresencialRoute: typeof PresencialRoute
   SobreRoute: typeof SobreRoute
+  VideosRoute: typeof VideosRoute
+  CalculadorasSlugRoute: typeof CalculadorasSlugRoute
+  CalculadorasIndexRoute: typeof CalculadorasIndexRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -126,6 +190,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/links': {
+      id: '/links'
+      path: '/links'
+      fullPath: '/links'
+      preLoaderRoute: typeof LinksRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/online': {
       id: '/online'
       path: '/online'
@@ -147,12 +218,33 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof SobreRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/videos': {
+      id: '/videos'
+      path: '/videos'
+      fullPath: '/videos'
+      preLoaderRoute: typeof VideosRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/_authenticated/admin': {
       id: '/_authenticated/admin'
       path: '/admin'
       fullPath: '/admin'
       preLoaderRoute: typeof AuthenticatedAdminRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/calculadoras/': {
+      id: '/calculadoras/'
+      path: '/calculadoras'
+      fullPath: '/calculadoras/'
+      preLoaderRoute: typeof CalculadorasIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/calculadoras/$slug': {
+      id: '/calculadoras/$slug'
+      path: '/calculadoras/$slug'
+      fullPath: '/calculadoras/$slug'
+      preLoaderRoute: typeof CalculadorasSlugRouteImport
+      parentRoute: typeof rootRouteImport
     }
   }
 }
@@ -172,9 +264,13 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
   AuthRoute: AuthRoute,
+  LinksRoute: LinksRoute,
   OnlineRoute: OnlineRoute,
   PresencialRoute: PresencialRoute,
   SobreRoute: SobreRoute,
+  VideosRoute: VideosRoute,
+  CalculadorasSlugRoute: CalculadorasSlugRoute,
+  CalculadorasIndexRoute: CalculadorasIndexRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
