@@ -1,5 +1,6 @@
 import type { ReactNode } from "react";
 
+import { BackButton } from "@/components/site/back-button";
 import { PageShell } from "@/components/site/page-shell";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -19,6 +20,9 @@ export function CalcShell({
 }) {
   return (
     <PageShell settings={settings}>
+      <div className="flex items-center justify-between">
+        <BackButton to="/calculadoras" label="Calculadoras" />
+      </div>
       <header className="text-center">
         <h1 className="text-3xl">{title}</h1>
         <p className="mx-auto mt-2 max-w-md text-sm text-muted-foreground">{subtitle}</p>
