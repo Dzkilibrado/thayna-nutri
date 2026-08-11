@@ -18,7 +18,9 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { ImageUploadField } from "@/components/admin/image-upload";
 import {
+
   BLOCK_COLUMNS,
   KINDS,
   PAGES,
