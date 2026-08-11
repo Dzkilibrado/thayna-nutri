@@ -56,7 +56,7 @@ export const KINDS = [
 
 export function whatsappLink(phone: string, message: string) {
   const digits = (phone || "").replace(/\D/g, "");
-  return `https://web.whatsapp.com/send?phone=${digits}&text=${encodeURIComponent(message || "")}`;
+  return `https://wa.me/${digits}?text=${encodeURIComponent(message || "")}`;
 }
 
 /** Converts a YouTube / Instagram / direct URL into an embeddable src. */
