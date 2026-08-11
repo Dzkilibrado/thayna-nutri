@@ -87,19 +87,29 @@ function ComoChegarPage() {
         <div className="grid gap-3 sm:grid-cols-2">
           <a
             {...externalLinkProps(mapsUrl)}
-            className="accent-glow block rounded-2xl bg-primary px-5 py-4 text-center font-display text-lg uppercase tracking-wide text-primary-foreground transition-opacity hover:opacity-90"
+            className="flex items-center justify-center gap-3 rounded-2xl border border-border bg-surface px-5 py-4 text-center font-display text-lg uppercase tracking-wide transition-colors hover:border-primary/60"
           >
-            Abrir no Google Maps
+            <Navigation className="size-5 text-primary" />
+            Google Maps
           </a>
           <a
-            {...externalLinkProps(
-              whatsappLink(settings?.whatsapp ?? "", settings?.whatsapp_message ?? ""),
-            )}
-            className="block rounded-2xl border border-border bg-surface px-5 py-4 text-center font-display text-lg uppercase tracking-wide transition-colors hover:border-primary/60"
+            {...externalLinkProps(WAZE_URL)}
+            className="flex items-center justify-center gap-3 rounded-2xl border border-border bg-surface px-5 py-4 text-center font-display text-lg uppercase tracking-wide transition-colors hover:border-primary/60"
           >
-            Agendar consulta
+            <Car className="size-5 text-primary" />
+            Waze
           </a>
         </div>
+
+        <a
+          {...externalLinkProps(
+            whatsappLink(settings?.whatsapp ?? "", settings?.whatsapp_message ?? ""),
+          )}
+          className="accent-glow flex items-center justify-center gap-3 rounded-2xl bg-primary px-5 py-4 text-center font-display text-lg uppercase tracking-wide text-primary-foreground transition-opacity hover:opacity-90"
+        >
+          <MessageCircle className="size-5" />
+          Agendar consulta no WhatsApp
+        </a>
       </div>
     </PageShell>
   );
