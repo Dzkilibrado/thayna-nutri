@@ -13,6 +13,7 @@ import {
 
 import type { ContentBlock, SiteSettings } from "@/lib/site";
 import { whatsappLink } from "@/lib/site";
+import { externalLinkProps } from "@/lib/external";
 
 const ICONS: Record<string, typeof LinkIcon> = {
   "message-circle": MessageCircle,

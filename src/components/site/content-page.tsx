@@ -4,6 +4,7 @@ import { LinkBlock } from "@/components/site/link-block";
 import { PageShell } from "@/components/site/page-shell";
 import { VideoEmbed } from "@/components/site/video-embed";
 import { whatsappLink } from "@/lib/site";
+import { externalLinkProps } from "@/lib/external";
 
 export function ContentPage({
   settings,

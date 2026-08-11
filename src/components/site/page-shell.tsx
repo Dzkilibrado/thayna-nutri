@@ -5,6 +5,7 @@ import { HomeButton } from "@/components/site/back-button";
 import { ThemeVars } from "@/components/site/theme-vars";
 import type { SiteSettings } from "@/lib/site";
 import { whatsappLink } from "@/lib/site";
+import { externalLinkProps } from "@/lib/external";
 
 export function PageShell({
   settings,
