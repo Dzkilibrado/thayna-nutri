@@ -16,6 +16,7 @@ import { Route as OnlineRouteImport } from './routes/online'
 import { Route as PresencialRouteImport } from './routes/presencial'
 import { Route as SobreRouteImport } from './routes/sobre'
 import { Route as AuthenticatedAdminRouteImport } from './routes/_authenticated/admin'
+import { Route as CalculadorasIndexRouteImport } from './routes/calculadoras/index'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -51,6 +52,11 @@ const AuthenticatedAdminRoute = AuthenticatedAdminRouteImport.update({
   path: '/admin',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const CalculadorasIndexRoute = CalculadorasIndexRouteImport.update({
+  id: '/calculadoras/',
+  path: '/calculadoras/',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -59,6 +65,7 @@ export interface FileRoutesByFullPath {
   '/presencial': typeof PresencialRoute
   '/sobre': typeof SobreRoute
   '/admin': typeof AuthenticatedAdminRoute
+  '/calculadoras/': typeof CalculadorasIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -67,6 +74,7 @@ export interface FileRoutesByTo {
   '/presencial': typeof PresencialRoute
   '/sobre': typeof SobreRoute
   '/admin': typeof AuthenticatedAdminRoute
+  '/calculadoras': typeof CalculadorasIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -77,12 +85,27 @@ export interface FileRoutesById {
   '/presencial': typeof PresencialRoute
   '/sobre': typeof SobreRoute
   '/_authenticated/admin': typeof AuthenticatedAdminRoute
+  '/calculadoras/': typeof CalculadorasIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/auth' | '/online' | '/presencial' | '/sobre' | '/admin'
+  fullPaths:
+    | '/'
+    | '/auth'
+    | '/online'
+    | '/presencial'
+    | '/sobre'
+    | '/admin'
+    | '/calculadoras/'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/auth' | '/online' | '/presencial' | '/sobre' | '/admin'
+  to:
+    | '/'
+    | '/auth'
+    | '/online'
+    | '/presencial'
+    | '/sobre'
+    | '/admin'
+    | '/calculadoras'
   id:
     | '__root__'
     | '/'
@@ -92,6 +115,7 @@ export interface FileRouteTypes {
     | '/presencial'
     | '/sobre'
     | '/_authenticated/admin'
+    | '/calculadoras/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -101,6 +125,7 @@ export interface RootRouteChildren {
   OnlineRoute: typeof OnlineRoute
   PresencialRoute: typeof PresencialRoute
   SobreRoute: typeof SobreRoute
+  CalculadorasIndexRoute: typeof CalculadorasIndexRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -154,6 +179,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAdminRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/calculadoras/': {
+      id: '/calculadoras/'
+      path: '/calculadoras'
+      fullPath: '/calculadoras/'
+      preLoaderRoute: typeof CalculadorasIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -175,6 +207,7 @@ const rootRouteChildren: RootRouteChildren = {
   OnlineRoute: OnlineRoute,
   PresencialRoute: PresencialRoute,
   SobreRoute: SobreRoute,
+  CalculadorasIndexRoute: CalculadorasIndexRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
