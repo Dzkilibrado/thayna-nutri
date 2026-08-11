@@ -525,6 +525,18 @@ function BlockCard({
           </span>
         </div>
         <div className="flex items-center gap-3">
+          {form.kind === "video" ? (
+            <div className="flex items-center gap-2">
+              <Switch
+                checked={form.featured}
+                onCheckedChange={(v) => set("featured", v)}
+                id={`feat-${block.id}`}
+              />
+              <Label htmlFor={`feat-${block.id}`} className="text-xs">
+                Na página inicial
+              </Label>
+            </div>
+          ) : null}
           <div className="flex items-center gap-2">
             <Switch
               checked={form.published}
@@ -535,6 +547,7 @@ function BlockCard({
               Publicado
             </Label>
           </div>
+
           <Button
             variant="ghost"
             size="icon"
