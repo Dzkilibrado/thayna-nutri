@@ -1,10 +1,10 @@
 import { createFileRoute } from "@tanstack/react-router";
 
 import { ContentPage } from "@/components/site/content-page";
-import { getSiteData } from "@/lib/site.functions";
+import { loadSiteData } from "@/lib/site-data";
 
 export const Route = createFileRoute("/sobre")({
-  loader: () => getSiteData(),
+  loader: () => loadSiteData(),
   head: () => ({
     meta: [
       { title: "Sobre mim | Thaynan Nutricionista Esportivo" },

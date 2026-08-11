@@ -3,11 +3,11 @@ import { createFileRoute } from "@tanstack/react-router";
 import { LinkBlock } from "@/components/site/link-block";
 import { PageShell } from "@/components/site/page-shell";
 import { VideoEmbed } from "@/components/site/video-embed";
-import { getSiteData } from "@/lib/site.functions";
+import { loadSiteData } from "@/lib/site-data";
 import type { ContentBlock, SiteSettings } from "@/lib/site";
 
 export const Route = createFileRoute("/")({
-  loader: () => getSiteData(),
+  loader: () => loadSiteData(),
   head: () => ({
     meta: [
       { title: "Thaynan Nutricionista Esportivo | Serra/ES" },
