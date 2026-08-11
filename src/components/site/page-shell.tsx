@@ -42,9 +42,9 @@ export function PageShell({
               </Link>
             ))}
             <a
-              href={whatsappLink(settings?.whatsapp ?? "", settings?.whatsapp_message ?? "")}
-              target="_blank"
-              rel="noreferrer noopener"
+              {...externalLinkProps(
+                whatsappLink(settings?.whatsapp ?? "", settings?.whatsapp_message ?? ""),
+              )}
               className="rounded-full bg-primary px-4 py-1.5 font-medium text-primary-foreground transition-opacity hover:opacity-90"
             >
               Agendar

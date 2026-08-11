@@ -70,7 +70,7 @@ export function LinkBlock({
   }
 
   return (
-    <a href={href} target="_blank" rel="noreferrer noopener" className={className}>
+    <a {...externalLinkProps(href)} className={className}>
       {content}
     </a>
   );
