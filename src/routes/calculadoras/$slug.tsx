@@ -9,7 +9,7 @@ import { Tmb } from "@/components/calculators/tmb";
 import { Whey } from "@/components/calculators/whey";
 import { CalcShell } from "@/components/site/calc-ui";
 import { CALCULATORS } from "@/lib/calculators";
-import { getSiteData } from "@/lib/site.functions";
+import { loadSiteData } from "@/lib/site-data";
 import type { ContentBlock, SiteSettings } from "@/lib/site";
 
 const COMPONENTS: Record<string, () => React.ReactElement> = {
@@ -26,7 +26,7 @@ export const Route = createFileRoute("/calculadoras/$slug")({
   loader: async ({ params }) => {
     const meta = CALCULATORS.find((c) => c.slug === params.slug);
     if (!meta) throw notFound();
-    const data = await getSiteData();
+    const data = await loadSiteData();
     return { ...data, meta };
   },
   head: ({ loaderData }) => {

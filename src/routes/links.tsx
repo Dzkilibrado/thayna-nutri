@@ -3,11 +3,11 @@ import { createFileRoute } from "@tanstack/react-router";
 import { BackButton } from "@/components/site/back-button";
 import { LinkBlock } from "@/components/site/link-block";
 import { PageShell } from "@/components/site/page-shell";
-import { getSiteData } from "@/lib/site.functions";
+import { loadSiteData } from "@/lib/site-data";
 import type { ContentBlock, SiteSettings } from "@/lib/site";
 
 export const Route = createFileRoute("/links")({
-  loader: () => getSiteData(),
+  loader: () => loadSiteData(),
   head: () => ({
     meta: [
       { title: "Links | Thaynan Pablo Nutrição & Performance" },

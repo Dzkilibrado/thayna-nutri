@@ -1,10 +1,10 @@
 import { createFileRoute } from "@tanstack/react-router";
 
 import { ContentPage } from "@/components/site/content-page";
-import { getSiteData } from "@/lib/site.functions";
+import { loadSiteData } from "@/lib/site-data";
 
 export const Route = createFileRoute("/presencial")({
-  loader: () => getSiteData(),
+  loader: () => loadSiteData(),
   head: () => ({
     meta: [
       { title: "Consulta presencial em Serra/ES | Clínica Overall" },

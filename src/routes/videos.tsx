@@ -3,11 +3,11 @@ import { createFileRoute } from "@tanstack/react-router";
 import { BackButton } from "@/components/site/back-button";
 import { PageShell } from "@/components/site/page-shell";
 import { VideoEmbed } from "@/components/site/video-embed";
-import { getSiteData } from "@/lib/site.functions";
+import { loadSiteData } from "@/lib/site-data";
 import type { ContentBlock, SiteSettings } from "@/lib/site";
 
 export const Route = createFileRoute("/videos")({
-  loader: () => getSiteData(),
+  loader: () => loadSiteData(),
   head: () => ({
     meta: [
       { title: "Vídeos | Thaynan Pablo Nutrição & Performance" },
