@@ -7,6 +7,13 @@
  */
 export function openExternal(url: string) {
   if (typeof window === "undefined" || !url) return;
+
+  const opened = window.open(url, "_blank", "noopener,noreferrer");
+  if (opened) {
+    opened.opener = null;
+    return;
+  }
+
   try {
     if (window.top) {
       window.top.location.href = url;
@@ -23,5 +30,9 @@ export function externalLinkProps(url: string) {
     href: url,
     target: "_blank" as const,
     rel: "noreferrer noopener",
+    onClick: (event: { preventDefault: () => void }) => {
+      event.preventDefault();
+      openExternal(url);
+    },
   };
 }
