@@ -1,17 +1,14 @@
 /**
  * Opens an external URL safely.
  *
- * Inside embedded previews (iframes) a plain `target="_blank"` can be turned
- * into an in-frame navigation, and WhatsApp refuses to be framed
- * (ERR_BLOCKED_BY_RESPONSE). Opening a real new tab — with a top-level
- * navigation fallback — avoids that.
+ * External services such as WhatsApp refuse to load inside an iframe. Using
+ * the browser-native `_top` target keeps the navigation tied to the user's
+ * click and guarantees the service opens outside the embedded preview.
  */
 export function openExternal(url: string) {
   if (typeof window === "undefined" || !url) return;
-  const win = window.open(url, "_blank", "noopener,noreferrer");
-  if (win) return;
   try {
-    if (window.top && window.top !== window.self) {
+    if (window.top) {
       window.top.location.href = url;
       return;
     }
@@ -24,12 +21,7 @@ export function openExternal(url: string) {
 export function externalLinkProps(url: string) {
   return {
     href: url,
-    target: "_blank" as const,
+    target: "_top" as const,
     rel: "noreferrer noopener",
-    onClick: (event: React.MouseEvent<HTMLAnchorElement>) => {
-      if (event.defaultPrevented || event.metaKey || event.ctrlKey || event.button !== 0) return;
-      event.preventDefault();
-      openExternal(url);
-    },
   };
 }
