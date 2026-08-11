@@ -3,7 +3,8 @@ import { createClient } from "@supabase/supabase-js";
 
 import { BLOCK_COLUMNS, SETTINGS_COLUMNS, type ContentBlock, type SiteSettings } from "./site";
 
-export const getSiteData = createServerFn({ method: "GET" }).handler(async () => {
+export const getSiteData = createServerFn({ method: "GET" }).handler(
+  async (): Promise<{ settings: SiteSettings | null; blocks: ContentBlock[] }> => {
   const url = process.env["SUPABASE_URL"]!;
   const key = process.env["SUPABASE_PUBLISHABLE_KEY"]!;
 
