@@ -12,6 +12,7 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as AuthRouteImport } from './routes/auth'
+import { Route as ComoChegarRouteImport } from './routes/como-chegar'
 import { Route as LinksRouteImport } from './routes/links'
 import { Route as OnlineRouteImport } from './routes/online'
 import { Route as PresencialRouteImport } from './routes/presencial'
@@ -33,6 +34,11 @@ const AuthenticatedRouteRoute = AuthenticatedRouteRouteImport.update({
 const AuthRoute = AuthRouteImport.update({
   id: '/auth',
   path: '/auth',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ComoChegarRoute = ComoChegarRouteImport.update({
+  id: '/como-chegar',
+  path: '/como-chegar',
   getParentRoute: () => rootRouteImport,
 } as any)
 const LinksRoute = LinksRouteImport.update({
@@ -79,6 +85,7 @@ const CalculadorasSlugRoute = CalculadorasSlugRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
+  '/como-chegar': typeof ComoChegarRoute
   '/links': typeof LinksRoute
   '/online': typeof OnlineRoute
   '/presencial': typeof PresencialRoute
@@ -91,6 +98,7 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
+  '/como-chegar': typeof ComoChegarRoute
   '/links': typeof LinksRoute
   '/online': typeof OnlineRoute
   '/presencial': typeof PresencialRoute
@@ -105,6 +113,7 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
   '/auth': typeof AuthRoute
+  '/como-chegar': typeof ComoChegarRoute
   '/links': typeof LinksRoute
   '/online': typeof OnlineRoute
   '/presencial': typeof PresencialRoute
@@ -119,6 +128,7 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/auth'
+    | '/como-chegar'
     | '/links'
     | '/online'
     | '/presencial'
@@ -131,6 +141,7 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/auth'
+    | '/como-chegar'
     | '/links'
     | '/online'
     | '/presencial'
@@ -144,6 +155,7 @@ export interface FileRouteTypes {
     | '/'
     | '/_authenticated'
     | '/auth'
+    | '/como-chegar'
     | '/links'
     | '/online'
     | '/presencial'
@@ -158,6 +170,7 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AuthenticatedRouteRoute: typeof AuthenticatedRouteRouteWithChildren
   AuthRoute: typeof AuthRoute
+  ComoChegarRoute: typeof ComoChegarRoute
   LinksRoute: typeof LinksRoute
   OnlineRoute: typeof OnlineRoute
   PresencialRoute: typeof PresencialRoute
@@ -188,6 +201,13 @@ declare module '@tanstack/react-router' {
       path: '/auth'
       fullPath: '/auth'
       preLoaderRoute: typeof AuthRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/como-chegar': {
+      id: '/como-chegar'
+      path: '/como-chegar'
+      fullPath: '/como-chegar'
+      preLoaderRoute: typeof ComoChegarRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/links': {
@@ -264,6 +284,7 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
   AuthRoute: AuthRoute,
+  ComoChegarRoute: ComoChegarRoute,
   LinksRoute: LinksRoute,
   OnlineRoute: OnlineRoute,
   PresencialRoute: PresencialRoute,

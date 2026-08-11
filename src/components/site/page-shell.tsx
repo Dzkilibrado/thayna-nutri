@@ -30,6 +30,7 @@ export function PageShell({
               { to: "/links", label: "Links" },
               { to: "/videos", label: "Vídeos" },
               { to: "/calculadoras", label: "Calculadoras" },
+              { to: "/como-chegar", label: "Como chegar" },
               { to: "/sobre", label: "Sobre" },
             ].map((item) => (
               <Link
