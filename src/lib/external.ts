@@ -8,7 +8,7 @@
 export function openExternal(url: string) {
   if (typeof window === "undefined" || !url) return;
 
-  const opened = window.open(url, "_blank", "noopener,noreferrer");
+  const opened = window.open(url, "_blank");
   if (opened) {
     opened.opener = null;
     return;
