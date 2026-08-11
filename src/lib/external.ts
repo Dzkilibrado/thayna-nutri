@@ -21,7 +21,7 @@ export function openExternal(url: string) {
 export function externalLinkProps(url: string) {
   return {
     href: url,
-    target: "_top" as const,
+    target: "_blank" as const,
     rel: "noreferrer noopener",
   };
 }

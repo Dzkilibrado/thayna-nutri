@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { MapPin, Clock, Phone } from "lucide-react";
+import { MapPin, Clock, Phone, Navigation as NavIcon, Car, MessageCircle } from "lucide-react";
 
 import { BackButton } from "@/components/site/back-button";
 import { PageShell } from "@/components/site/page-shell";
@@ -9,6 +9,8 @@ import { whatsappLink } from "@/lib/site";
 
 const DEFAULT_MAPS_URL =
   "https://www.google.com/maps/place/Cl%C3%ADnica+Overall/@-20.1954098,-40.2573663,17z/data=!4m10!1m2!2m1!1sCentro+Empresarial+da+Serra+Cl%C3%ADnica+Overall!3m6!1s0xb81f005d842e3b:0x70d701d9d07f7bf1!8m2!3d-20.1951652!4d-40.2543406!16s%2Fg%2F11wy7jjxcl";
+
+const WAZE_URL = "https://waze.com/ul?ll=-20.1951652,-40.2543406&navigate=yes";
 
 const DEFAULT_ADDRESS =
   "Clínica Overall — Centro Empresarial da Serra, sala 718. Parque Residencial Laranjeiras, Serra/ES, CEP 29.165-612. Ponto de referência: em frente ao Shopping Laranjeiras.";
@@ -87,19 +89,29 @@ function ComoChegarPage() {
         <div className="grid gap-3 sm:grid-cols-2">
           <a
             {...externalLinkProps(mapsUrl)}
-            className="accent-glow block rounded-2xl bg-primary px-5 py-4 text-center font-display text-lg uppercase tracking-wide text-primary-foreground transition-opacity hover:opacity-90"
+            className="flex items-center justify-center gap-3 rounded-2xl border border-border bg-surface px-5 py-4 text-center font-display text-lg uppercase tracking-wide transition-colors hover:border-primary/60"
           >
-            Abrir no Google Maps
+            <NavIcon className="size-5 text-primary" />
+            Google Maps
           </a>
           <a
-            {...externalLinkProps(
-              whatsappLink(settings?.whatsapp ?? "", settings?.whatsapp_message ?? ""),
-            )}
-            className="block rounded-2xl border border-border bg-surface px-5 py-4 text-center font-display text-lg uppercase tracking-wide transition-colors hover:border-primary/60"
+            {...externalLinkProps(WAZE_URL)}
+            className="flex items-center justify-center gap-3 rounded-2xl border border-border bg-surface px-5 py-4 text-center font-display text-lg uppercase tracking-wide transition-colors hover:border-primary/60"
           >
-            Agendar consulta
+            <Car className="size-5 text-primary" />
+            Waze
           </a>
         </div>
+
+        <a
+          {...externalLinkProps(
+            whatsappLink(settings?.whatsapp ?? "", settings?.whatsapp_message ?? ""),
+          )}
+          className="accent-glow flex items-center justify-center gap-3 rounded-2xl bg-primary px-5 py-4 text-center font-display text-lg uppercase tracking-wide text-primary-foreground transition-opacity hover:opacity-90"
+        >
+          <MessageCircle className="size-5" />
+          Agendar consulta no WhatsApp
+        </a>
       </div>
     </PageShell>
   );
