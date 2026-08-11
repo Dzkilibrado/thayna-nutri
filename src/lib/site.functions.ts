@@ -31,8 +31,10 @@ export const getSiteData = createServerFn({ method: "GET" }).handler(
       .order("sort_order", { ascending: true }),
   ]);
 
-  return {
-    settings: (settingsRes.data ?? null) as SiteSettings | null,
-    blocks: (blocksRes.data ?? []) as ContentBlock[],
-  };
-});
+    return {
+      settings: (settingsRes.data ?? null) as SiteSettings | null,
+      blocks: (blocksRes.data ?? []) as ContentBlock[],
+    };
+  },
+);
+
