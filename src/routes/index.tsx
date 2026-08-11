@@ -4,6 +4,7 @@ import { LinkBlock } from "@/components/site/link-block";
 import { PageShell } from "@/components/site/page-shell";
 import { VideoEmbed } from "@/components/site/video-embed";
 import { getSiteData } from "@/lib/site.functions";
+import type { ContentBlock, SiteSettings } from "@/lib/site";
 
 export const Route = createFileRoute("/")({
   loader: () => getSiteData(),
@@ -26,7 +27,10 @@ export const Route = createFileRoute("/")({
 });
 
 function Home() {
-  const { settings, blocks } = Route.useLoaderData();
+  const { settings, blocks } = Route.useLoaderData() as {
+    settings: SiteSettings | null;
+    blocks: ContentBlock[];
+  };
   const links = blocks.filter((b) => b.page === "home" && b.kind === "link");
   const videos = blocks.filter((b) => b.page === "home" && b.kind === "video");
 
