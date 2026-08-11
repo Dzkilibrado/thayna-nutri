@@ -13,6 +13,7 @@ import {
 
 import type { ContentBlock, SiteSettings } from "@/lib/site";
 import { whatsappLink } from "@/lib/site";
+import { externalLinkProps } from "@/lib/external";
 
 const ICONS: Record<string, typeof LinkIcon> = {
   "message-circle": MessageCircle,
@@ -69,7 +70,7 @@ export function LinkBlock({
   }
 
   return (
-    <a href={href} target="_blank" rel="noreferrer noopener" className={className}>
+    <a {...externalLinkProps(href)} className={className}>
       {content}
     </a>
   );

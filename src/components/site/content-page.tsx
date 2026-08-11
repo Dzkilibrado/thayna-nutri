@@ -4,6 +4,7 @@ import { LinkBlock } from "@/components/site/link-block";
 import { PageShell } from "@/components/site/page-shell";
 import { VideoEmbed } from "@/components/site/video-embed";
 import { whatsappLink } from "@/lib/site";
+import { externalLinkProps } from "@/lib/external";
 
 export function ContentPage({
   settings,
@@ -59,9 +60,9 @@ export function ContentPage({
         ))}
 
         <a
-          href={whatsappLink(settings?.whatsapp ?? "", settings?.whatsapp_message ?? "")}
-          target="_blank"
-          rel="noreferrer noopener"
+          {...externalLinkProps(
+            whatsappLink(settings?.whatsapp ?? "", settings?.whatsapp_message ?? ""),
+          )}
           className="accent-glow block rounded-2xl bg-primary px-5 py-4 text-center font-display text-lg uppercase tracking-wide text-primary-foreground transition-opacity hover:opacity-90"
         >
           Agendar consulta no WhatsApp

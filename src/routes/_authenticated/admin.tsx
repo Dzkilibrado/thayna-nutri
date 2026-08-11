@@ -18,7 +18,9 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { ImageUploadField } from "@/components/admin/image-upload";
 import {
+
   BLOCK_COLUMNS,
   KINDS,
   PAGES,
@@ -249,12 +251,14 @@ function SettingsForm({
           <Field label="Bio da página inicial">
             <Textarea rows={3} value={form.bio} onChange={(e) => set("bio", e.target.value)} />
           </Field>
-          <Field label="Foto de perfil (URL)">
-            <Input
+          <Field label="Foto de perfil" hint="Envie um arquivo do seu computador ou cole uma URL.">
+            <ImageUploadField
               value={form.avatar_url ?? ""}
-              onChange={(e) => set("avatar_url", e.target.value)}
+              onChange={(v) => set("avatar_url", v)}
+              folder="avatars"
             />
           </Field>
+
           <Field
             label="Vídeo de apresentação (URL)"
             hint="YouTube, Instagram (reel) ou link direto .mp4"
