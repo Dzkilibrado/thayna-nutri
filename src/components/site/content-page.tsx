@@ -22,7 +22,7 @@ export function ContentPage({
 
   return (
     <PageShell settings={settings}>
-      <div className="flex items-center justify-between">
+      <div className="mb-4 flex items-center justify-between">
         <BackButton to="/" label="Voltar" />
       </div>
       <header className="hero-surface -mx-5 -mt-4 rounded-b-3xl px-5 pb-8 pt-12">
