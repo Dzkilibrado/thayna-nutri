@@ -34,11 +34,19 @@ export function LinkBlock({
   settings: SiteSettings | null;
 }) {
   const Icon = ICONS[block.icon ?? "link"] ?? LinkIcon;
-  const raw = block.url ?? "#";
-  const isWhatsapp = raw === "whatsapp";
-  const href = isWhatsapp
-    ? whatsappLink(settings?.whatsapp ?? "", settings?.whatsapp_message ?? "")
-    : raw;
+  const raw = (block.url ?? "#").trim();
+  const token = raw.toLowerCase();
+  const isGenericInstagram = /^https?:\/\/(www\.)?instagram\.com\/?$/i.test(raw);
+  const isGenericYoutube = /^https?:\/\/(www\.)?youtube\.com\/?$/i.test(raw);
+
+  let href = raw;
+  if (token === "whatsapp") {
+    href = whatsappLink(settings?.whatsapp ?? "", settings?.whatsapp_message ?? "");
+  } else if (token === "instagram" || isGenericInstagram) {
+    href = settings?.instagram_url || raw;
+  } else if (token === "youtube" || isGenericYoutube) {
+    href = settings?.youtube_url || raw;
+  }
   const internal = href.startsWith("/");
 
   const content = (
