@@ -372,6 +372,48 @@ function ColorField({
   );
 }
 
+const LINK_SHORTCUTS = [
+  {
+    label: "WhatsApp",
+    value: "whatsapp",
+    hint: "Abre a conversa com o número cadastrado em Perfil & contato",
+  },
+  { label: "Instagram", value: "instagram", hint: "Abre o perfil cadastrado em Perfil & contato" },
+  { label: "YouTube", value: "youtube", hint: "Abre o canal cadastrado em Perfil & contato" },
+  { label: "Sobre mim", value: "/sobre", hint: "Leva à página Sobre deste site" },
+  {
+    label: "Como chegar",
+    value: "/como-chegar",
+    hint: "Leva à página com o endereço do consultório",
+  },
+  { label: "Depoimentos", value: "/depoimentos", hint: "Leva à página de depoimentos" },
+  { label: "Calculadoras", value: "/calculadoras", hint: "Leva à lista de calculadoras" },
+  { label: "Vídeos", value: "/videos", hint: "Leva à galeria de vídeos" },
+];
+
+function LinkShortcuts({ onPick }: { onPick: (value: string) => void }) {
+  return (
+    <div className="mt-2 space-y-2">
+      <p className="text-[11px] text-muted-foreground">
+        Atalhos — clique para preencher o campo acima:
+      </p>
+      <div className="flex flex-wrap gap-2">
+        {LINK_SHORTCUTS.map((s) => (
+          <button
+            key={s.value}
+            type="button"
+            title={s.hint}
+            onClick={() => onPick(s.value)}
+            className="rounded-full border border-border bg-surface-2 px-3 py-1 text-xs text-muted-foreground transition-colors hover:border-primary/60 hover:text-foreground"
+          >
+            {s.label}
+          </button>
+        ))}
+      </div>
+    </div>
+  );
+}
+
 function BlocksEditor({ blocks }: { blocks: ContentBlock[] }) {
   const queryClient = useQueryClient();
   const [page, setPage] = useState<string>("home");
@@ -617,14 +659,23 @@ function BlockCard({
         </Field>
       ) : (
         <Field
-          label={form.kind === "video" ? "Endereço do vídeo" : "Para onde este item leva"}
+          label={form.kind === "video" ? "Link do vídeo" : "Link de destino"}
           hint={
             form.kind === "video"
-              ? "Cole o endereço do vídeo no YouTube ou no Instagram."
-              : "Escreva whatsapp para abrir a conversa, /sobre para levar a uma página do próprio site, ou cole o endereço completo de um site."
+              ? "Cole o link do vídeo no YouTube ou no Instagram."
+              : "Cole o link completo, ou use um dos atalhos abaixo."
           }
         >
-          <Input value={form.url ?? ""} onChange={(e) => set("url", e.target.value)} />
+          <Input
+            value={form.url ?? ""}
+            onChange={(e) => set("url", e.target.value)}
+            placeholder={
+              form.kind === "video"
+                ? "https://youtube.com/watch?v=..."
+                : "https://instagram.com/thaynanpablo.nutri"
+            }
+          />
+          {form.kind === "link" ? <LinkShortcuts onPick={(v) => set("url", v)} /> : null}
         </Field>
       )}
 
