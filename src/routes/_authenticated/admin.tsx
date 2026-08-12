@@ -3,6 +3,7 @@ import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { IconPicker } from "@/components/admin/icon-picker";
 import { VideoField } from "@/components/admin/video-field";
 import { FileField } from "@/components/admin/file-field";
+import { AccessEditor } from "@/components/admin/access-editor";
 import { TestimonialsEditor } from "@/components/admin/testimonials-editor";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
@@ -50,12 +51,19 @@ function AdminPage() {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
 
+  // A permissão é apenas lida. Antes, esta consulta CONCEDIA o papel de
+  // administrador a quem chegasse primeiro — bastava criar uma conta e abrir
+  // esta página. Agora o acesso vem de convite, feito na aba Acessos.
   const roleQuery = useQuery({
     queryKey: ["is-admin"],
     queryFn: async () => {
-      const { data, error } = await supabase.rpc("claim_first_admin");
+      const { data, error } = await supabase
+        .from("user_roles")
+        .select("role")
+        .eq("role", "admin")
+        .maybeSingle();
       if (error) throw error;
-      return Boolean(data);
+      return data !== null;
     },
   });
 
@@ -140,6 +148,7 @@ function AdminPage() {
             <TabsTrigger value="depoimentos">Depoimentos</TabsTrigger>
             <TabsTrigger value="perfil">Perfil & contato</TabsTrigger>
             <TabsTrigger value="cores">Cores</TabsTrigger>
+            <TabsTrigger value="acessos">Acessos</TabsTrigger>
           </TabsList>
 
           <TabsContent value="conteudo" className="mt-6">
@@ -164,6 +173,10 @@ function AdminPage() {
             ) : (
               <p>Carregando…</p>
             )}
+          </TabsContent>
+
+          <TabsContent value="acessos" className="mt-6">
+            <AccessEditor />
           </TabsContent>
         </Tabs>
       </main>
