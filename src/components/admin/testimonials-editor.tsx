@@ -4,6 +4,7 @@ import { ArrowDown, ArrowUp, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 
 import { ImageUploadField } from "@/components/admin/image-upload";
+import { VideoField } from "@/components/admin/video-field";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -260,14 +261,11 @@ function TestimonialForm({
         />
       </Field>
 
-      <Field
-        label="Vídeo do depoimento"
-        hint="Opcional. Cole o endereço do vídeo no YouTube ou no Instagram."
-      >
-        <Input
+      <Field label="Vídeo do depoimento" hint="Opcional.">
+        <VideoField
           value={form.video_url ?? ""}
-          onChange={(e) => set("video_url", e.target.value)}
-          placeholder="https://…"
+          onChange={(v) => set("video_url", v)}
+          folder="depoimentos"
         />
       </Field>
 

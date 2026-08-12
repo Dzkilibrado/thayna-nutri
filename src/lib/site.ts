@@ -99,6 +99,23 @@ export function toEmbedUrl(raw: string | null | undefined): {
     };
   }
 
+  const drive = url.match(/drive\.google\.com\/file\/d\/([\w-]+)/);
+  if (drive) return { type: "iframe", src: `https://drive.google.com/file/d/${drive[1]}/preview` };
+
+  const vimeo = url.match(/vimeo\.com\/(?:video\/)?(\d+)/);
+  if (vimeo) return { type: "iframe", src: `https://player.vimeo.com/video/${vimeo[1]}` };
+
+  if (/dropbox\.com/i.test(url)) {
+    return {
+      type: "video",
+      src: url.replace(/[?&]dl=0/, "").concat(url.includes("?") ? "&raw=1" : "?raw=1"),
+    };
+  }
+
+  if (/1drv\.ms|onedrive\.live\.com/i.test(url)) {
+    return { type: "iframe", src: url.replace("/redir?", "/embed?") };
+  }
+
   if (/\.(mp4|webm|ogg|mov)(\?|$)/i.test(url)) return { type: "video", src: url };
 
   return { type: "iframe", src: url };

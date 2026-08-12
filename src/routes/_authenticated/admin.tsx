@@ -1,6 +1,7 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 
 import { IconPicker } from "@/components/admin/icon-picker";
+import { VideoField } from "@/components/admin/video-field";
 import { TestimonialsEditor } from "@/components/admin/testimonials-editor";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
@@ -266,13 +267,11 @@ function SettingsForm({
             />
           </Field>
 
-          <Field
-            label="Vídeo de apresentação (URL)"
-            hint="Cole o endereço do vídeo no YouTube ou no Instagram."
-          >
-            <Input
+          <Field label="Vídeo de apresentação" hint="Aparece no topo da página inicial.">
+            <VideoField
               value={form.intro_video_url ?? ""}
-              onChange={(e) => set("intro_video_url", e.target.value)}
+              onChange={(v) => set("intro_video_url", v)}
+              folder="apresentacao"
             />
           </Field>
           <div className="grid gap-5 sm:grid-cols-2">
@@ -702,20 +701,22 @@ function BlockCard({
           label={form.kind === "video" ? "Link do vídeo" : "Link de destino"}
           hint={
             form.kind === "video"
-              ? "Cole o link do vídeo no YouTube ou no Instagram."
+              ? "Cole um link ou envie um arquivo do computador ou do celular."
               : "Cole o link completo, ou use um dos atalhos abaixo."
           }
         >
-          <Input
-            value={form.url ?? ""}
-            onChange={(e) => set("url", e.target.value)}
-            placeholder={
-              form.kind === "video"
-                ? "https://youtube.com/watch?v=..."
-                : "https://instagram.com/thaynanpablo.nutri"
-            }
-          />
-          {form.kind === "link" ? <LinkShortcuts onPick={(v) => set("url", v)} /> : null}
+          {form.kind === "video" ? (
+            <VideoField value={form.url ?? ""} onChange={(v) => set("url", v)} />
+          ) : (
+            <>
+              <Input
+                value={form.url ?? ""}
+                onChange={(e) => set("url", e.target.value)}
+                placeholder="https://instagram.com/thaynanpablo.nutri"
+              />
+              <LinkShortcuts onPick={(v) => set("url", v)} />
+            </>
+          )}
         </Field>
       )}
 
