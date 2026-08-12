@@ -1,6 +1,6 @@
 import { useState } from "react";
 
-import { CalcCard, NumField } from "@/components/site/calc-ui";
+import { CalcCard, CalcNotice, NumField } from "@/components/site/calc-ui";
 
 type Product = { weight: string; serving: string; protein: string; price: string };
 
@@ -12,7 +12,8 @@ function analyse(p: Product) {
   const pct = serving > 0 ? (proteinPerServing / serving) * 100 : 0;
   const totalProtein = (weight * pct) / 100;
   const per100 = totalProtein > 0 ? price / (totalProtein / 100) : 0;
-  return { pct, totalProtein, per100 };
+  const invalid = (serving > 0 && proteinPerServing > serving) || (weight > 0 && serving > weight);
+  return { pct, totalProtein, per100, invalid };
 }
 
 function ProductForm({
@@ -51,13 +52,19 @@ function ProductForm({
           onChange={(v) => onChange({ ...value, price: v })}
         />
       </div>
+      {r.invalid ? (
+        <CalcNotice tone="error">
+          Confira os números do rótulo: a proteína não pode ser maior que a porção, e a porção não
+          pode ser maior que a embalagem.
+        </CalcNotice>
+      ) : null}
       <div className="space-y-1 rounded-xl border border-border bg-surface-2 p-4 text-sm">
         <p className="flex justify-between">
-          <span className="text-muted-foreground">% de Proteína:</span>
+          <span className="text-muted-foreground">Proteína no pote:</span>
           <strong>{r.pct.toFixed(1)}%</strong>
         </p>
         <p className="flex justify-between">
-          <span className="text-muted-foreground">Proteína Total:</span>
+          <span className="text-muted-foreground">Proteína total na embalagem:</span>
           <strong>{Math.round(r.totalProtein)}g</strong>
         </p>
         <p className="flex justify-between">
@@ -80,16 +87,16 @@ export function Whey() {
 
   const a = analyse(p1);
   const b = analyse(p2);
-  const ready = a.per100 > 0 && b.per100 > 0;
+  const ready = a.per100 > 0 && b.per100 > 0 && !a.invalid && !b.invalid;
   const winner = ready ? (a.per100 <= b.per100 ? 1 : 2) : 0;
   const diff = ready ? Math.abs(a.per100 - b.per100) : 0;
 
   return (
     <>
-      <CalcCard title="Compare whey proteins">
+      <CalcCard title="Qual whey compensa mais">
         <p className="text-sm text-muted-foreground">
-          Insira os dados dos dois produtos para descobrir qual oferece melhor custo por grama de
-          proteína.
+          O preço da embalagem engana: o que importa é quanto você paga por proteína de verdade.
+          Preencha os dois rótulos e compare.
         </p>
       </CalcCard>
       <ProductForm title="Produto 1" value={p1} onChange={setP1} />
@@ -97,8 +104,8 @@ export function Whey() {
       <CalcCard title="Resultado da comparação">
         {ready ? (
           <p className="text-sm">
-            O <strong className="text-primary">Produto {winner}</strong> tem o melhor custo-benefício
-            — economia de <strong>R$ {diff.toFixed(2)}</strong> a cada 100g de proteína.
+            O <strong className="text-primary">Produto {winner}</strong> compensa mais — economia de{" "}
+            <strong>R$ {diff.toFixed(2)}</strong> a cada 100g de proteína.
           </p>
         ) : (
           <p className="text-sm text-muted-foreground">Insira os dados para comparar.</p>

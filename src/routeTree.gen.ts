@@ -13,6 +13,7 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as ComoChegarRouteImport } from './routes/como-chegar'
+import { Route as DepoimentosRouteImport } from './routes/depoimentos'
 import { Route as LinksRouteImport } from './routes/links'
 import { Route as OnlineRouteImport } from './routes/online'
 import { Route as PresencialRouteImport } from './routes/presencial'
@@ -39,6 +40,11 @@ const AuthRoute = AuthRouteImport.update({
 const ComoChegarRoute = ComoChegarRouteImport.update({
   id: '/como-chegar',
   path: '/como-chegar',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DepoimentosRoute = DepoimentosRouteImport.update({
+  id: '/depoimentos',
+  path: '/depoimentos',
   getParentRoute: () => rootRouteImport,
 } as any)
 const LinksRoute = LinksRouteImport.update({
@@ -86,6 +92,7 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
   '/como-chegar': typeof ComoChegarRoute
+  '/depoimentos': typeof DepoimentosRoute
   '/links': typeof LinksRoute
   '/online': typeof OnlineRoute
   '/presencial': typeof PresencialRoute
@@ -99,6 +106,7 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
   '/como-chegar': typeof ComoChegarRoute
+  '/depoimentos': typeof DepoimentosRoute
   '/links': typeof LinksRoute
   '/online': typeof OnlineRoute
   '/presencial': typeof PresencialRoute
@@ -114,6 +122,7 @@ export interface FileRoutesById {
   '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
   '/auth': typeof AuthRoute
   '/como-chegar': typeof ComoChegarRoute
+  '/depoimentos': typeof DepoimentosRoute
   '/links': typeof LinksRoute
   '/online': typeof OnlineRoute
   '/presencial': typeof PresencialRoute
@@ -129,6 +138,7 @@ export interface FileRouteTypes {
     | '/'
     | '/auth'
     | '/como-chegar'
+    | '/depoimentos'
     | '/links'
     | '/online'
     | '/presencial'
@@ -142,6 +152,7 @@ export interface FileRouteTypes {
     | '/'
     | '/auth'
     | '/como-chegar'
+    | '/depoimentos'
     | '/links'
     | '/online'
     | '/presencial'
@@ -156,6 +167,7 @@ export interface FileRouteTypes {
     | '/_authenticated'
     | '/auth'
     | '/como-chegar'
+    | '/depoimentos'
     | '/links'
     | '/online'
     | '/presencial'
@@ -171,6 +183,7 @@ export interface RootRouteChildren {
   AuthenticatedRouteRoute: typeof AuthenticatedRouteRouteWithChildren
   AuthRoute: typeof AuthRoute
   ComoChegarRoute: typeof ComoChegarRoute
+  DepoimentosRoute: typeof DepoimentosRoute
   LinksRoute: typeof LinksRoute
   OnlineRoute: typeof OnlineRoute
   PresencialRoute: typeof PresencialRoute
@@ -208,6 +221,13 @@ declare module '@tanstack/react-router' {
       path: '/como-chegar'
       fullPath: '/como-chegar'
       preLoaderRoute: typeof ComoChegarRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/depoimentos': {
+      id: '/depoimentos'
+      path: '/depoimentos'
+      fullPath: '/depoimentos'
+      preLoaderRoute: typeof DepoimentosRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/links': {
@@ -285,6 +305,7 @@ const rootRouteChildren: RootRouteChildren = {
   AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
   AuthRoute: AuthRoute,
   ComoChegarRoute: ComoChegarRoute,
+  DepoimentosRoute: DepoimentosRoute,
   LinksRoute: LinksRoute,
   OnlineRoute: OnlineRoute,
   PresencialRoute: PresencialRoute,
@@ -296,3 +317,13 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}

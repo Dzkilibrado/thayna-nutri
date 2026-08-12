@@ -29,6 +29,7 @@ export function PageShell({
             {[
               { to: "/links", label: "Links" },
               { to: "/videos", label: "Vídeos" },
+              { to: "/depoimentos", label: "Depoimentos" },
               { to: "/calculadoras", label: "Calculadoras" },
               { to: "/como-chegar", label: "Como chegar" },
               { to: "/sobre", label: "Sobre" },

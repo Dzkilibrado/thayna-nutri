@@ -1,10 +1,25 @@
 export type Sex = "male" | "female";
 export type Biotype = "ecto" | "meso" | "endo";
 
-export const BIOTYPES: { value: Biotype; label: string; factor: number }[] = [
-  { value: "ecto", label: "Ectomorfo", factor: 1.05 },
-  { value: "meso", label: "Mesomorfo", factor: 1 },
-  { value: "endo", label: "Endomorfo", factor: 0.95 },
+export const BIOTYPES: { value: Biotype; label: string; hint: string; factor: number }[] = [
+  {
+    value: "ecto",
+    label: "Ectomorfo",
+    hint: "Corpo mais fino, ombros estreitos, dificuldade para ganhar peso",
+    factor: 1.05,
+  },
+  {
+    value: "meso",
+    label: "Mesomorfo",
+    hint: "Ombros largos, cintura fina, ganha músculo com facilidade",
+    factor: 1,
+  },
+  {
+    value: "endo",
+    label: "Endomorfo",
+    hint: "Estrutura mais larga, acumula gordura com facilidade",
+    factor: 0.95,
+  },
 ];
 
 export const ACTIVITY_LEVELS = [
@@ -13,6 +28,18 @@ export const ACTIVITY_LEVELS = [
   { value: 1.55, label: "Moderadamente ativo (exercício moderado 3-5 dias/semana)" },
   { value: 1.725, label: "Muito ativo (exercício pesado 6-7 dias/semana)" },
   { value: 1.9, label: "Extremamente ativo (exercício muito pesado, trabalho físico)" },
+];
+
+/**
+ * Gasto do dia a dia FORA do treino, usado na Dieta Avançada.
+ * O treino e o cardio entram somados depois, por isso os fatores aqui são
+ * menores que os de ACTIVITY_LEVELS (que já embutem o exercício).
+ */
+export const ROUTINE_LEVELS = [
+  { value: 1.15, label: "Trabalho sentado, ando pouco durante o dia" },
+  { value: 1.25, label: "Rotina normal, ando um pouco todo dia" },
+  { value: 1.35, label: "Fico muito em pé ou ando bastante" },
+  { value: 1.5, label: "Trabalho pesado, esforço físico o dia inteiro" },
 ];
 
 export const GOALS = [
@@ -34,52 +61,73 @@ const biotypeFactor = (b: Biotype) => BIOTYPES.find((x) => x.value === b)?.facto
 
 /** Mifflin-St Jeor, ajustada pelo biotipo. */
 export function tmb(sex: Sex, age: number, heightCm: number, weightKg: number, biotype: Biotype) {
-  const base =
-    10 * weightKg + 6.25 * heightCm - 5 * age + (sex === "male" ? 5 : -161);
+  const base = 10 * weightKg + 6.25 * heightCm - 5 * age + (sex === "male" ? 5 : -161);
   return Math.max(0, Math.round(base * biotypeFactor(biotype)));
 }
 
-/** Katch-McArdle a partir da massa magra. */
+/** Katch-McArdle a partir da massa magra. Mais preciso quando a gordura é conhecida. */
 export function tmbLean(leanKg: number) {
   return Math.round(370 + 21.6 * leanKg);
 }
 
-/** Percentual de gordura — fórmula da Marinha Americana (US Navy). */
-export function bodyFat(input: {
+export type BodyFatInput = {
   sex: Sex;
   heightCm: number;
   waistCm: number;
   neckCm: number;
   hipCm: number;
-}) {
+};
+
+/**
+ * Percentual de gordura - fórmula da Marinha Americana.
+ * Devolve `null` quando as medidas são incompatíveis (ex: cintura menor que o
+ * pescoço), em vez de devolver 0 e a tela mostrar "0% de gordura".
+ */
+export function bodyFat(input: BodyFatInput): number | null {
   const { sex, heightCm, waistCm, neckCm, hipCm } = input;
+  if (!(heightCm > 0) || !(waistCm > 0) || !(neckCm > 0)) return null;
+  if (sex === "female" && !(hipCm > 0)) return null;
+
+  const inner = sex === "male" ? waistCm - neckCm : waistCm + hipCm - neckCm;
+  if (inner <= 0) return null;
+
   const log10 = Math.log10;
   const bf =
     sex === "male"
-      ? 495 / (1.0324 - 0.19077 * log10(waistCm - neckCm) + 0.15456 * log10(heightCm)) - 450
-      : 495 /
-          (1.29579 - 0.35004 * log10(waistCm + hipCm - neckCm) + 0.221 * log10(heightCm)) -
-        450;
-  if (!Number.isFinite(bf)) return 0;
+      ? 495 / (1.0324 - 0.19077 * log10(inner) + 0.15456 * log10(heightCm)) - 450
+      : 495 / (1.29579 - 0.35004 * log10(inner) + 0.221 * log10(heightCm)) - 450;
+
+  if (!Number.isFinite(bf) || bf <= 0) return null;
   return Math.min(70, Math.max(2, bf));
 }
 
-/** Potencial genético — modelo de Casey Butt. */
+/** Mensagem em linguagem simples para medidas que não fecham. */
+export function bodyFatError(input: BodyFatInput): string | null {
+  if (bodyFat(input) !== null) return null;
+  if (input.sex === "male") {
+    return "A medida da cintura precisa ser maior que a do pescoço. Confira a fita métrica e tente de novo.";
+  }
+  return "As medidas não fecham. Confira cintura, quadril e pescoço e tente de novo.";
+}
+
+/**
+ * Potencial genético — modelo de Casey Butt.
+ * O percentual informado é o de GORDURA ALVO (a referência do modelo é 10%
+ * para homens e 18% para mulheres), não o percentual atual da pessoa.
+ */
 export function geneticPotential(input: {
   heightCm: number;
   ankleCm: number;
   wristCm: number;
-  bfPercent: number;
+  targetBfPercent: number;
 }) {
   const H = input.heightCm / 2.54;
   const A = input.ankleCm / 2.54;
   const W = input.wristCm / 2.54;
-  const bf = input.bfPercent / 100;
+  const bf = input.targetBfPercent / 100;
 
   const leanLb =
-    Math.pow(H, 1.5) *
-    (Math.sqrt(W) / 22.667 + Math.sqrt(A) / 17.0104) *
-    (bf / 2.24 + 1);
+    Math.pow(H, 1.5) * (Math.sqrt(W) / 22.667 + Math.sqrt(A) / 17.0104) * (bf / 2.24 + 1);
   const leanKg = leanLb * 0.4536;
   const maxWeight = leanKg / (1 - bf);
 
@@ -96,11 +144,34 @@ export function geneticPotential(input: {
   };
 }
 
-export function macrosFromCalories(kcal: number, weightKg: number, proteinPerKg: number, fatPerKg: number) {
+export type Macros = {
+  protein: number;
+  fat: number;
+  carbs: number;
+  /** Calorias que as macros realmente somam — pode passar da meta em déficit forte. */
+  actualKcal: number;
+  /** true quando proteína + gordura já estouram a meta e o carbo foi zerado. */
+  overTarget: boolean;
+};
+
+/**
+ * Distribui as macros dentro da meta calórica.
+ * Quando proteína e gordura sozinhas já passam da meta, o carboidrato vai a zero
+ * e `overTarget` sinaliza — a tela precisa avisar, em vez de exibir uma meta que
+ * não bate com a soma das macros.
+ */
+export function macrosFromCalories(
+  kcal: number,
+  weightKg: number,
+  proteinPerKg: number,
+  fatPerKg: number,
+): Macros {
   const protein = Math.round(proteinPerKg * weightKg);
   const fat = Math.round(fatPerKg * weightKg);
-  const carbs = Math.max(0, Math.round((kcal - protein * 4 - fat * 9) / 4));
-  return { protein, fat, carbs };
+  const floor = protein * 4 + fat * 9;
+  const carbs = Math.max(0, Math.round((kcal - floor) / 4));
+  const actualKcal = floor + carbs * 4;
+  return { protein, fat, carbs, actualKcal, overTarget: floor > kcal };
 }
 
 export const CALCULATORS = [
@@ -124,8 +195,8 @@ export const CALCULATORS = [
   },
   {
     slug: "bf",
-    title: "Gordura Corporal (BF)",
-    description: "Percentual de gordura, massa magra, massa gorda e TMB.",
+    title: "Gordura Corporal",
+    description: "Percentual de gordura, massa magra, massa gorda e gasto em repouso.",
     icon: "percent",
   },
   {

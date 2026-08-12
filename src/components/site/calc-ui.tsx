@@ -39,9 +39,7 @@ export function CalcShell({
 export function CalcCard({ title, children }: { title?: string; children: ReactNode }) {
   return (
     <section className="card-shadow space-y-5 rounded-2xl border border-border bg-surface p-5">
-      {title ? (
-        <h2 className="font-display text-xl uppercase tracking-wide">{title}</h2>
-      ) : null}
+      {title ? <h2 className="font-display text-xl uppercase tracking-wide">{title}</h2> : null}
       {children}
     </section>
   );
@@ -160,20 +158,17 @@ export function ResultStat({
   );
 }
 
-export function ResultTable({
-  head,
-  rows,
-}: {
-  head: string[];
-  rows: (string | number)[][];
-}) {
+export function ResultTable({ head, rows }: { head: string[]; rows: (string | number)[][] }) {
   return (
     <div className="overflow-x-auto rounded-2xl border border-border">
       <table className="w-full text-sm">
         <thead className="bg-surface-2">
           <tr>
             {head.map((h) => (
-              <th key={h} className="px-3 py-2 text-left text-xs uppercase tracking-wide text-muted-foreground">
+              <th
+                key={h}
+                className="px-3 py-2 text-left text-xs uppercase tracking-wide text-muted-foreground"
+              >
                 {h}
               </th>
             ))}
@@ -192,5 +187,28 @@ export function ResultTable({
         </tbody>
       </table>
     </div>
+  );
+}
+
+/** Aviso dentro de uma calculadora — erro de preenchimento ou ressalva do resultado. */
+export function CalcNotice({
+  tone = "warning",
+  children,
+}: {
+  tone?: "warning" | "error";
+  children: ReactNode;
+}) {
+  return (
+    <p
+      role={tone === "error" ? "alert" : undefined}
+      className={cn(
+        "rounded-xl border px-4 py-3 text-sm",
+        tone === "error"
+          ? "border-destructive/50 bg-destructive/10 text-foreground"
+          : "border-primary/40 bg-primary/10 text-foreground",
+      )}
+    >
+      {children}
+    </p>
   );
 }

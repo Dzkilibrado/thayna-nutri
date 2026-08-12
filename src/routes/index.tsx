@@ -1,10 +1,11 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { Link, createFileRoute } from "@tanstack/react-router";
 
 import { LinkBlock } from "@/components/site/link-block";
 import { PageShell } from "@/components/site/page-shell";
 import { VideoEmbed } from "@/components/site/video-embed";
+import { TestimonialCard } from "@/components/site/testimonial-card";
 import { loadSiteData } from "@/lib/site-data";
-import type { ContentBlock, SiteSettings } from "@/lib/site";
+import type { ContentBlock, SiteSettings, Testimonial } from "@/lib/site";
 
 export const Route = createFileRoute("/")({
   loader: () => loadSiteData(),
@@ -27,14 +28,14 @@ export const Route = createFileRoute("/")({
 });
 
 function Home() {
-  const { settings, blocks } = Route.useLoaderData() as {
+  const { settings, blocks, testimonials } = Route.useLoaderData() as {
     settings: SiteSettings | null;
     blocks: ContentBlock[];
+    testimonials: Testimonial[];
   };
+  const featuredTestimonials = testimonials.filter((t) => t.featured).slice(0, 4);
   const links = blocks.filter((b) => b.page === "home" && b.kind === "link");
-  const videos = blocks.filter(
-    (b) => b.kind === "video" && (b.page === "home" || b.featured),
-  );
+  const videos = blocks.filter((b) => b.kind === "video" && (b.page === "home" || b.featured));
 
   return (
     <PageShell settings={settings}>
@@ -68,6 +69,23 @@ function Home() {
           <LinkBlock key={block.id} block={block} settings={settings} />
         ))}
       </section>
+
+      {featuredTestimonials.length > 0 ? (
+        <section className="mt-10 space-y-4">
+          <h2 className="text-2xl">Depoimentos</h2>
+          <div className="grid gap-4 sm:grid-cols-2">
+            {featuredTestimonials.map((item) => (
+              <TestimonialCard key={item.id} item={item} />
+            ))}
+          </div>
+          <Link
+            to="/depoimentos"
+            className="block rounded-2xl border border-border bg-surface px-4 py-3 text-center text-sm text-muted-foreground transition-colors hover:border-primary/60 hover:text-foreground"
+          >
+            Ver todos os depoimentos
+          </Link>
+        </section>
+      ) : null}
 
       {videos.length > 0 ? (
         <section className="mt-10 space-y-6">

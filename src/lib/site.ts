@@ -33,6 +33,21 @@ export type ContentBlock = {
   featured: boolean;
 };
 
+export type Testimonial = {
+  id: string;
+  author_name: string;
+  author_context: string | null;
+  quote: string;
+  photo_url: string | null;
+  video_url: string | null;
+  sort_order: number;
+  featured: boolean;
+  published: boolean;
+};
+
+export const TESTIMONIAL_COLUMNS =
+  "id, author_name, author_context, quote, photo_url, video_url, sort_order, featured, published";
+
 export const SETTINGS_COLUMNS =
   "brand_name, brand_tagline, headline, bio, avatar_url, whatsapp, whatsapp_message, email, address, maps_url, hours, instagram_url, youtube_url, intro_video_url, color_background, color_surface, color_accent, color_foreground";
 
@@ -47,6 +62,8 @@ export const PAGES = [
   { value: "presencial", label: "Consulta presencial" },
   { value: "online", label: "Consulta online" },
 ] as const;
+
+export const MAX_TESTIMONIAL_QUOTE = 600;
 
 export const KINDS = [
   { value: "link", label: "Link / botão" },

@@ -1,30 +1,10 @@
 import { Link } from "@tanstack/react-router";
-import {
-  ArrowRight,
-  Instagram,
-  MapPin,
-  MessageCircle,
-  Play,
-  User,
-  Video,
-  Youtube,
-  Link as LinkIcon,
-} from "lucide-react";
+import { ArrowRight } from "lucide-react";
 
+import { iconFor } from "@/lib/icons";
 import type { ContentBlock, SiteSettings } from "@/lib/site";
 import { whatsappLink } from "@/lib/site";
 import { externalLinkProps } from "@/lib/external";
-
-const ICONS: Record<string, typeof LinkIcon> = {
-  "message-circle": MessageCircle,
-  "map-pin": MapPin,
-  video: Video,
-  user: User,
-  instagram: Instagram,
-  youtube: Youtube,
-  play: Play,
-  link: LinkIcon,
-};
 
 export function LinkBlock({
   block,
@@ -33,7 +13,7 @@ export function LinkBlock({
   block: ContentBlock;
   settings: SiteSettings | null;
 }) {
-  const Icon = ICONS[block.icon ?? "link"] ?? LinkIcon;
+  const Icon = iconFor(block.icon);
   const raw = (block.url ?? "#").trim();
   const token = raw.toLowerCase();
   const isGenericInstagram = /^https?:\/\/(www\.)?instagram\.com\/?$/i.test(raw);

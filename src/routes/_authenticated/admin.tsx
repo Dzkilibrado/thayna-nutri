@@ -1,4 +1,7 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+
+import { IconPicker } from "@/components/admin/icon-picker";
+import { TestimonialsEditor } from "@/components/admin/testimonials-editor";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
@@ -20,7 +23,6 @@ import {
 } from "@/components/ui/select";
 import { ImageUploadField } from "@/components/admin/image-upload";
 import {
-
   BLOCK_COLUMNS,
   KINDS,
   PAGES,
@@ -133,12 +135,17 @@ function AdminPage() {
         <Tabs defaultValue="conteudo">
           <TabsList>
             <TabsTrigger value="conteudo">Conteúdo</TabsTrigger>
+            <TabsTrigger value="depoimentos">Depoimentos</TabsTrigger>
             <TabsTrigger value="perfil">Perfil & contato</TabsTrigger>
             <TabsTrigger value="cores">Cores</TabsTrigger>
           </TabsList>
 
           <TabsContent value="conteudo" className="mt-6">
             {blocksQuery.data ? <BlocksEditor blocks={blocksQuery.data} /> : <p>Carregando…</p>}
+          </TabsContent>
+
+          <TabsContent value="depoimentos" className="mt-6">
+            <TestimonialsEditor />
           </TabsContent>
 
           <TabsContent value="perfil" className="mt-6">
@@ -261,7 +268,7 @@ function SettingsForm({
 
           <Field
             label="Vídeo de apresentação (URL)"
-            hint="YouTube, Instagram (reel) ou link direto .mp4"
+            hint="Cole o endereço do vídeo no YouTube ou no Instagram."
           >
             <Input
               value={form.intro_video_url ?? ""}
@@ -377,14 +384,14 @@ function BlocksEditor({ blocks }: { blocks: ContentBlock[] }) {
       const { error } = await supabase.from("content_blocks").insert({
         page,
         kind: "link",
-        title: "Novo bloco",
+        title: "Novo item",
         sort_order: items.length + 1,
-        published: false,
+        published: true,
       });
       if (error) throw error;
     },
     onSuccess: () => {
-      toast.success("Bloco criado.");
+      toast.success("Item criado e já visível no site.");
       void refresh();
     },
     onError: (e: Error) => toast.error(e.message),
@@ -410,7 +417,7 @@ function BlocksEditor({ blocks }: { blocks: ContentBlock[] }) {
           </Field>
         </div>
         <Button onClick={() => create.mutate()} disabled={create.isPending}>
-          <Plus className="size-4" /> Novo bloco
+          <Plus className="size-4" /> Novo item
         </Button>
       </div>
 
@@ -463,7 +470,7 @@ function BlockCard({
       if (error) throw error;
     },
     onSuccess: () => {
-      toast.success("Bloco salvo.");
+      toast.success("Item salvo.");
       void refresh();
     },
     onError: (e: Error) => toast.error(e.message),
@@ -475,7 +482,7 @@ function BlockCard({
       if (error) throw error;
     },
     onSuccess: () => {
-      toast.success("Bloco removido.");
+      toast.success("Item excluído.");
       void refresh();
     },
     onError: (e: Error) => toast.error(e.message),
@@ -525,7 +532,7 @@ function BlockCard({
             <ArrowDown className="size-4" />
           </Button>
           <span className="text-xs uppercase tracking-widest text-muted-foreground">
-            {form.kind}
+            {KINDS.find((k) => k.value === form.kind)?.label ?? form.kind}
           </span>
         </div>
         <div className="flex items-center gap-3">
@@ -548,7 +555,7 @@ function BlockCard({
               id={`pub-${block.id}`}
             />
             <Label htmlFor={`pub-${block.id}`} className="text-xs">
-              Publicado
+              {form.published ? "Aparecendo no site" : "Rascunho (oculto)"}
             </Label>
           </div>
 
@@ -556,7 +563,7 @@ function BlockCard({
             variant="ghost"
             size="icon"
             onClick={() => remove.mutate()}
-            aria-label="Excluir bloco"
+            aria-label="Excluir item"
           >
             <Trash2 className="size-4 text-destructive" />
           </Button>
@@ -602,15 +609,19 @@ function BlockCard({
 
       {form.kind === "text" ? (
         <Field label="Texto">
-          <Textarea rows={5} value={form.body ?? ""} onChange={(e) => set("body", e.target.value)} />
+          <Textarea
+            rows={5}
+            value={form.body ?? ""}
+            onChange={(e) => set("body", e.target.value)}
+          />
         </Field>
       ) : (
         <Field
-          label={form.kind === "video" ? "URL do vídeo" : "Destino do link"}
+          label={form.kind === "video" ? "Endereço do vídeo" : "Para onde este item leva"}
           hint={
             form.kind === "video"
-              ? "YouTube, Instagram (reel) ou link direto .mp4"
-              : "Use whatsapp para abrir o WhatsApp, /sobre para páginas internas ou uma URL completa."
+              ? "Cole o endereço do vídeo no YouTube ou no Instagram."
+              : "Escreva whatsapp para abrir a conversa, /sobre para levar a uma página do próprio site, ou cole o endereço completo de um site."
           }
         >
           <Input value={form.url ?? ""} onChange={(e) => set("url", e.target.value)} />
@@ -618,16 +629,20 @@ function BlockCard({
       )}
 
       {form.kind === "link" ? (
-        <Field
-          label="Ícone"
-          hint="message-circle, map-pin, video, user, instagram, youtube, play, link"
-        >
-          <Input value={form.icon ?? ""} onChange={(e) => set("icon", e.target.value)} />
+        <Field label="Ícone" hint="Escolha o desenho que aparece ao lado do título.">
+          <IconPicker value={form.icon} onChange={(id) => set("icon", id)} />
         </Field>
       ) : null}
 
+      {!form.published ? (
+        <p className="rounded-xl border border-primary/40 bg-primary/10 px-4 py-3 text-sm">
+          Este item está como rascunho e não aparece no site. Ligue a chave &ldquo;Aparecendo no
+          site&rdquo; acima e salve para publicar.
+        </p>
+      ) : null}
+
       <Button onClick={() => save.mutate(form)} disabled={save.isPending}>
-        {save.isPending ? "Salvando…" : "Salvar bloco"}
+        {save.isPending ? "Salvando…" : "Salvar item"}
       </Button>
     </div>
   );
