@@ -21,23 +21,25 @@ export function PageShell({
     <div className="min-h-screen bg-background">
       <ThemeVars settings={settings} />
       <header className="border-b border-border/60 bg-surface/40 backdrop-blur">
-        <div className="mx-auto flex max-w-2xl items-center justify-between px-5 py-4">
-          <Link to="/" className="font-display text-xl uppercase tracking-wider">
+        <div className="mx-auto flex max-w-2xl items-center gap-4 px-5 py-4">
+          <Link
+            to="/"
+            className="shrink-0 font-display text-xl uppercase leading-tight tracking-wider"
+          >
             {settings?.brand_name ?? "Thaynan"}
           </Link>
-          <nav className="flex items-center gap-3 text-sm">
+          <nav className="nav-scroll ml-auto flex min-w-0 items-center gap-4 overflow-x-auto text-sm">
             {[
               { to: "/links", label: "Links" },
               { to: "/videos", label: "Vídeos" },
               { to: "/depoimentos", label: "Depoimentos" },
               { to: "/calculadoras", label: "Calculadoras" },
-              { to: "/como-chegar", label: "Como chegar" },
               { to: "/sobre", label: "Sobre" },
             ].map((item) => (
               <Link
                 key={item.to}
                 to={item.to}
-                className="text-muted-foreground transition-colors hover:text-foreground"
+                className="whitespace-nowrap text-muted-foreground transition-colors hover:text-foreground"
                 activeProps={{ className: "text-foreground" }}
               >
                 {item.label}
@@ -47,7 +49,7 @@ export function PageShell({
               {...externalLinkProps(
                 whatsappLink(settings?.whatsapp ?? "", settings?.whatsapp_message ?? ""),
               )}
-              className="rounded-full bg-primary px-4 py-1.5 font-medium text-primary-foreground transition-opacity hover:opacity-90"
+              className="shrink-0 whitespace-nowrap rounded-full bg-primary px-4 py-1.5 font-medium text-primary-foreground transition-opacity hover:opacity-90"
             >
               Agendar
             </a>
@@ -60,7 +62,8 @@ export function PageShell({
 
       <footer className="border-t border-border/60 px-5 py-8 text-center text-xs text-muted-foreground">
         <p>
-          {settings?.brand_name ?? "Thaynan"} — {settings?.brand_tagline ?? "Nutrição & Performance"}
+          {settings?.brand_name ?? "Thaynan"} —{" "}
+          {settings?.brand_tagline ?? "Nutrição & Performance"}
         </p>
         <p className="mt-1">Atendimento {settings?.hours ?? "09:00 - 20:00"}</p>
         <p className="mt-3">
