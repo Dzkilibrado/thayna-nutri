@@ -77,46 +77,74 @@ export function whatsappLink(phone: string, message: string) {
 }
 
 /** Converts a YouTube / Instagram / direct URL into an embeddable src. */
-export function toEmbedUrl(raw: string | null | undefined): {
+export type EmbedInfo = {
   type: "iframe" | "video" | "none";
   src: string;
-} {
-  const url = (raw || "").trim();
-  if (!url) return { type: "none", src: "" };
+  /**
+   * Proporção conhecida da origem. Reels e Shorts são verticais; o resto
+   * assume-se horizontal. Arquivos enviados não declaram nada — quem manda é a
+   * proporção real do arquivo, lida pelo próprio navegador.
+   */
+  ratio: "wide" | "vertical" | "intrinsic";
+};
 
+export function toEmbedUrl(raw: string | null | undefined): EmbedInfo {
+  const url = (raw || "").trim();
+  if (!url) return { type: "none", src: "", ratio: "wide" };
+
+  const isShort = /youtube\.com\/shorts\//i.test(url);
   const yt =
     url.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/shorts\/)([\w-]{6,})/) ??
     url.match(/youtube\.com\/embed\/([\w-]{6,})/);
-  if (yt) return { type: "iframe", src: `https://www.youtube.com/embed/${yt[1]}` };
+  if (yt)
+    return {
+      type: "iframe",
+      src: `https://www.youtube.com/embed/${yt[1]}`,
+      ratio: isShort ? "vertical" : "wide",
+    };
 
   const ig = url.match(/instagram\.com\/(?:p|reel|tv)\/([\w-]+)/);
-  if (ig) return { type: "iframe", src: `https://www.instagram.com/reel/${ig[1]}/embed` };
+  if (ig)
+    return {
+      type: "iframe",
+      src: `https://www.instagram.com/reel/${ig[1]}/embed`,
+      ratio: "vertical",
+    };
 
   if (/facebook\.com|fb\.watch/i.test(url)) {
     return {
       type: "iframe",
       src: `https://www.facebook.com/plugins/video.php?height=476&show_text=false&href=${encodeURIComponent(url)}`,
+      ratio: "wide",
     };
   }
 
   const drive = url.match(/drive\.google\.com\/file\/d\/([\w-]+)/);
-  if (drive) return { type: "iframe", src: `https://drive.google.com/file/d/${drive[1]}/preview` };
+  if (drive)
+    return {
+      type: "iframe",
+      src: `https://drive.google.com/file/d/${drive[1]}/preview`,
+      ratio: "wide",
+    };
 
   const vimeo = url.match(/vimeo\.com\/(?:video\/)?(\d+)/);
-  if (vimeo) return { type: "iframe", src: `https://player.vimeo.com/video/${vimeo[1]}` };
+  if (vimeo)
+    return { type: "iframe", src: `https://player.vimeo.com/video/${vimeo[1]}`, ratio: "wide" };
 
   if (/dropbox\.com/i.test(url)) {
     return {
       type: "video",
       src: url.replace(/[?&]dl=0/, "").concat(url.includes("?") ? "&raw=1" : "?raw=1"),
+      ratio: "intrinsic",
     };
   }
 
   if (/1drv\.ms|onedrive\.live\.com/i.test(url)) {
-    return { type: "iframe", src: url.replace("/redir?", "/embed?") };
+    return { type: "iframe", src: url.replace("/redir?", "/embed?"), ratio: "wide" };
   }
 
-  if (/\.(mp4|webm|ogg|mov)(\?|$)/i.test(url)) return { type: "video", src: url };
+  if (/\.(mp4|webm|ogg|mov)(\?|$)/i.test(url))
+    return { type: "video", src: url, ratio: "intrinsic" };
 
-  return { type: "iframe", src: url };
+  return { type: "iframe", src: url, ratio: "wide" };
 }
