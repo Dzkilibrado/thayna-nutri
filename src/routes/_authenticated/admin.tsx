@@ -2,6 +2,7 @@ import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 
 import { IconPicker } from "@/components/admin/icon-picker";
 import { VideoField } from "@/components/admin/video-field";
+import { FileField } from "@/components/admin/file-field";
 import { TestimonialsEditor } from "@/components/admin/testimonials-editor";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
@@ -376,13 +377,15 @@ function ColorField({
  * "Link / botão" na página Vídeos) salva sem erro e não aparece em lugar
  * nenhum — por isso o painel avisa antes que a pessoa vá procurar no site.
  */
+const ALL_KINDS = ["link", "video", "image", "file", "text"];
+
 const PAGE_ACCEPTS: Record<string, { kinds: string[]; says: string }> = {
   home: { kinds: ["link", "video"], says: "links/botões e vídeos" },
   links: { kinds: ["link"], says: "links/botões" },
   videos: { kinds: ["video"], says: "vídeos" },
-  sobre: { kinds: ["link", "video", "text"], says: "qualquer tipo" },
-  presencial: { kinds: ["link", "video", "text"], says: "qualquer tipo" },
-  online: { kinds: ["link", "video", "text"], says: "qualquer tipo" },
+  sobre: { kinds: ALL_KINDS, says: "qualquer tipo" },
+  presencial: { kinds: ALL_KINDS, says: "qualquer tipo" },
+  online: { kinds: ALL_KINDS, says: "qualquer tipo" },
 };
 
 function mismatchMessage(page: string, kind: string): string | null {
@@ -688,7 +691,19 @@ function BlockCard({
         </Field>
       </div>
 
-      {form.kind === "text" ? (
+      {form.kind === "image" ? (
+        <Field label="Foto" hint="Envie do computador ou do celular, ou cole o link da imagem.">
+          <ImageUploadField
+            value={form.url ?? ""}
+            onChange={(v) => set("url", v)}
+            folder="conteudo"
+          />
+        </Field>
+      ) : form.kind === "file" ? (
+        <Field label="Arquivo" hint="PDF, documento ou planilha para o visitante baixar.">
+          <FileField value={form.url ?? ""} onChange={(v) => set("url", v)} folder="conteudo" />
+        </Field>
+      ) : form.kind === "text" ? (
         <Field label="Texto">
           <Textarea
             rows={5}

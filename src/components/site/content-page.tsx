@@ -3,6 +3,7 @@ import { BackButton } from "@/components/site/back-button";
 import { LinkBlock } from "@/components/site/link-block";
 import { PageShell } from "@/components/site/page-shell";
 import { VideoEmbed } from "@/components/site/video-embed";
+import { Download } from "lucide-react";
 import { whatsappLink } from "@/lib/site";
 import { externalLinkProps } from "@/lib/external";
 
@@ -42,12 +43,37 @@ export function ContentPage({
               <>
                 {block.title ? <h2 className="text-2xl">{block.title}</h2> : null}
                 {block.subtitle ? (
-                  <p className="text-sm uppercase tracking-widest text-primary">
-                    {block.subtitle}
-                  </p>
+                  <p className="text-sm uppercase tracking-widest text-primary">{block.subtitle}</p>
                 ) : null}
-                {block.kind === "video" ? (
-                  <VideoEmbed url={block.url} title={block.title} />
+                {block.kind === "video" ? <VideoEmbed url={block.url} title={block.title} /> : null}
+
+                {block.kind === "image" && block.url ? (
+                  <img
+                    src={block.url}
+                    alt={block.title || "Imagem"}
+                    loading="lazy"
+                    className="card-shadow block w-full rounded-2xl border border-border object-contain"
+                  />
+                ) : null}
+
+                {block.kind === "file" && block.url ? (
+                  <a
+                    {...externalLinkProps(block.url)}
+                    download
+                    className="group card-shadow flex w-full items-center gap-4 rounded-2xl border border-border bg-surface px-4 py-4 text-left transition-all hover:-translate-y-0.5 hover:border-primary/60"
+                  >
+                    <span className="flex size-11 shrink-0 items-center justify-center rounded-xl bg-accent text-primary">
+                      <Download className="size-5" />
+                    </span>
+                    <span className="min-w-0 flex-1">
+                      <span className="block truncate font-display text-lg uppercase tracking-wide">
+                        {block.title || "Baixar arquivo"}
+                      </span>
+                      <span className="block text-sm text-muted-foreground">
+                        Clique para baixar
+                      </span>
+                    </span>
+                  </a>
                 ) : null}
                 {block.body ? (
                   <p className="whitespace-pre-line leading-relaxed text-muted-foreground">

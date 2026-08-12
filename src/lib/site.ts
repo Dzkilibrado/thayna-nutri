@@ -68,6 +68,8 @@ export const MAX_TESTIMONIAL_QUOTE = 600;
 export const KINDS = [
   { value: "link", label: "Link / botão" },
   { value: "video", label: "Vídeo" },
+  { value: "image", label: "Foto / imagem" },
+  { value: "file", label: "Arquivo para baixar" },
   { value: "text", label: "Texto" },
 ] as const;
 
