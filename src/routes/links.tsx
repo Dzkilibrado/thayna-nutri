@@ -4,12 +4,15 @@ import { BackButton } from "@/components/site/back-button";
 import { LinkBlock } from "@/components/site/link-block";
 import { PageShell } from "@/components/site/page-shell";
 import { loadSiteData } from "@/lib/site-data";
+import { pageUrlHead } from "@/lib/seo";
 import type { ContentBlock, SiteSettings } from "@/lib/site";
 
 export const Route = createFileRoute("/links")({
   loader: () => loadSiteData(),
   head: () => ({
+    links: pageUrlHead("/links").links,
     meta: [
+      ...pageUrlHead("/links").meta,
       { title: "Links | Thaynan Pablo Nutrição & Performance" },
       {
         name: "description",
@@ -46,9 +49,7 @@ function LinksPage() {
 
       <section className="mt-8 space-y-3">
         {links.length === 0 ? (
-          <p className="text-center text-sm text-muted-foreground">
-            Nenhum link publicado ainda.
-          </p>
+          <p className="text-center text-sm text-muted-foreground">Nenhum link publicado ainda.</p>
         ) : (
           links.map((block) => <LinkBlock key={block.id} block={block} settings={settings} />)
         )}

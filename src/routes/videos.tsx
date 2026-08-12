@@ -4,12 +4,15 @@ import { BackButton } from "@/components/site/back-button";
 import { PageShell } from "@/components/site/page-shell";
 import { VideoEmbed } from "@/components/site/video-embed";
 import { loadSiteData } from "@/lib/site-data";
+import { pageUrlHead } from "@/lib/seo";
 import type { ContentBlock, SiteSettings } from "@/lib/site";
 
 export const Route = createFileRoute("/videos")({
   loader: () => loadSiteData(),
   head: () => ({
+    links: pageUrlHead("/videos").links,
     meta: [
+      ...pageUrlHead("/videos").meta,
       { title: "Vídeos | Thaynan Pablo Nutrição & Performance" },
       {
         name: "description",
@@ -49,9 +52,7 @@ function VideosPage() {
 
       <section className="mt-8 space-y-8">
         {videos.length === 0 ? (
-          <p className="text-center text-sm text-muted-foreground">
-            Nenhum vídeo publicado ainda.
-          </p>
+          <p className="text-center text-sm text-muted-foreground">Nenhum vídeo publicado ainda.</p>
         ) : (
           videos.map((block) => (
             <article key={block.id} className="space-y-2">

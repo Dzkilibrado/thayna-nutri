@@ -3,12 +3,15 @@ import { BackButton } from "@/components/site/back-button";
 import { PageShell } from "@/components/site/page-shell";
 import { TestimonialCard } from "@/components/site/testimonial-card";
 import { loadSiteData } from "@/lib/site-data";
+import { pageUrlHead } from "@/lib/seo";
 import type { SiteSettings, Testimonial } from "@/lib/site";
 
 export const Route = createFileRoute("/depoimentos")({
   loader: () => loadSiteData(),
   head: () => ({
+    links: pageUrlHead("/depoimentos").links,
     meta: [
+      ...pageUrlHead("/depoimentos").meta,
       { title: "Depoimentos | Thaynan Pablo Nutrição & Performance" },
       {
         name: "description",

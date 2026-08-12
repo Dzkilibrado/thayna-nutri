@@ -2,11 +2,14 @@ import { createFileRoute } from "@tanstack/react-router";
 
 import { ContentPage } from "@/components/site/content-page";
 import { loadSiteData } from "@/lib/site-data";
+import { pageUrlHead } from "@/lib/seo";
 
 export const Route = createFileRoute("/presencial")({
   loader: () => loadSiteData(),
   head: () => ({
+    links: pageUrlHead("/presencial").links,
     meta: [
+      ...pageUrlHead("/presencial").meta,
       { title: "Consulta presencial em Serra/ES | Clínica Overall" },
       {
         name: "description",

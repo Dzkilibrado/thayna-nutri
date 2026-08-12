@@ -4,6 +4,7 @@ import { MapPin, Clock, Phone, Navigation as NavIcon, Car, MessageCircle } from 
 import { BackButton } from "@/components/site/back-button";
 import { PageShell } from "@/components/site/page-shell";
 import { loadSiteData } from "@/lib/site-data";
+import { pageUrlHead } from "@/lib/seo";
 import { externalLinkProps } from "@/lib/external";
 import { whatsappLink } from "@/lib/site";
 
@@ -18,7 +19,9 @@ const DEFAULT_ADDRESS =
 export const Route = createFileRoute("/como-chegar")({
   loader: () => loadSiteData(),
   head: () => ({
+    links: pageUrlHead("/como-chegar").links,
     meta: [
+      ...pageUrlHead("/como-chegar").meta,
       { title: "Como chegar | Thaynan Nutricionista Esportivo" },
       {
         name: "description",

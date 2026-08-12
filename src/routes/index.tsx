@@ -5,12 +5,15 @@ import { PageShell } from "@/components/site/page-shell";
 import { VideoEmbed } from "@/components/site/video-embed";
 import { TestimonialCard } from "@/components/site/testimonial-card";
 import { loadSiteData } from "@/lib/site-data";
+import { pageUrlHead } from "@/lib/seo";
 import type { ContentBlock, SiteSettings, Testimonial } from "@/lib/site";
 
 export const Route = createFileRoute("/")({
   loader: () => loadSiteData(),
   head: () => ({
+    links: pageUrlHead("/").links,
     meta: [
+      ...pageUrlHead("/").meta,
       { title: "Thaynan Nutricionista Esportivo | Serra/ES" },
       {
         name: "description",

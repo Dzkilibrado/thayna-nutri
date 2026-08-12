@@ -4,13 +4,16 @@ import { ArrowRight } from "lucide-react";
 import { BackButton } from "@/components/site/back-button";
 import { PageShell } from "@/components/site/page-shell";
 import { CALCULATORS } from "@/lib/calculators";
+import { pageUrlHead } from "@/lib/seo";
 import { loadSiteData } from "@/lib/site-data";
 import type { ContentBlock, SiteSettings } from "@/lib/site";
 
 export const Route = createFileRoute("/calculadoras/")({
   loader: () => loadSiteData(),
   head: () => ({
+    links: pageUrlHead("/calculadoras").links,
     meta: [
+      ...pageUrlHead("/calculadoras").meta,
       { title: "Calculadoras fitness gratuitas | Thaynan Nutrição" },
       {
         name: "description",
