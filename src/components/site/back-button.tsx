@@ -29,18 +29,3 @@ export function BackButton({
     </Link>
   );
 }
-
-export function HomeButton({ className }: { className?: string }) {
-  return (
-    <Link
-      to="/"
-      aria-label="Voltar para página inicial"
-      className={cn(
-        "inline-flex items-center justify-center rounded-full border border-border bg-surface p-2 text-muted-foreground transition-colors hover:border-primary/60 hover:text-foreground",
-        className,
-      )}
-    >
-      <Home className="size-5" />
-    </Link>
-  );
-}
