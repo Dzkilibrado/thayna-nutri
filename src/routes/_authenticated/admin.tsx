@@ -372,6 +372,29 @@ function ColorField({
   );
 }
 
+/**
+ * Cada página exibe só um tipo de item. Uma combinação inválida (ex: um
+ * "Link / botão" na página Vídeos) salva sem erro e não aparece em lugar
+ * nenhum — por isso o painel avisa antes que a pessoa vá procurar no site.
+ */
+const PAGE_ACCEPTS: Record<string, { kinds: string[]; says: string }> = {
+  home: { kinds: ["link", "video"], says: "links/botões e vídeos" },
+  links: { kinds: ["link"], says: "links/botões" },
+  videos: { kinds: ["video"], says: "vídeos" },
+  sobre: { kinds: ["link", "video", "text"], says: "qualquer tipo" },
+  presencial: { kinds: ["link", "video", "text"], says: "qualquer tipo" },
+  online: { kinds: ["link", "video", "text"], says: "qualquer tipo" },
+};
+
+function mismatchMessage(page: string, kind: string): string | null {
+  const rule = PAGE_ACCEPTS[page];
+  if (!rule || rule.kinds.includes(kind)) return null;
+  const pageLabel = PAGES.find((p) => p.value === page)?.label ?? page;
+  const kindLabel = KINDS.find((k) => k.value === kind)?.label ?? kind;
+  const suggestion = KINDS.find((k) => rule.kinds.includes(k.value))?.label ?? "";
+  return `A página ${pageLabel} mostra apenas ${rule.says}. Este item é do tipo "${kindLabel}", então ele não vai aparecer no site. Troque o tipo para "${suggestion}" ou escolha outra página.`;
+}
+
 const LINK_SHORTCUTS = [
   {
     label: "WhatsApp",
@@ -551,6 +574,8 @@ function BlockCard({
   const set = (key: keyof ContentBlock, value: string | boolean | number) =>
     setForm((prev) => ({ ...prev, [key]: value }));
 
+  const mismatch = mismatchMessage(form.page, form.kind);
+
   return (
     <div className="space-y-4 rounded-2xl border border-border bg-surface p-5">
       <div className="flex flex-wrap items-center justify-between gap-3">
@@ -576,6 +601,11 @@ function BlockCard({
           <span className="text-xs uppercase tracking-widest text-muted-foreground">
             {KINDS.find((k) => k.value === form.kind)?.label ?? form.kind}
           </span>
+          {mismatch ? (
+            <span className="rounded-full bg-destructive/20 px-2 py-0.5 text-[11px] text-foreground">
+              Não aparece no site
+            </span>
+          ) : null}
         </div>
         <div className="flex items-center gap-3">
           {form.kind === "video" ? (
@@ -628,7 +658,17 @@ function BlockCard({
           </Select>
         </Field>
         <Field label="Página">
-          <Select value={form.page} onValueChange={(v) => set("page", v)}>
+          <Select
+            value={form.page}
+            onValueChange={(v) => {
+              const rule = PAGE_ACCEPTS[v];
+              setForm((prev) => ({
+                ...prev,
+                page: v,
+                kind: rule && !rule.kinds.includes(prev.kind) ? rule.kinds[0]! : prev.kind,
+              }));
+            }}
+          >
             <SelectTrigger>
               <SelectValue />
             </SelectTrigger>
@@ -683,6 +723,15 @@ function BlockCard({
         <Field label="Ícone" hint="Escolha o desenho que aparece ao lado do título.">
           <IconPicker value={form.icon} onChange={(id) => set("icon", id)} />
         </Field>
+      ) : null}
+
+      {mismatch ? (
+        <p
+          role="alert"
+          className="rounded-xl border border-destructive/50 bg-destructive/10 px-4 py-3 text-sm"
+        >
+          {mismatch}
+        </p>
       ) : null}
 
       {!form.published ? (
