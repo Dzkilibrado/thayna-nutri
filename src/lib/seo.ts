@@ -2,7 +2,7 @@
  * Endereço oficial do site. É a base de tudo que precisa de URL absoluta:
  * canonical, og:url e o mapa do site. Se o domínio mudar, muda só aqui.
  */
-export const SITE_URL = "https://thayna-nutri.lovable.app";
+export const SITE_URL = "https://thaynanpro.com.br";
 
 export const absoluteUrl = (path: string) =>
   `${SITE_URL}${path.startsWith("/") ? path : `/${path}`}`.replace(/\/$/, "") || SITE_URL;
@@ -18,7 +18,10 @@ export const absoluteUrl = (path: string) =>
 export function pageUrlHead(path: string) {
   const url = absoluteUrl(path);
   return {
-    meta: [{ property: "og:url", content: url }],
+    meta: [
+      { property: "og:url", content: url },
+      { property: "og:locale", content: "pt_BR" },
+    ],
     links: [{ rel: "canonical", href: url }],
   };
 }
