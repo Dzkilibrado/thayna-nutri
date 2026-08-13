@@ -31,7 +31,7 @@ export function TestimonialCard({ item }: { item: Testimonial }) {
                 </DialogTitle>
               </DialogHeader>
               <VideoEmbed url={item.video_url} title={item.author_name} />
-              <p className="text-sm text-muted-foreground">{item.quote}</p>
+              <p className="break-words text-sm text-muted-foreground">{item.quote}</p>
             </DialogContent>
           </Dialog>
         </>
@@ -39,7 +39,9 @@ export function TestimonialCard({ item }: { item: Testimonial }) {
 
       <Quote className="size-6 shrink-0 text-primary" aria-hidden="true" />
 
-      <blockquote className="text-sm leading-relaxed text-foreground/90">{item.quote}</blockquote>
+      <blockquote className="break-words text-sm leading-relaxed text-foreground/90">
+        {item.quote}
+      </blockquote>
 
       <footer className="mt-auto flex items-center gap-3 border-t border-border pt-4">
         {item.photo_url ? (

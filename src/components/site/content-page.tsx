@@ -74,7 +74,7 @@ export function ContentPage({
                   </a>
                 ) : null}
                 {block.body ? (
-                  <p className="whitespace-pre-line leading-relaxed text-muted-foreground">
+                  <p className="whitespace-pre-line break-words leading-relaxed text-muted-foreground">
                     {block.body}
                   </p>
                 ) : null}

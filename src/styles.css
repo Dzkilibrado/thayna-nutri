@@ -172,3 +172,22 @@
   );
   box-shadow: inset 0 1px 0 color-mix(in oklab, var(--brand-accent) 30%, transparent);
 }
+
+/* Rede de segurança: nenhum conteúdo vindo do painel deve empurrar o layout
+   para fora da tela. Um link longo colado no meio de um texto, ou uma palavra
+   sem espaços, quebra dentro da palavra em vez de gerar rolagem horizontal. */
+html,
+body {
+  overflow-x: hidden;
+}
+
+p,
+h1,
+h2,
+h3,
+h4,
+li,
+blockquote,
+figcaption {
+  overflow-wrap: anywhere;
+}
