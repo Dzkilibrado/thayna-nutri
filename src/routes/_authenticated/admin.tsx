@@ -30,6 +30,8 @@ import {
   KINDS,
   PAGES,
   SETTINGS_COLUMNS,
+  SOURCE_HAS_AUTO_COVER,
+  videoSource,
   type ContentBlock,
   type SiteSettings,
 } from "@/lib/site";
@@ -788,7 +790,11 @@ function BlockCard({
           </Field>
           <Field
             label="Capa"
-            hint="Opcional. Vídeos do YouTube já têm capa automática; Instagram e arquivos enviados não."
+            hint={
+              SOURCE_HAS_AUTO_COVER[videoSource(form.url)]
+                ? "Este vídeo já usa a capa automática do YouTube. Envie uma imagem só se quiser substituir."
+                : "Esta origem não fornece capa automática. Envie uma imagem para o vídeo aparecer bem na galeria."
+            }
           >
             <ImageUploadField
               value={form.cover_url ?? ""}

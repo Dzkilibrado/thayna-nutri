@@ -168,3 +168,31 @@ export function videoCover(block: {
   const yt = embed.src.match(/youtube\.com\/embed\/([\w-]{6,})/);
   return yt ? `https://img.youtube.com/vi/${yt[1]}/hqdefault.jpg` : null;
 }
+
+export type VideoSource = "youtube" | "instagram" | "facebook" | "vimeo" | "file" | "other";
+
+/** De onde vem o vídeo — usado para desenhar a capa quando não há imagem. */
+export function videoSource(url: string | null | undefined): VideoSource {
+  const value = (url ?? "").trim();
+  if (!value) return "other";
+  if (/youtube\.com|youtu\.be/i.test(value)) return "youtube";
+  if (/instagram\.com/i.test(value)) return "instagram";
+  if (/facebook\.com|fb\.watch/i.test(value)) return "facebook";
+  if (/vimeo\.com/i.test(value)) return "vimeo";
+  if (/\.(mp4|webm|ogg|mov)(\?|$)/i.test(value)) return "file";
+  return "other";
+}
+
+/**
+ * Só o YouTube publica capa a partir do endereço do vídeo. Instagram e
+ * Facebook exigem API com token que expira, e arquivo enviado não tem capa —
+ * nesses casos a página desenha uma capa própria com a marca da origem.
+ */
+export const SOURCE_HAS_AUTO_COVER: Record<VideoSource, boolean> = {
+  youtube: true,
+  instagram: false,
+  facebook: false,
+  vimeo: false,
+  file: false,
+  other: false,
+};
