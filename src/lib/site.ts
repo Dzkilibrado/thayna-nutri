@@ -31,6 +31,8 @@ export type ContentBlock = {
   sort_order: number;
   published: boolean;
   featured: boolean;
+  category: string | null;
+  cover_url: string | null;
 };
 
 export type Testimonial = {
@@ -52,7 +54,7 @@ export const SETTINGS_COLUMNS =
   "brand_name, brand_tagline, headline, bio, avatar_url, whatsapp, whatsapp_message, email, address, maps_url, hours, instagram_url, youtube_url, intro_video_url, color_background, color_surface, color_accent, color_foreground";
 
 export const BLOCK_COLUMNS =
-  "id, page, kind, title, subtitle, body, url, icon, sort_order, published, featured";
+  "id, page, kind, title, subtitle, body, url, icon, sort_order, published, featured, category, cover_url";
 
 export const PAGES = [
   { value: "home", label: "Início (links)" },
@@ -149,4 +151,20 @@ export function toEmbedUrl(raw: string | null | undefined): EmbedInfo {
     return { type: "video", src: url, ratio: "intrinsic" };
 
   return { type: "iframe", src: url, ratio: "wide" };
+}
+
+/**
+ * Imagem de capa do vídeo para a grade da galeria.
+ * O YouTube publica a capa a partir do identificador do vídeo, então ela vem
+ * de graça. Instagram e arquivos enviados não expõem capa pública — nesses
+ * casos vale a capa informada no painel, e sem ela a grade usa um fundo neutro.
+ */
+export function videoCover(block: {
+  cover_url?: string | null;
+  url?: string | null;
+}): string | null {
+  if (block.cover_url) return block.cover_url;
+  const embed = toEmbedUrl(block.url);
+  const yt = embed.src.match(/youtube\.com\/embed\/([\w-]{6,})/);
+  return yt ? `https://img.youtube.com/vi/${yt[1]}/hqdefault.jpg` : null;
 }

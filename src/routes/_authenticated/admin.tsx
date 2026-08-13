@@ -6,7 +6,7 @@ import { FileField } from "@/components/admin/file-field";
 import { AccessEditor } from "@/components/admin/access-editor";
 import { TestimonialsEditor } from "@/components/admin/testimonials-editor";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { toast } from "sonner";
 import { Plus, Trash2, ArrowUp, ArrowDown, LogOut, ExternalLink } from "lucide-react";
 
@@ -523,6 +523,7 @@ function BlocksEditor({ blocks }: { blocks: ContentBlock[] }) {
               isLast={index === items.length - 1}
               neighbour={index === 0 ? undefined : items[index - 1]}
               next={index === items.length - 1 ? undefined : items[index + 1]}
+              allBlocks={blocks}
             />
           ))}
         </div>
@@ -533,12 +534,14 @@ function BlocksEditor({ blocks }: { blocks: ContentBlock[] }) {
 
 function BlockCard({
   block,
+  allBlocks,
   isFirst,
   isLast,
   neighbour,
   next,
 }: {
   block: ContentBlock;
+  allBlocks: ContentBlock[];
   isFirst: boolean;
   isLast: boolean;
   neighbour?: ContentBlock | undefined;
@@ -598,6 +601,15 @@ function BlockCard({
     setForm((prev) => ({ ...prev, [key]: value }));
 
   const mismatch = mismatchMessage(form.page, form.kind);
+
+  const categories = useMemo(() => {
+    const found = new Set<string>();
+    for (const b of allBlocks) {
+      const name = b.category?.trim();
+      if (name) found.add(name);
+    }
+    return [...found].sort((a, b) => a.localeCompare(b, "pt-BR"));
+  }, [allBlocks]);
 
   return (
     <div className="space-y-4 rounded-2xl border border-border bg-surface p-5">
@@ -755,6 +767,37 @@ function BlockCard({
           )}
         </Field>
       )}
+
+      {form.kind === "video" ? (
+        <div className="grid gap-5 sm:grid-cols-2">
+          <Field
+            label="Assunto"
+            hint="Agrupa o vídeo na página. Ex.: Competições, Nutrição, Atendimento."
+          >
+            <Input
+              list="assuntos-de-video"
+              value={form.category ?? ""}
+              placeholder="Competições"
+              onChange={(e) => set("category", e.target.value)}
+            />
+            <datalist id="assuntos-de-video">
+              {categories.map((c) => (
+                <option key={c} value={c} />
+              ))}
+            </datalist>
+          </Field>
+          <Field
+            label="Capa"
+            hint="Opcional. Vídeos do YouTube já têm capa automática; Instagram e arquivos enviados não."
+          >
+            <ImageUploadField
+              value={form.cover_url ?? ""}
+              onChange={(v) => set("cover_url", v)}
+              folder="capas"
+            />
+          </Field>
+        </div>
+      ) : null}
 
       {form.kind === "link" ? (
         <Field label="Ícone" hint="Escolha o desenho que aparece ao lado do título.">
