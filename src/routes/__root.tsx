@@ -79,6 +79,10 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
   head: () => ({
     meta: [
       { charSet: "utf-8" },
+      // O site é escrito em português para um público brasileiro. Sem isto, o
+      // Chrome traduzia a página automaticamente e reescrevia os textos do
+      // painel ("Agendar consulta" virava "Agendador consulta").
+      { name: "google", content: "notranslate" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
       { title: "Thaynan Pablo | Nutrição & Performance" },
       {

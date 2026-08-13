@@ -37,19 +37,22 @@ export function LinkBlock({
         className="absolute inset-y-3 left-0 w-0.5 rounded-full bg-primary/40 transition-all group-hover:inset-y-2 group-hover:bg-primary"
       />
 
-      <span className="icon-tile flex size-12 shrink-0 items-center justify-center rounded-2xl text-primary transition-transform group-hover:scale-105">
+      <span className="icon-tile flex size-12 shrink-0 items-center justify-center self-center rounded-2xl text-primary transition-transform group-hover:scale-105">
         <Icon className="size-[22px]" />
       </span>
 
       <span className="min-w-0 flex-1">
         <span
           translate="no"
-          className="block truncate font-display text-lg uppercase tracking-wide transition-colors group-hover:text-primary"
+          className="block font-display text-lg uppercase leading-tight tracking-wide transition-colors group-hover:text-primary"
         >
           {block.title}
         </span>
         {block.subtitle ? (
-          <span translate="no" className="mt-0.5 block truncate text-sm text-muted-foreground">
+          <span
+            translate="no"
+            className="mt-1 line-clamp-2 block text-sm leading-snug text-muted-foreground"
+          >
             {block.subtitle}
           </span>
         ) : null}
@@ -62,7 +65,7 @@ export function LinkBlock({
   );
 
   const className =
-    "group link-card-surface card-shadow relative flex w-full items-center gap-4 overflow-hidden rounded-2xl border border-border px-4 py-4 pl-5 text-left transition-all duration-200 hover:link-card-hover hover:-translate-y-0.5 hover:border-primary/50 hover:accent-glow focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring";
+    "group link-card-surface card-shadow relative flex w-full items-center gap-4 overflow-hidden rounded-2xl border border-border px-4 py-4 pl-5 min-h-[5.5rem] text-left transition-all duration-200 hover:link-card-hover hover:-translate-y-0.5 hover:border-primary/50 hover:accent-glow focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring";
 
   if (internal) {
     return (
