@@ -99,7 +99,10 @@ function AdminPage() {
     await queryClient.cancelQueries();
     queryClient.clear();
     await supabase.auth.signOut();
-    navigate({ to: "/auth", replace: true });
+    // Sair devolve à página inicial do site. Voltar para a tela de login dava a
+    // impressão de que a saída não tinha funcionado, e deixava a pessoa presa
+    // no painel sem caminho de volta para o site.
+    navigate({ to: "/", replace: true });
   }
 
   if (roleQuery.isLoading) {
@@ -112,9 +115,14 @@ function AdminPage() {
         title="Sem permissão"
         description="Sua conta não tem acesso de administrador. Peça para um administrador liberar seu acesso."
         action={
-          <Button variant="secondary" onClick={signOut}>
-            Sair
-          </Button>
+          <div className="flex flex-wrap items-center justify-center gap-2">
+            <Button variant="secondary" asChild>
+              <Link to="/">Ir para o site</Link>
+            </Button>
+            <Button variant="ghost" onClick={signOut}>
+              <LogOut className="size-4" /> Sair
+            </Button>
+          </div>
         }
       />
     );
@@ -130,9 +138,9 @@ function AdminPage() {
           </div>
           <div className="flex items-center gap-2">
             <Button variant="secondary" size="sm" asChild>
-              <Link to="/">
+              <a href="/" target="_blank" rel="noreferrer">
                 <ExternalLink className="size-4" /> Ver site
-              </Link>
+              </a>
             </Button>
             <Button variant="ghost" size="sm" onClick={signOut}>
               <LogOut className="size-4" /> Sair
