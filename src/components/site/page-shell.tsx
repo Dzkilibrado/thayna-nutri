@@ -1,6 +1,15 @@
 import { Link } from "@tanstack/react-router";
 import { useState } from "react";
-import { Menu } from "lucide-react";
+import {
+  Calculator,
+  Home,
+  Link as LinkIcon,
+  MapPin,
+  Menu,
+  PlayCircle,
+  Star,
+  User,
+} from "lucide-react";
 
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import type { ReactNode } from "react";
@@ -11,11 +20,17 @@ import { whatsappLink } from "@/lib/site";
 import { externalLinkProps } from "@/lib/external";
 
 const NAV_ITEMS = [
-  { to: "/links", label: "Links" },
-  { to: "/videos", label: "Vídeos" },
-  { to: "/depoimentos", label: "Depoimentos" },
-  { to: "/calculadoras", label: "Calculadoras" },
-  { to: "/sobre", label: "Sobre" },
+  { to: "/links", label: "Links", icon: LinkIcon },
+  { to: "/videos", label: "Vídeos", icon: PlayCircle },
+  { to: "/depoimentos", label: "Depoimentos", icon: Star },
+  { to: "/calculadoras", label: "Calculadoras", icon: Calculator },
+  { to: "/sobre", label: "Sobre", icon: User },
+];
+
+const MENU_ITEMS = [
+  { to: "/", label: "Início", icon: Home, exact: true },
+  ...NAV_ITEMS.map((i) => ({ ...i, exact: false })),
+  { to: "/como-chegar", label: "Como chegar", icon: MapPin, exact: false },
 ];
 
 export function PageShell({
@@ -86,35 +101,22 @@ export function PageShell({
                     {settings?.brand_name ?? "Thaynan"}
                   </SheetTitle>
                 </SheetHeader>
-                <nav className="mt-6 flex flex-col gap-1">
-                  <Link
-                    to="/"
-                    onClick={() => setMenuOpen(false)}
-                    className="rounded-xl px-4 py-3 text-base text-muted-foreground transition-colors hover:bg-surface-2 hover:text-foreground"
-                    activeProps={{ className: "bg-surface-2 text-foreground" }}
-                    activeOptions={{ exact: true }}
-                  >
-                    Início
-                  </Link>
-                  {NAV_ITEMS.map((item) => (
+                <nav className="mt-6 flex flex-col gap-1.5">
+                  {MENU_ITEMS.map((item) => (
                     <Link
                       key={item.to}
                       to={item.to}
                       onClick={() => setMenuOpen(false)}
-                      className="rounded-xl px-4 py-3 text-base text-muted-foreground transition-colors hover:bg-surface-2 hover:text-foreground"
+                      activeOptions={{ exact: item.exact }}
+                      className="group flex items-center gap-3 rounded-xl px-3 py-3 text-base text-muted-foreground transition-colors hover:bg-surface-2 hover:text-foreground"
                       activeProps={{ className: "bg-surface-2 text-foreground" }}
                     >
-                      {item.label}
+                      <span className="icon-tile flex size-9 shrink-0 items-center justify-center rounded-lg text-primary">
+                        <item.icon className="size-[18px]" />
+                      </span>
+                      <span className="truncate">{item.label}</span>
                     </Link>
                   ))}
-                  <Link
-                    to="/como-chegar"
-                    onClick={() => setMenuOpen(false)}
-                    className="rounded-xl px-4 py-3 text-base text-muted-foreground transition-colors hover:bg-surface-2 hover:text-foreground"
-                    activeProps={{ className: "bg-surface-2 text-foreground" }}
-                  >
-                    Como chegar
-                  </Link>
                 </nav>
               </SheetContent>
             </Sheet>

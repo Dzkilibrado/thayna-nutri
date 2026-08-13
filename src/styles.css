@@ -145,3 +145,30 @@
 .nav-scroll::-webkit-scrollbar {
   display: none;
 }
+
+/* Cartão de link: fundo com leve profundidade e um brilho de acento que só
+   aparece no hover, em vez do bloco chapado anterior. */
+@utility link-card-surface {
+  background-image: linear-gradient(
+    150deg,
+    color-mix(in oklab, var(--brand-surface) 96%, var(--brand-accent)),
+    var(--brand-surface) 55%
+  );
+}
+
+@utility link-card-hover {
+  background-image: linear-gradient(
+    150deg,
+    color-mix(in oklab, var(--brand-surface) 88%, var(--brand-accent)),
+    var(--brand-surface) 65%
+  );
+}
+
+@utility icon-tile {
+  background-image: linear-gradient(
+    140deg,
+    color-mix(in oklab, var(--brand-accent) 34%, var(--brand-surface)),
+    color-mix(in oklab, var(--brand-accent) 12%, var(--brand-surface))
+  );
+  box-shadow: inset 0 1px 0 color-mix(in oklab, var(--brand-accent) 30%, transparent);
+}
