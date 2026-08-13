@@ -1,10 +1,22 @@
 import { Link } from "@tanstack/react-router";
+import { useState } from "react";
+import { Menu } from "lucide-react";
+
+import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import type { ReactNode } from "react";
 
 import { ThemeVars } from "@/components/site/theme-vars";
 import type { SiteSettings } from "@/lib/site";
 import { whatsappLink } from "@/lib/site";
 import { externalLinkProps } from "@/lib/external";
+
+const NAV_ITEMS = [
+  { to: "/links", label: "Links" },
+  { to: "/videos", label: "Vídeos" },
+  { to: "/depoimentos", label: "Depoimentos" },
+  { to: "/calculadoras", label: "Calculadoras" },
+  { to: "/sobre", label: "Sobre" },
+];
 
 export function PageShell({
   settings,
@@ -13,6 +25,7 @@ export function PageShell({
   settings: SiteSettings | null;
   children: ReactNode;
 }) {
+  const [menuOpen, setMenuOpen] = useState(false);
   return (
     <div className="min-h-screen bg-background">
       <ThemeVars settings={settings} />
@@ -25,14 +38,9 @@ export function PageShell({
           >
             {settings?.brand_name ?? "Thaynan"}
           </Link>
-          <nav className="nav-scroll ml-auto flex min-w-0 items-center gap-4 overflow-x-auto text-sm">
-            {[
-              { to: "/links", label: "Links" },
-              { to: "/videos", label: "Vídeos" },
-              { to: "/depoimentos", label: "Depoimentos" },
-              { to: "/calculadoras", label: "Calculadoras" },
-              { to: "/sobre", label: "Sobre" },
-            ].map((item) => (
+          {/* Desktop: menu inteiro visível. */}
+          <nav className="ml-auto hidden items-center gap-4 text-sm sm:flex">
+            {NAV_ITEMS.map((item) => (
               <Link
                 key={item.to}
                 to={item.to}
@@ -51,6 +59,66 @@ export function PageShell({
               Agendar
             </a>
           </nav>
+
+          {/* Celular: Agendar continua à vista, o resto vai para o painel. */}
+          <div className="ml-auto flex items-center gap-2 sm:hidden">
+            <a
+              {...externalLinkProps(
+                whatsappLink(settings?.whatsapp ?? "", settings?.whatsapp_message ?? ""),
+              )}
+              className="shrink-0 whitespace-nowrap rounded-full bg-primary px-4 py-1.5 text-sm font-medium text-primary-foreground transition-opacity hover:opacity-90"
+            >
+              Agendar
+            </a>
+            <Sheet open={menuOpen} onOpenChange={setMenuOpen}>
+              <SheetTrigger asChild>
+                <button
+                  type="button"
+                  aria-label="Abrir menu"
+                  className="flex size-10 shrink-0 items-center justify-center rounded-full border border-border text-foreground transition-colors hover:border-primary/60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                >
+                  <Menu className="size-5" />
+                </button>
+              </SheetTrigger>
+              <SheetContent side="right" className="w-[85vw] max-w-xs border-border bg-surface">
+                <SheetHeader>
+                  <SheetTitle className="font-display uppercase tracking-wider">
+                    {settings?.brand_name ?? "Thaynan"}
+                  </SheetTitle>
+                </SheetHeader>
+                <nav className="mt-6 flex flex-col gap-1">
+                  <Link
+                    to="/"
+                    onClick={() => setMenuOpen(false)}
+                    className="rounded-xl px-4 py-3 text-base text-muted-foreground transition-colors hover:bg-surface-2 hover:text-foreground"
+                    activeProps={{ className: "bg-surface-2 text-foreground" }}
+                    activeOptions={{ exact: true }}
+                  >
+                    Início
+                  </Link>
+                  {NAV_ITEMS.map((item) => (
+                    <Link
+                      key={item.to}
+                      to={item.to}
+                      onClick={() => setMenuOpen(false)}
+                      className="rounded-xl px-4 py-3 text-base text-muted-foreground transition-colors hover:bg-surface-2 hover:text-foreground"
+                      activeProps={{ className: "bg-surface-2 text-foreground" }}
+                    >
+                      {item.label}
+                    </Link>
+                  ))}
+                  <Link
+                    to="/como-chegar"
+                    onClick={() => setMenuOpen(false)}
+                    className="rounded-xl px-4 py-3 text-base text-muted-foreground transition-colors hover:bg-surface-2 hover:text-foreground"
+                    activeProps={{ className: "bg-surface-2 text-foreground" }}
+                  >
+                    Como chegar
+                  </Link>
+                </nav>
+              </SheetContent>
+            </Sheet>
+          </div>
         </div>
       </header>
 
