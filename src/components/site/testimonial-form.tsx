@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { PenLine } from "lucide-react";
+import { PenLine, ShieldCheck } from "lucide-react";
 import { toast } from "sonner";
 
 import { Button } from "@/components/ui/button";
@@ -95,8 +95,7 @@ export function TestimonialForm() {
             <DialogHeader>
               <DialogTitle>Escrever depoimento</DialogTitle>
               <DialogDescription>
-                Conte como foi o seu acompanhamento. O texto passa por leitura antes de ser
-                publicado, então ele não aparece no site na hora.
+                Conte como foi o seu acompanhamento com o Thaynan.
               </DialogDescription>
             </DialogHeader>
 
@@ -162,6 +161,18 @@ export function TestimonialForm() {
               <p className="text-[11px] leading-relaxed text-muted-foreground">
                 Ao enviar, você autoriza a publicação do seu nome e do texto no site. Não escreva
                 dados de saúde, resultados de exames, peso ou medidas.
+              </p>
+
+              {/* Aviso no momento do clique: quem escreve precisa saber que o
+                  texto não vai ao ar na hora, para não achar que deu errado
+                  ao voltar à página e não encontrar o depoimento. */}
+              <p className="flex items-start gap-2 rounded-xl border border-primary/40 bg-primary/10 px-4 py-3 text-xs leading-relaxed">
+                <ShieldCheck className="mt-0.5 size-4 shrink-0 text-primary" />
+                <span>
+                  Ao enviar, seu depoimento vai para aprovação do Thaynan. Ele lê cada relato antes
+                  de publicar, então o texto não aparece na página na mesma hora. Assim que for
+                  aprovado, ele entra aqui.
+                </span>
               </p>
 
               <Button onClick={() => void submit()} disabled={busy || !canSend} className="w-full">
