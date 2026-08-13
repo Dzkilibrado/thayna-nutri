@@ -20,7 +20,6 @@ import {
   Dialog,
   DialogContent,
   DialogDescription,
-  DialogFooter,
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
@@ -398,45 +397,41 @@ function TestimonialDialog({
               folder="depoimentos"
             />
           </Field>
+        </div>
 
-          <div className="space-y-3 rounded-xl border border-border bg-surface-2 p-4">
-            <div className="flex items-center justify-between gap-3">
-              <Label htmlFor="pub-dep" className="text-sm">
-                Aparecendo no site
-              </Label>
+        <div className="sticky bottom-0 -mx-6 mt-2 flex flex-wrap items-center justify-between gap-3 border-t border-border bg-surface px-6 py-4">
+          <div className="flex flex-wrap items-center gap-4">
+            <div className="flex items-center gap-2">
               <Switch
                 id="pub-dep"
                 checked={form.published}
                 onCheckedChange={(v) => set("published", v)}
               />
-            </div>
-            <div className="flex items-center justify-between gap-3">
-              <Label htmlFor="feat-dep" className="text-sm">
-                Destacar na página inicial
+              <Label htmlFor="pub-dep" className="text-sm">
+                {form.published ? "Vai aparecer no site" : "Salvar como rascunho"}
               </Label>
+            </div>
+            <div className="flex items-center gap-2">
               <Switch
                 id="feat-dep"
                 checked={form.featured}
                 onCheckedChange={(v) => set("featured", v)}
               />
+              <Label htmlFor="feat-dep" className="text-sm">
+                Destacar na home
+              </Label>
             </div>
-            {!form.published ? (
-              <p className="text-[11px] text-muted-foreground">
-                Com a chave desligada, o depoimento fica guardado no painel mas não aparece para
-                quem visita o site.
-              </p>
-            ) : null}
+          </div>
+
+          <div className="flex items-center gap-2">
+            <Button variant="ghost" onClick={onClose}>
+              Cancelar
+            </Button>
+            <Button onClick={() => save.mutate(form)} disabled={save.isPending || !canSave}>
+              {save.isPending ? "Salvando…" : isNew ? "Criar depoimento" : "Salvar alterações"}
+            </Button>
           </div>
         </div>
-
-        <DialogFooter>
-          <Button variant="ghost" onClick={onClose}>
-            Cancelar
-          </Button>
-          <Button onClick={() => save.mutate(form)} disabled={save.isPending || !canSave}>
-            {save.isPending ? "Salvando…" : isNew ? "Criar depoimento" : "Salvar alterações"}
-          </Button>
-        </DialogFooter>
       </DialogContent>
     </Dialog>
   );
