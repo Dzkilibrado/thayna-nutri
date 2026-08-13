@@ -42,11 +42,14 @@ export function LinkBlock({
       </span>
 
       <span className="min-w-0 flex-1">
-        <span className="block truncate font-display text-lg uppercase tracking-wide transition-colors group-hover:text-primary">
+        <span
+          translate="no"
+          className="block truncate font-display text-lg uppercase tracking-wide transition-colors group-hover:text-primary"
+        >
           {block.title}
         </span>
         {block.subtitle ? (
-          <span className="mt-0.5 block truncate text-sm text-muted-foreground">
+          <span translate="no" className="mt-0.5 block truncate text-sm text-muted-foreground">
             {block.subtitle}
           </span>
         ) : null}

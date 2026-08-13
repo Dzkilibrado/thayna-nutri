@@ -49,6 +49,7 @@ export function PageShell({
           <Link
             to="/"
             aria-label="Ir para a página inicial"
+            translate="no"
             className="shrink-0 rounded-md font-display text-xl uppercase leading-tight tracking-wider transition-colors hover:text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
           >
             {settings?.brand_name ?? "Thaynan"}
@@ -59,6 +60,7 @@ export function PageShell({
               <Link
                 key={item.to}
                 to={item.to}
+                translate="no"
                 className="whitespace-nowrap text-muted-foreground transition-colors hover:text-foreground"
                 activeProps={{ className: "text-foreground" }}
               >
@@ -69,6 +71,7 @@ export function PageShell({
               {...externalLinkProps(
                 whatsappLink(settings?.whatsapp ?? "", settings?.whatsapp_message ?? ""),
               )}
+              translate="no"
               className="shrink-0 whitespace-nowrap rounded-full bg-primary px-4 py-1.5 font-medium text-primary-foreground transition-opacity hover:opacity-90"
             >
               Agendar
@@ -81,6 +84,7 @@ export function PageShell({
               {...externalLinkProps(
                 whatsappLink(settings?.whatsapp ?? "", settings?.whatsapp_message ?? ""),
               )}
+              translate="no"
               className="shrink-0 whitespace-nowrap rounded-full bg-primary px-4 py-1.5 text-sm font-medium text-primary-foreground transition-opacity hover:opacity-90"
             >
               Agendar
@@ -97,7 +101,7 @@ export function PageShell({
               </SheetTrigger>
               <SheetContent side="right" className="w-[85vw] max-w-xs border-border bg-surface">
                 <SheetHeader>
-                  <SheetTitle className="font-display uppercase tracking-wider">
+                  <SheetTitle translate="no" className="font-display uppercase tracking-wider">
                     {settings?.brand_name ?? "Thaynan"}
                   </SheetTitle>
                 </SheetHeader>
@@ -108,6 +112,7 @@ export function PageShell({
                       to={item.to}
                       onClick={() => setMenuOpen(false)}
                       activeOptions={{ exact: item.exact }}
+                      translate="no"
                       className="group flex items-center gap-3 rounded-xl px-3 py-3 text-base text-muted-foreground transition-colors hover:bg-surface-2 hover:text-foreground"
                       activeProps={{ className: "bg-surface-2 text-foreground" }}
                     >
