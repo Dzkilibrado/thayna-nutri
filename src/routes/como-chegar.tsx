@@ -36,6 +36,35 @@ export const Route = createFileRoute("/como-chegar")({
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
     ],
+    scripts: [
+      {
+        type: "application/ld+json",
+        children: JSON.stringify({
+          "@context": "https://schema.org",
+          "@type": "MedicalClinic",
+          name: "Clínica Overall — Thaynan Nutricionista Esportivo",
+          url: "https://thayna-nutri.lovable.app/como-chegar",
+          telephone: "+55 27 99665-7309",
+          address: {
+            "@type": "PostalAddress",
+            streetAddress: "Centro Empresarial da Serra, sala 718 — Parque Residencial Laranjeiras",
+            addressLocality: "Serra",
+            addressRegion: "ES",
+            postalCode: "29165-612",
+            addressCountry: "BR",
+          },
+          geo: { "@type": "GeoCoordinates", latitude: -20.1951652, longitude: -40.2543406 },
+          openingHoursSpecification: [
+            {
+              "@type": "OpeningHoursSpecification",
+              dayOfWeek: ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"],
+              opens: "09:00",
+              closes: "20:00",
+            },
+          ],
+        }),
+      },
+    ],
   }),
   component: ComoChegarPage,
 });

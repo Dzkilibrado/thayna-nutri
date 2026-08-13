@@ -50,7 +50,7 @@ export function ContentPage({
                 {block.kind === "image" && block.url ? (
                   <img
                     src={block.url}
-                    alt={block.title || "Imagem"}
+                    alt={block.title || ""}
                     loading="lazy"
                     className="card-shadow block w-full rounded-2xl border border-border object-contain"
                   />

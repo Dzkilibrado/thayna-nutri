@@ -1,4 +1,4 @@
-import type { ReactNode } from "react";
+import { useId, type ReactNode } from "react";
 
 import { BackButton } from "@/components/site/back-button";
 import { PageShell } from "@/components/site/page-shell";
@@ -58,10 +58,14 @@ export function NumField({
   onChange: (v: string) => void;
   step?: string;
 }) {
+  const id = useId();
   return (
     <div className="space-y-1.5">
-      <Label className="text-xs uppercase tracking-wide text-muted-foreground">{label}</Label>
+      <Label htmlFor={id} className="text-xs uppercase tracking-wide text-muted-foreground">
+        {label}
+      </Label>
       <Input
+        id={id}
         type="number"
         inputMode="decimal"
         step={step}
@@ -85,8 +89,8 @@ export function ChoiceGroup<T extends string | number>({
   onChange: (v: T) => void;
 }) {
   return (
-    <div className="space-y-2">
-      <Label className="text-xs uppercase tracking-wide text-muted-foreground">{label}</Label>
+    <fieldset className="space-y-2">
+      <legend className="text-xs uppercase tracking-wide text-muted-foreground">{label}</legend>
       <div className="flex flex-wrap gap-2">
         {options.map((o) => (
           <button
@@ -104,7 +108,7 @@ export function ChoiceGroup<T extends string | number>({
           </button>
         ))}
       </div>
-    </div>
+    </fieldset>
   );
 }
 
@@ -119,10 +123,14 @@ export function SelectField<T extends string | number>({
   value: T;
   onChange: (v: T) => void;
 }) {
+  const id = useId();
   return (
     <div className="space-y-1.5">
-      <Label className="text-xs uppercase tracking-wide text-muted-foreground">{label}</Label>
+      <Label htmlFor={id} className="text-xs uppercase tracking-wide text-muted-foreground">
+        {label}
+      </Label>
       <select
+        id={id}
         value={String(value)}
         onChange={(e) => {
           const found = options.find((o) => String(o.value) === e.target.value);

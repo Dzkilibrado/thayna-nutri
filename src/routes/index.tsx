@@ -25,8 +25,25 @@ export const Route = createFileRoute("/")({
         property: "og:description",
         content: "Agende sua consulta e acompanhe conteúdos sobre nutrição e performance.",
       },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary_large_image" },
+    ],
+    scripts: [
+      {
+        type: "application/ld+json",
+        children: JSON.stringify({
+          "@context": "https://schema.org",
+          "@type": "Person",
+          name: "Thaynan Pablo",
+          jobTitle: "Nutricionista Esportivo",
+          url: "https://thayna-nutri.lovable.app/",
+          worksFor: { "@type": "MedicalClinic", name: "Clínica Overall" },
+          areaServed: "Serra, ES",
+        }),
+      },
     ],
   }),
+
   component: Home,
 });
 
@@ -54,7 +71,9 @@ function Home() {
             {(settings?.brand_name ?? "T").slice(0, 1)}
           </div>
         )}
-        <h1 className="mt-5 text-4xl">{settings?.brand_name ?? "Thaynan"}</h1>
+        <h1 className="mt-5 text-4xl">
+          {settings?.brand_name ?? "Thaynan"} — Nutrição &amp; Performance
+        </h1>
         <p className="mt-1 text-sm uppercase tracking-[0.25em] text-primary">
           {settings?.brand_tagline ?? "Nutrição & Performance"}
         </p>
