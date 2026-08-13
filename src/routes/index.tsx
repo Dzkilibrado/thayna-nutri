@@ -71,7 +71,9 @@ function Home() {
             {(settings?.brand_name ?? "T").slice(0, 1)}
           </div>
         )}
-        <h1 className="mt-5 text-4xl">{settings?.brand_name ?? "Thaynan"}</h1>
+        <h1 className="mt-5 text-4xl">
+          {settings?.brand_name ?? "Thaynan"} — Nutrição &amp; Performance
+        </h1>
         <p className="mt-1 text-sm uppercase tracking-[0.25em] text-primary">
           {settings?.brand_tagline ?? "Nutrição & Performance"}
         </p>
