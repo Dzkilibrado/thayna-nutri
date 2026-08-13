@@ -26,7 +26,6 @@ export function VideoEmbed({ url, title }: { url: string | null | undefined; tit
   if (embed.type === "video") {
     return (
       <div className={cn(frame, "mx-auto w-fit max-w-full")}>
-        {/* eslint-disable-next-line jsx-a11y/media-has-caption */}
         <video
           src={embed.src}
           controls

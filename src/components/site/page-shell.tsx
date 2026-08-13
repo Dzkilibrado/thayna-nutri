@@ -24,12 +24,17 @@ const NAV_ITEMS = [
   { to: "/videos", label: "Vídeos", icon: PlayCircle },
   { to: "/depoimentos", label: "Depoimentos", icon: Star },
   { to: "/calculadoras", label: "Calculadoras", icon: Calculator },
-  { to: "/sobre", label: "Sobre", icon: User },
 ];
 
+/**
+ * O menu do celular é a única navegação nas páginas internas, então ele mantém
+ * os itens que saíram da barra do topo — Sobre e Como chegar, que já aparecem
+ * na lista da página inicial com melhor posicionamento.
+ */
 const MENU_ITEMS = [
   { to: "/", label: "Início", icon: Home, exact: true },
   ...NAV_ITEMS.map((i) => ({ ...i, exact: false })),
+  { to: "/sobre", label: "Sobre mim", icon: User, exact: false },
   { to: "/como-chegar", label: "Como chegar", icon: MapPin, exact: false },
 ];
 

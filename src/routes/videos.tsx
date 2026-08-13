@@ -1,13 +1,13 @@
 import { useMemo, useState } from "react";
 import { createFileRoute } from "@tanstack/react-router";
-import { Facebook, Film, Instagram, Play, Video } from "lucide-react";
 
 import { BackButton } from "@/components/site/back-button";
 import { PageShell } from "@/components/site/page-shell";
 import { VideoEmbed } from "@/components/site/video-embed";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { pageUrlHead } from "@/lib/seo";
-import { videoCover, videoSource, type ContentBlock, type SiteSettings } from "@/lib/site";
+import { VideoThumb } from "@/components/site/video-thumb";
+import type { ContentBlock, SiteSettings } from "@/lib/site";
 import { loadSiteData } from "@/lib/site-data";
 import { cn } from "@/lib/utils";
 
@@ -131,59 +131,18 @@ function VideosPage() {
   );
 }
 
-const SOURCE_ART = {
-  instagram: { Icon: Instagram, label: "Instagram" },
-  facebook: { Icon: Facebook, label: "Facebook" },
-  vimeo: { Icon: Video, label: "Vimeo" },
-  file: { Icon: Film, label: "Vídeo" },
-  youtube: { Icon: Video, label: "YouTube" },
-  other: { Icon: Film, label: "Vídeo" },
-} as const;
-
-/**
- * Capa desenhada para quando a origem não fornece miniatura.
- * Melhor do que um retângulo vazio: identifica de onde vem o vídeo e mantém a
- * grade com aparência intencional.
- */
-function SourceCover({ url }: { url: string | null }) {
-  const { Icon, label } = SOURCE_ART[videoSource(url)];
-  return (
-    <span className="icon-tile flex size-full flex-col items-center justify-center gap-2">
-      <Icon className="size-8 text-primary/70" />
-      <span className="text-[11px] uppercase tracking-[0.2em] text-muted-foreground">{label}</span>
-    </span>
-  );
-}
-
 function VideoCard({ video, onOpen }: { video: ContentBlock; onOpen: () => void }) {
-  const cover = videoCover(video);
-
   return (
-    <button
-      type="button"
-      onClick={onOpen}
-      className="group card-shadow overflow-hidden rounded-2xl border border-border bg-surface text-left transition-all hover:-translate-y-0.5 hover:border-primary/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-    >
-      <span className="relative block aspect-video w-full overflow-hidden bg-surface-2">
-        {cover ? (
-          <img
-            src={cover}
-            alt=""
-            loading="lazy"
-            className="size-full object-cover transition-transform duration-300 group-hover:scale-105"
-          />
-        ) : (
-          <SourceCover url={video.url} />
-        )}
+    <div className="group card-shadow overflow-hidden rounded-2xl border border-border bg-surface transition-all hover:-translate-y-0.5 hover:border-primary/50">
+      <VideoThumb
+        url={video.url}
+        coverUrl={video.cover_url}
+        onOpen={onOpen}
+        label={video.title}
+        className="rounded-none border-0"
+      />
 
-        <span className="absolute inset-0 flex items-center justify-center bg-black/25 transition-colors group-hover:bg-black/10">
-          <span className="flex size-14 items-center justify-center rounded-full bg-primary/90 text-primary-foreground shadow-lg transition-transform group-hover:scale-110">
-            <Play className="size-6 translate-x-0.5 fill-current" />
-          </span>
-        </span>
-      </span>
-
-      <span className="block p-4">
+      <button type="button" onClick={onOpen} className="block w-full p-4 text-left">
         {video.category ? (
           <span className="mb-1.5 inline-block rounded-full bg-primary/15 px-2.5 py-0.5 text-[11px] text-primary">
             {video.category}
@@ -197,7 +156,7 @@ function VideoCard({ video, onOpen }: { video: ContentBlock; onOpen: () => void 
             {video.subtitle}
           </span>
         ) : null}
-      </span>
-    </button>
+      </button>
+    </div>
   );
 }

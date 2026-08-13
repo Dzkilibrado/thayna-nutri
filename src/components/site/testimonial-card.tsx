@@ -1,12 +1,41 @@
+import { useState } from "react";
 import { Quote } from "lucide-react";
 
 import { VideoEmbed } from "@/components/site/video-embed";
+import { VideoThumb } from "@/components/site/video-thumb";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import type { Testimonial } from "@/lib/site";
 
 export function TestimonialCard({ item }: { item: Testimonial }) {
+  const [playing, setPlaying] = useState(false);
+
   return (
     <article className="card-shadow flex flex-col gap-4 rounded-2xl border border-border bg-surface p-5">
-      {item.video_url ? <VideoEmbed url={item.video_url} title={item.author_name} /> : null}
+      {item.video_url ? (
+        <>
+          {/* O player só carrega ao clicar: numa grade de depoimentos, abrir
+              todos de uma vez deixa a página pesada. A foto da pessoa serve de
+              capa quando a origem não fornece miniatura. */}
+          <VideoThumb
+            url={item.video_url}
+            fallbackCover={item.photo_url}
+            onOpen={() => setPlaying(true)}
+            label={item.author_name}
+          />
+
+          <Dialog open={playing} onOpenChange={setPlaying}>
+            <DialogContent className="max-w-3xl border-border bg-surface">
+              <DialogHeader>
+                <DialogTitle className="font-display uppercase tracking-wide">
+                  {item.author_name}
+                </DialogTitle>
+              </DialogHeader>
+              <VideoEmbed url={item.video_url} title={item.author_name} />
+              <p className="text-sm text-muted-foreground">{item.quote}</p>
+            </DialogContent>
+          </Dialog>
+        </>
+      ) : null}
 
       <Quote className="size-6 shrink-0 text-primary" aria-hidden="true" />
 
