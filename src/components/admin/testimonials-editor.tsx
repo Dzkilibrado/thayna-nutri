@@ -1,17 +1,36 @@
 import { useEffect, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { ArrowDown, ArrowUp, Trash2 } from "lucide-react";
+import { ArrowDown, ArrowUp, Eye, EyeOff, Pencil, Plus, Star, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 
 import { ImageUploadField } from "@/components/admin/image-upload";
 import { VideoField } from "@/components/admin/video-field";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { Textarea } from "@/components/ui/textarea";
 import { supabase } from "@/integrations/supabase/client";
 import { MAX_TESTIMONIAL_QUOTE, TESTIMONIAL_COLUMNS, type Testimonial } from "@/lib/site";
+import { cn } from "@/lib/utils";
 
 function Field({
   label,
@@ -31,8 +50,22 @@ function Field({
   );
 }
 
+const EMPTY: Testimonial = {
+  id: "",
+  author_name: "",
+  author_context: null,
+  quote: "",
+  photo_url: null,
+  video_url: null,
+  sort_order: 0,
+  featured: false,
+  published: true,
+};
+
 export function TestimonialsEditor() {
   const queryClient = useQueryClient();
+  const [editing, setEditing] = useState<Testimonial | null>(null);
+  const [creating, setCreating] = useState(false);
 
   const query = useQuery({
     queryKey: ["admin-testimonials"],
@@ -49,32 +82,15 @@ export function TestimonialsEditor() {
   const items = query.data ?? [];
   const refresh = () => queryClient.invalidateQueries({ queryKey: ["admin-testimonials"] });
 
-  const create = useMutation({
-    mutationFn: async () => {
-      const { error } = await supabase.from("testimonials").insert({
-        author_name: "Novo depoimento",
-        quote: "",
-        sort_order: items.length + 1,
-        published: true,
-      });
-      if (error) throw error;
-    },
-    onSuccess: () => {
-      toast.success("Depoimento criado e já visível no site.");
-      void refresh();
-    },
-    onError: (e: Error) => toast.error(e.message),
-  });
-
   return (
     <div className="space-y-5">
       <div className="flex flex-wrap items-start justify-between gap-3">
         <p className="max-w-md text-sm text-muted-foreground">
-          Relatos de pacientes. Aparecem na página Depoimentos e, quando marcados, também na página
-          inicial.
+          Relatos de pacientes. Aparecem na página Depoimentos e, quando destacados, também na
+          página inicial.
         </p>
-        <Button onClick={() => create.mutate()} disabled={create.isPending}>
-          + Novo depoimento
+        <Button onClick={() => setCreating(true)}>
+          <Plus className="size-4" /> Novo depoimento
         </Button>
       </div>
 
@@ -87,71 +103,71 @@ export function TestimonialsEditor() {
       {query.isLoading ? <p className="text-sm">Carregando…</p> : null}
 
       {!query.isLoading && items.length === 0 ? (
-        <p className="rounded-2xl border border-dashed border-border px-4 py-8 text-center text-sm text-muted-foreground">
+        <p className="rounded-2xl border border-dashed border-border p-8 text-center text-sm text-muted-foreground">
           Nenhum depoimento ainda. Clique em &ldquo;Novo depoimento&rdquo; para começar.
         </p>
       ) : null}
 
-      {items.map((item, index) => (
-        <TestimonialForm
-          key={item.id}
-          item={item}
-          isFirst={index === 0}
-          isLast={index === items.length - 1}
-          previous={items[index - 1]}
-          next={items[index + 1]}
+      {items.length > 0 ? (
+        <>
+          <p className="text-sm text-muted-foreground">
+            Esta é a ordem em que aparecem no site. Use as setas para reorganizar e o lápis para
+            alterar o conteúdo.
+          </p>
+          <ul className="space-y-2">
+            {items.map((item, index) => (
+              <TestimonialRow
+                key={item.id}
+                item={item}
+                isFirst={index === 0}
+                isLast={index === items.length - 1}
+                previous={items[index - 1]}
+                next={items[index + 1]}
+                onEdit={() => setEditing(item)}
+                onChanged={refresh}
+              />
+            ))}
+          </ul>
+        </>
+      ) : null}
+
+      {editing ? (
+        <TestimonialDialog
+          item={editing}
+          onClose={() => setEditing(null)}
+          onSaved={() => void refresh()}
         />
-      ))}
+      ) : null}
+
+      {creating ? (
+        <TestimonialDialog
+          item={{ ...EMPTY, sort_order: items.length + 1 }}
+          onClose={() => setCreating(false)}
+          onSaved={() => void refresh()}
+        />
+      ) : null}
     </div>
   );
 }
 
-function TestimonialForm({
+function TestimonialRow({
   item,
   isFirst,
   isLast,
   previous,
   next,
+  onEdit,
+  onChanged,
 }: {
   item: Testimonial;
   isFirst: boolean;
   isLast: boolean;
   previous?: Testimonial | undefined;
   next?: Testimonial | undefined;
+  onEdit: () => void;
+  onChanged: () => void;
 }) {
-  const queryClient = useQueryClient();
-  const [form, setForm] = useState<Testimonial>(item);
-
-  useEffect(() => setForm(item), [item]);
-
-  const refresh = () => queryClient.invalidateQueries({ queryKey: ["admin-testimonials"] });
-  const set = <K extends keyof Testimonial>(key: K, value: Testimonial[K]) =>
-    setForm((prev) => ({ ...prev, [key]: value }));
-
-  const save = useMutation({
-    mutationFn: async (values: Testimonial) => {
-      const { id, ...rest } = values;
-      const { error } = await supabase.from("testimonials").update(rest).eq("id", id);
-      if (error) throw error;
-    },
-    onSuccess: () => {
-      toast.success("Depoimento salvo.");
-      void refresh();
-    },
-    onError: (e: Error) => toast.error(e.message),
-  });
-
-  const remove = useMutation({
-    mutationFn: async () => {
-      const { error } = await supabase.from("testimonials").delete().eq("id", item.id);
-      if (error) throw error;
-    },
-    onSuccess: () => {
-      toast.success("Depoimento excluído.");
-      void refresh();
-    },
-    onError: (e: Error) => toast.error(e.message),
-  });
+  const [confirmDelete, setConfirmDelete] = useState(false);
 
   const swap = useMutation({
     mutationFn: async (other: Testimonial) => {
@@ -162,123 +178,266 @@ function TestimonialForm({
       if (r1.error) throw r1.error;
       if (r2.error) throw r2.error;
     },
-    onSuccess: () => void refresh(),
+    onSuccess: onChanged,
     onError: (e: Error) => toast.error(e.message),
   });
 
-  const tooLong = form.quote.length > MAX_TESTIMONIAL_QUOTE;
+  const remove = useMutation({
+    mutationFn: async () => {
+      const { error } = await supabase.from("testimonials").delete().eq("id", item.id);
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      toast.success("Depoimento excluído.");
+      setConfirmDelete(false);
+      onChanged();
+    },
+    onError: (e: Error) => toast.error(e.message),
+  });
 
   return (
-    <div className="space-y-4 rounded-2xl border border-border bg-surface p-5">
-      <div className="flex flex-wrap items-center justify-between gap-3">
-        <div className="flex items-center gap-2">
-          <Button
-            variant="ghost"
-            size="icon"
-            disabled={isFirst || swap.isPending}
-            onClick={() => previous && swap.mutate(previous)}
-            aria-label="Mover para cima"
-          >
-            <ArrowUp className="size-4" />
-          </Button>
-          <Button
-            variant="ghost"
-            size="icon"
-            disabled={isLast || swap.isPending}
-            onClick={() => next && swap.mutate(next)}
-            aria-label="Mover para baixo"
-          >
-            <ArrowDown className="size-4" />
-          </Button>
-        </div>
-
-        <div className="flex items-center gap-3">
-          <div className="flex items-center gap-2">
-            <Switch
-              id={`feat-${item.id}`}
-              checked={form.featured}
-              onCheckedChange={(v) => set("featured", v)}
-            />
-            <Label htmlFor={`feat-${item.id}`} className="text-xs">
-              Na página inicial
-            </Label>
-          </div>
-          <div className="flex items-center gap-2">
-            <Switch
-              id={`pub-${item.id}`}
-              checked={form.published}
-              onCheckedChange={(v) => set("published", v)}
-            />
-            <Label htmlFor={`pub-${item.id}`} className="text-xs">
-              {form.published ? "Aparecendo no site" : "Rascunho (oculto)"}
-            </Label>
-          </div>
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={() => remove.mutate()}
-            aria-label="Excluir depoimento"
-          >
-            <Trash2 className="size-4 text-destructive" />
-          </Button>
-        </div>
+    <li className="flex items-center gap-3 rounded-xl border border-border bg-surface px-3 py-3">
+      <div className="flex shrink-0 flex-col">
+        <button
+          type="button"
+          disabled={isFirst || swap.isPending}
+          onClick={() => previous && swap.mutate(previous)}
+          aria-label="Mover para cima"
+          className="rounded p-0.5 text-muted-foreground transition-colors hover:text-foreground disabled:opacity-30"
+        >
+          <ArrowUp className="size-4" />
+        </button>
+        <button
+          type="button"
+          disabled={isLast || swap.isPending}
+          onClick={() => next && swap.mutate(next)}
+          aria-label="Mover para baixo"
+          className="rounded p-0.5 text-muted-foreground transition-colors hover:text-foreground disabled:opacity-30"
+        >
+          <ArrowDown className="size-4" />
+        </button>
       </div>
 
-      <div className="grid gap-4 sm:grid-cols-2">
-        <Field label="Nome de quem falou">
-          <Input
-            value={form.author_name}
-            onChange={(e) => set("author_name", e.target.value)}
-            placeholder="Ex: Marina S."
-          />
-        </Field>
-        <Field label="Sobre o acompanhamento" hint="Ex: Corrida de rua, Ganho de massa, Online">
-          <Input
-            value={form.author_context ?? ""}
-            onChange={(e) => set("author_context", e.target.value)}
-          />
-        </Field>
+      {item.photo_url ? (
+        <img
+          src={item.photo_url}
+          alt=""
+          className="size-10 shrink-0 rounded-full border border-border object-cover"
+        />
+      ) : (
+        <span className="icon-tile flex size-10 shrink-0 items-center justify-center rounded-full font-display text-sm text-primary">
+          {(item.author_name || "?").slice(0, 1).toUpperCase()}
+        </span>
+      )}
+
+      <div className="min-w-0 flex-1">
+        <p className="truncate text-sm font-medium">{item.author_name || "(sem nome)"}</p>
+        <p className="truncate text-xs text-muted-foreground">
+          {item.author_context ? `${item.author_context} · ` : ""}
+          {item.quote || "(sem texto)"}
+        </p>
       </div>
 
-      <Field
-        label="Depoimento"
-        hint={`${form.quote.length} de ${MAX_TESTIMONIAL_QUOTE} caracteres`}
+      {item.featured ? (
+        <span className="hidden shrink-0 items-center gap-1.5 rounded-full bg-primary/15 px-2.5 py-1 text-[11px] text-primary sm:flex">
+          <Star className="size-3" /> Na home
+        </span>
+      ) : null}
+
+      <span
+        className={cn(
+          "hidden shrink-0 items-center gap-1.5 rounded-full px-2.5 py-1 text-[11px] sm:flex",
+          item.published ? "bg-primary/15 text-primary" : "bg-surface-2 text-muted-foreground",
+        )}
       >
-        <Textarea rows={4} value={form.quote} onChange={(e) => set("quote", e.target.value)} />
-      </Field>
+        {item.published ? <Eye className="size-3" /> : <EyeOff className="size-3" />}
+        {item.published ? "No site" : "Rascunho"}
+      </span>
 
-      {tooLong ? (
-        <p className="rounded-xl border border-destructive/50 bg-destructive/10 px-4 py-3 text-sm">
-          O texto está longo demais para o card. Reduza para até {MAX_TESTIMONIAL_QUOTE} caracteres.
-        </p>
-      ) : null}
+      <div className="flex shrink-0 items-center gap-1">
+        <Button variant="ghost" size="icon" onClick={onEdit} aria-label="Editar depoimento">
+          <Pencil className="size-4" />
+        </Button>
+        <Button
+          variant="ghost"
+          size="icon"
+          onClick={() => setConfirmDelete(true)}
+          aria-label="Excluir depoimento"
+        >
+          <Trash2 className="size-4 text-destructive" />
+        </Button>
+      </div>
 
-      <Field label="Foto da pessoa" hint="Opcional. Foto de rosto — nunca antes e depois.">
-        <ImageUploadField
-          value={form.photo_url ?? ""}
-          onChange={(url) => set("photo_url", url)}
-          folder="depoimentos"
-        />
-      </Field>
+      <AlertDialog open={confirmDelete} onOpenChange={setConfirmDelete}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Excluir o depoimento de {item.author_name}?</AlertDialogTitle>
+            <AlertDialogDescription>
+              O depoimento sai do site na hora e não tem como desfazer. Se você só quer escondê-lo
+              por um tempo, edite e desligue a chave &ldquo;Aparecendo no site&rdquo;.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancelar</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={(e) => {
+                e.preventDefault();
+                remove.mutate();
+              }}
+            >
+              Excluir
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+    </li>
+  );
+}
 
-      <Field label="Vídeo do depoimento" hint="Opcional.">
-        <VideoField
-          value={form.video_url ?? ""}
-          onChange={(v) => set("video_url", v)}
-          folder="depoimentos"
-        />
-      </Field>
+function TestimonialDialog({
+  item,
+  onClose,
+  onSaved,
+}: {
+  item: Testimonial;
+  onClose: () => void;
+  onSaved: () => void;
+}) {
+  const [form, setForm] = useState<Testimonial>(item);
+  useEffect(() => setForm(item), [item]);
 
-      {!form.published ? (
-        <p className="rounded-xl border border-primary/40 bg-primary/10 px-4 py-3 text-sm">
-          Este depoimento está como rascunho e não aparece no site. Ligue a chave &ldquo;Aparecendo
-          no site&rdquo; acima e salve para publicar.
-        </p>
-      ) : null}
+  const isNew = item.id === "";
+  const set = <K extends keyof Testimonial>(key: K, value: Testimonial[K]) =>
+    setForm((prev) => ({ ...prev, [key]: value }));
 
-      <Button onClick={() => save.mutate(form)} disabled={save.isPending || tooLong}>
-        {save.isPending ? "Salvando…" : "Salvar depoimento"}
-      </Button>
-    </div>
+  const tooLong = form.quote.length > MAX_TESTIMONIAL_QUOTE;
+  const canSave = form.author_name.trim().length > 0 && form.quote.trim().length > 0 && !tooLong;
+
+  const save = useMutation({
+    mutationFn: async (values: Testimonial) => {
+      const { id, ...rest } = values;
+      const { error } = isNew
+        ? await supabase.from("testimonials").insert(rest)
+        : await supabase.from("testimonials").update(rest).eq("id", id);
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      toast.success(
+        form.published
+          ? isNew
+            ? "Depoimento criado e já visível no site."
+            : "Depoimento salvo e atualizado no site."
+          : "Depoimento salvo como rascunho — ele não aparece no site.",
+      );
+      onSaved();
+      onClose();
+    },
+    onError: (e: Error) => toast.error(e.message),
+  });
+
+  return (
+    <Dialog open onOpenChange={(open) => !open && onClose()}>
+      <DialogContent className="max-h-[90vh] max-w-2xl overflow-y-auto border-border bg-surface">
+        <DialogHeader>
+          <DialogTitle>{isNew ? "Novo depoimento" : "Editar depoimento"}</DialogTitle>
+          <DialogDescription>
+            As alterações só valem depois de salvar. Fechar esta janela descarta o que você mudou.
+          </DialogDescription>
+        </DialogHeader>
+
+        <div className="space-y-5">
+          <div className="grid gap-4 sm:grid-cols-2">
+            <Field label="Nome de quem falou">
+              <Input
+                autoFocus
+                value={form.author_name}
+                placeholder="Ex.: Marina S."
+                onChange={(e) => set("author_name", e.target.value)}
+              />
+            </Field>
+            <Field
+              label="Sobre o acompanhamento"
+              hint="Opcional. Ex.: Corrida de rua, Ganho de massa, Online."
+            >
+              <Input
+                value={form.author_context ?? ""}
+                onChange={(e) => set("author_context", e.target.value)}
+              />
+            </Field>
+          </div>
+
+          <Field
+            label="Depoimento"
+            hint={`${form.quote.length} de ${MAX_TESTIMONIAL_QUOTE} caracteres`}
+          >
+            <Textarea rows={5} value={form.quote} onChange={(e) => set("quote", e.target.value)} />
+          </Field>
+
+          {tooLong ? (
+            <p
+              role="alert"
+              className="rounded-xl border border-destructive/50 bg-destructive/10 px-4 py-3 text-sm"
+            >
+              O texto está longo demais para o card. Reduza para até {MAX_TESTIMONIAL_QUOTE}{" "}
+              caracteres.
+            </p>
+          ) : null}
+
+          <Field label="Foto da pessoa" hint="Opcional. Foto de rosto — nunca antes e depois.">
+            <ImageUploadField
+              value={form.photo_url ?? ""}
+              onChange={(url) => set("photo_url", url)}
+              folder="depoimentos"
+            />
+          </Field>
+
+          <Field label="Vídeo do depoimento" hint="Opcional.">
+            <VideoField
+              value={form.video_url ?? ""}
+              onChange={(v) => set("video_url", v)}
+              folder="depoimentos"
+            />
+          </Field>
+
+          <div className="space-y-3 rounded-xl border border-border bg-surface-2 p-4">
+            <div className="flex items-center justify-between gap-3">
+              <Label htmlFor="pub-dep" className="text-sm">
+                Aparecendo no site
+              </Label>
+              <Switch
+                id="pub-dep"
+                checked={form.published}
+                onCheckedChange={(v) => set("published", v)}
+              />
+            </div>
+            <div className="flex items-center justify-between gap-3">
+              <Label htmlFor="feat-dep" className="text-sm">
+                Destacar na página inicial
+              </Label>
+              <Switch
+                id="feat-dep"
+                checked={form.featured}
+                onCheckedChange={(v) => set("featured", v)}
+              />
+            </div>
+            {!form.published ? (
+              <p className="text-[11px] text-muted-foreground">
+                Com a chave desligada, o depoimento fica guardado no painel mas não aparece para
+                quem visita o site.
+              </p>
+            ) : null}
+          </div>
+        </div>
+
+        <DialogFooter>
+          <Button variant="ghost" onClick={onClose}>
+            Cancelar
+          </Button>
+          <Button onClick={() => save.mutate(form)} disabled={save.isPending || !canSave}>
+            {save.isPending ? "Salvando…" : isNew ? "Criar depoimento" : "Salvar alterações"}
+          </Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
   );
 }
