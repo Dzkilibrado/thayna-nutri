@@ -153,6 +153,12 @@ export function TestimonialForm() {
                 className="pointer-events-none absolute left-[-9999px] size-0 opacity-0"
               />
 
+              <p className="rounded-xl border border-border bg-surface-2 px-4 py-3 text-[11px] leading-relaxed text-muted-foreground">
+                Quer que seu depoimento tenha foto ou vídeo? Este formulário aceita apenas texto.
+                Envie a foto ou o link do vídeo direto para o Thaynan pelo WhatsApp, que ele anexa
+                ao seu depoimento.
+              </p>
+
               <p className="text-[11px] leading-relaxed text-muted-foreground">
                 Ao enviar, você autoriza a publicação do seu nome e do texto no site. Não escreva
                 dados de saúde, resultados de exames, peso ou medidas.
