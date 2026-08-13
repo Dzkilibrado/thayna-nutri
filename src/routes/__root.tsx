@@ -11,6 +11,7 @@ import { useEffect, type ReactNode } from "react";
 
 import { Toaster } from "@/components/ui/sonner";
 
+import { SITE_URL } from "@/lib/seo";
 import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
 
@@ -129,8 +130,31 @@ function RootShell({ children }: { children: ReactNode }) {
   );
 }
 
+/**
+ * O endereço .lovable.app não pode ser desativado — é o endereço reserva
+ * permanente do projeto. Então quem chegar por ele é levado ao domínio
+ * oficial, preservando o caminho e os parâmetros.
+ *
+ * A checagem de iframe é essencial: o editor do Lovable mostra a prévia do site
+ * dentro de um iframe nesse mesmo endereço. Sem ela, a prévia se redirecionaria
+ * para o site publicado e você perderia a visualização das alterações antes de
+ * publicar.
+ */
+function useCanonicalHostRedirect() {
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    if (window.top !== window.self) return;
+    if (!window.location.hostname.endsWith(".lovable.app")) return;
+
+    window.location.replace(
+      `${SITE_URL}${window.location.pathname}${window.location.search}${window.location.hash}`,
+    );
+  }, []);
+}
+
 function RootComponent() {
   const { queryClient } = Route.useRouteContext();
+  useCanonicalHostRedirect();
 
   return (
     <QueryClientProvider client={queryClient}>
