@@ -42,7 +42,7 @@ function DepoimentosPage() {
       <header className="text-center">
         <h1 className="text-3xl">Depoimentos</h1>
         <p className="mx-auto mt-2 max-w-md text-sm text-muted-foreground">
-          Relatos de quem acompanhou de perto. Cada resposta é individual — o que funcionou para uma
+          Relatos de quem acompanhou de perto. Cada resposta é individual: o que funcionou para uma
           pessoa não define o resultado de outra.
         </p>
         <div className="mt-5 flex justify-center">
