@@ -16,4 +16,4 @@ Allow: /
 Disallow: /auth
 Disallow: /admin
 
-Sitemap: https://thaynanpro.com.br/sitemap.xml
+Sitemap: https://thayna-nutri.lovable.app/sitemap.xml
