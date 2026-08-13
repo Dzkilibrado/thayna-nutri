@@ -20,11 +20,15 @@ export function BackButton({
     <Link
       to={to}
       className={cn(
-        "inline-flex items-center gap-2 rounded-full border border-border bg-surface px-4 py-2 text-sm font-medium text-muted-foreground transition-colors hover:border-primary/60 hover:text-foreground",
+        "group -ml-1 inline-flex items-center gap-1.5 rounded-md py-1 pl-1 pr-2 text-sm text-muted-foreground transition-colors hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
         className,
       )}
     >
-      {showHome ? <Home className="size-4" /> : <ArrowLeft className="size-4" />}
+      {showHome ? (
+        <Home className="size-4" />
+      ) : (
+        <ArrowLeft className="size-4 transition-transform group-hover:-translate-x-0.5" />
+      )}
       {label}
     </Link>
   );

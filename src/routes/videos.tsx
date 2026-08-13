@@ -50,7 +50,7 @@ function VideosPage() {
         </p>
       </header>
 
-      <section className="mt-8 space-y-8">
+      <section className="mt-8 grid gap-8 lg:grid-cols-2">
         {videos.length === 0 ? (
           <p className="text-center text-sm text-muted-foreground">Nenhum vídeo publicado ainda.</p>
         ) : (

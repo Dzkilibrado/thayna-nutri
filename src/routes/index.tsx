@@ -25,25 +25,8 @@ export const Route = createFileRoute("/")({
         property: "og:description",
         content: "Agende sua consulta e acompanhe conteúdos sobre nutrição e performance.",
       },
-      { property: "og:type", content: "website" },
-      { name: "twitter:card", content: "summary_large_image" },
-    ],
-    scripts: [
-      {
-        type: "application/ld+json",
-        children: JSON.stringify({
-          "@context": "https://schema.org",
-          "@type": "Person",
-          name: "Thaynan Pablo",
-          jobTitle: "Nutricionista Esportivo",
-          url: "https://thayna-nutri.lovable.app/",
-          worksFor: { "@type": "MedicalClinic", name: "Clínica Overall" },
-          areaServed: "Serra, ES",
-        }),
-      },
     ],
   }),
-
   component: Home,
 });
 
@@ -59,7 +42,7 @@ function Home() {
 
   return (
     <PageShell settings={settings}>
-      <section className="hero-surface -mx-5 -mt-8 rounded-b-3xl px-5 pb-10 pt-12 text-center">
+      <section className="hero-surface -mx-5 -mt-8 rounded-b-3xl px-5 pb-10 pt-12 text-center sm:-mx-8 sm:px-8">
         {settings?.avatar_url ? (
           <img
             src={settings.avatar_url}
@@ -71,9 +54,7 @@ function Home() {
             {(settings?.brand_name ?? "T").slice(0, 1)}
           </div>
         )}
-        <h1 className="mt-5 text-4xl">
-          {settings?.brand_name ?? "Thaynan"} — Nutrição &amp; Performance
-        </h1>
+        <h1 className="mt-5 text-4xl">{settings?.brand_name ?? "Thaynan"}</h1>
         <p className="mt-1 text-sm uppercase tracking-[0.25em] text-primary">
           {settings?.brand_tagline ?? "Nutrição & Performance"}
         </p>
@@ -86,7 +67,7 @@ function Home() {
         </section>
       ) : null}
 
-      <section className="mt-8 space-y-3">
+      <section className="mt-8 grid gap-3 md:grid-cols-2">
         {links.map((block) => (
           <LinkBlock key={block.id} block={block} settings={settings} />
         ))}
@@ -95,7 +76,7 @@ function Home() {
       {featuredTestimonials.length > 0 ? (
         <section className="mt-10 space-y-4">
           <h2 className="text-2xl">Depoimentos</h2>
-          <div className="grid gap-4 sm:grid-cols-2">
+          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
             {featuredTestimonials.map((item) => (
               <TestimonialCard key={item.id} item={item} />
             ))}

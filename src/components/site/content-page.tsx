@@ -24,17 +24,15 @@ export function ContentPage({
 
   return (
     <PageShell settings={settings}>
-      <div className="mb-4 flex items-center justify-between">
+      <header className="hero-surface -mx-5 -mt-8 rounded-b-3xl px-5 pb-10 pt-6 sm:-mx-8 sm:px-8">
         <BackButton to="/" label="Voltar" />
-      </div>
-      <header className="hero-surface -mx-5 -mt-4 rounded-b-3xl px-5 pb-8 pt-12">
         {kicker ? (
-          <p className="text-xs uppercase tracking-[0.3em] text-primary">{kicker}</p>
+          <p className="mt-8 text-xs uppercase tracking-[0.3em] text-primary">{kicker}</p>
         ) : null}
         <h1 className="mt-2 text-4xl">{title}</h1>
       </header>
 
-      <div className="mt-8 space-y-8">
+      <div className="mt-10 space-y-10 lg:mx-auto lg:max-w-3xl">
         {items.map((block) => (
           <section key={block.id} className="space-y-3">
             {block.kind === "link" ? (
@@ -50,7 +48,7 @@ export function ContentPage({
                 {block.kind === "image" && block.url ? (
                   <img
                     src={block.url}
-                    alt={block.title || ""}
+                    alt={block.title || "Imagem"}
                     loading="lazy"
                     className="card-shadow block w-full rounded-2xl border border-border object-contain"
                   />

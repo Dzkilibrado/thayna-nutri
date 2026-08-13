@@ -51,7 +51,7 @@ function DepoimentosPage() {
           Os primeiros depoimentos aparecem aqui em breve.
         </p>
       ) : (
-        <section className="mt-8 grid gap-4 sm:grid-cols-2">
+        <section className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {testimonials.map((item) => (
             <TestimonialCard key={item.id} item={item} />
           ))}

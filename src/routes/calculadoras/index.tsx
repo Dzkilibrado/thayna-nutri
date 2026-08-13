@@ -50,7 +50,7 @@ function CalculatorsIndex() {
         </p>
       </header>
 
-      <div className="mt-8 grid gap-3 sm:grid-cols-2">
+      <div className="mt-8 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
         {CALCULATORS.map((c) => (
           <Link
             key={c.slug}

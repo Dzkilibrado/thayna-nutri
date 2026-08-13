@@ -47,7 +47,7 @@ function LinksPage() {
         </p>
       </header>
 
-      <section className="mt-8 space-y-3">
+      <section className="mt-8 grid gap-3 md:grid-cols-2">
         {links.length === 0 ? (
           <p className="text-center text-sm text-muted-foreground">Nenhum link publicado ainda.</p>
         ) : (

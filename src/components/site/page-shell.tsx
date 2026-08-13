@@ -30,7 +30,7 @@ export function PageShell({
     <div className="min-h-screen bg-background">
       <ThemeVars settings={settings} />
       <header className="border-b border-border/60 bg-surface/40 backdrop-blur">
-        <div className="mx-auto flex max-w-2xl items-center gap-4 px-5 py-4">
+        <div className="mx-auto flex w-full max-w-2xl items-center gap-4 px-5 py-4 md:max-w-3xl lg:max-w-5xl lg:px-8">
           <Link
             to="/"
             aria-label="Ir para a página inicial"
@@ -122,7 +122,9 @@ export function PageShell({
         </div>
       </header>
 
-      <main className="mx-auto max-w-2xl px-5 pb-16 pt-8">{children}</main>
+      <main className="mx-auto w-full max-w-2xl px-5 pb-16 pt-8 md:max-w-3xl lg:max-w-5xl lg:px-8">
+        {children}
+      </main>
 
       <footer className="border-t border-border/60 px-5 py-8 text-center text-xs text-muted-foreground">
         <p>
