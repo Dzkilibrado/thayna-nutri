@@ -25,8 +25,25 @@ export const Route = createFileRoute("/")({
         property: "og:description",
         content: "Agende sua consulta e acompanhe conteúdos sobre nutrição e performance.",
       },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary_large_image" },
+    ],
+    scripts: [
+      {
+        type: "application/ld+json",
+        children: JSON.stringify({
+          "@context": "https://schema.org",
+          "@type": "Person",
+          name: "Thaynan Pablo",
+          jobTitle: "Nutricionista Esportivo",
+          url: "https://thayna-nutri.lovable.app/",
+          worksFor: { "@type": "MedicalClinic", name: "Clínica Overall" },
+          areaServed: "Serra, ES",
+        }),
+      },
     ],
   }),
+
   component: Home,
 });
 
