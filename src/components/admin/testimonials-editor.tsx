@@ -1,6 +1,17 @@
 import { useEffect, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { ArrowDown, ArrowUp, Eye, EyeOff, Pencil, Plus, Star, Trash2 } from "lucide-react";
+import {
+  ArrowDown,
+  ArrowUp,
+  Check,
+  Eye,
+  EyeOff,
+  Pencil,
+  Plus,
+  Star,
+  Trash2,
+  X,
+} from "lucide-react";
 import { toast } from "sonner";
 
 import { ImageUploadField } from "@/components/admin/image-upload";
@@ -59,6 +70,8 @@ const EMPTY: Testimonial = {
   sort_order: 0,
   featured: false,
   published: true,
+  status: "approved",
+  source: "admin",
 };
 
 export function TestimonialsEditor() {
@@ -78,7 +91,9 @@ export function TestimonialsEditor() {
     },
   });
 
-  const items = query.data ?? [];
+  const all = query.data ?? [];
+  const pending = all.filter((t) => t.status === "pending");
+  const items = all.filter((t) => t.status !== "pending");
   const refresh = () => queryClient.invalidateQueries({ queryKey: ["admin-testimonials"] });
 
   return (
@@ -92,6 +107,25 @@ export function TestimonialsEditor() {
           <Plus className="size-4" /> Novo depoimento
         </Button>
       </div>
+
+      {pending.length > 0 ? (
+        <section className="space-y-3 rounded-2xl border border-primary/50 bg-primary/5 p-4">
+          <div>
+            <h3 className="text-lg">Aguardando aprovação ({pending.length})</h3>
+            <p className="mt-1 text-sm text-muted-foreground">
+              Enviados pelo formulário do site. Não aparecem para ninguém até serem aprovados.
+            </p>
+          </div>
+          {pending.map((item) => (
+            <PendingRow
+              key={item.id}
+              item={item}
+              nextOrder={items.length + 1}
+              onChanged={refresh}
+            />
+          ))}
+        </section>
+      ) : null}
 
       <p className="rounded-xl border border-primary/40 bg-primary/10 px-4 py-3 text-sm">
         Não publique fotos de antes e depois. A resolução do Conselho Federal de Nutricionistas
@@ -145,6 +179,96 @@ export function TestimonialsEditor() {
           onSaved={() => void refresh()}
         />
       ) : null}
+    </div>
+  );
+}
+
+/**
+ * Item da fila de aprovação. Aprovar publica; recusar exclui, como combinado —
+ * um depoimento recusado não deve ficar guardado no banco.
+ */
+function PendingRow({
+  item,
+  nextOrder,
+  onChanged,
+}: {
+  item: Testimonial;
+  nextOrder: number;
+  onChanged: () => void;
+}) {
+  const [confirmReject, setConfirmReject] = useState(false);
+
+  const approve = useMutation({
+    mutationFn: async () => {
+      const { error } = await supabase
+        .from("testimonials")
+        .update({ status: "approved", published: true, sort_order: nextOrder })
+        .eq("id", item.id);
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      toast.success("Depoimento aprovado e publicado no site.");
+      onChanged();
+    },
+    onError: (e: Error) => toast.error(e.message),
+  });
+
+  const reject = useMutation({
+    mutationFn: async () => {
+      const { error } = await supabase.from("testimonials").delete().eq("id", item.id);
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      toast.success("Depoimento recusado e excluído.");
+      setConfirmReject(false);
+      onChanged();
+    },
+    onError: (e: Error) => toast.error(e.message),
+  });
+
+  return (
+    <div className="space-y-3 rounded-xl border border-border bg-surface p-4">
+      <div>
+        <p className="text-sm font-medium">{item.author_name}</p>
+        {item.author_context ? (
+          <p className="text-xs text-muted-foreground">{item.author_context}</p>
+        ) : null}
+      </div>
+
+      <p className="break-words rounded-lg bg-surface-2 px-3 py-2 text-sm leading-relaxed text-foreground/90">
+        {item.quote}
+      </p>
+
+      <div className="flex flex-wrap gap-2">
+        <Button size="sm" onClick={() => approve.mutate()} disabled={approve.isPending}>
+          <Check className="size-4" /> Aprovar e publicar
+        </Button>
+        <Button size="sm" variant="ghost" onClick={() => setConfirmReject(true)}>
+          <X className="size-4 text-destructive" /> Recusar
+        </Button>
+      </div>
+
+      <AlertDialog open={confirmReject} onOpenChange={setConfirmReject}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Recusar o depoimento de {item.author_name}?</AlertDialogTitle>
+            <AlertDialogDescription>
+              Ele será excluído e sairá desta lista. Não tem como recuperar depois.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancelar</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={(e) => {
+                e.preventDefault();
+                reject.mutate();
+              }}
+            >
+              Recusar e excluir
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }

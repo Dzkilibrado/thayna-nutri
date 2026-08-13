@@ -2,6 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { BackButton } from "@/components/site/back-button";
 import { PageShell } from "@/components/site/page-shell";
 import { TestimonialCard } from "@/components/site/testimonial-card";
+import { TestimonialForm } from "@/components/site/testimonial-form";
 import { loadSiteData } from "@/lib/site-data";
 import { pageUrlHead } from "@/lib/seo";
 import type { SiteSettings, Testimonial } from "@/lib/site";
@@ -44,6 +45,9 @@ function DepoimentosPage() {
           Relatos de quem acompanhou de perto. Cada resposta é individual — o que funcionou para uma
           pessoa não define o resultado de outra.
         </p>
+        <div className="mt-5 flex justify-center">
+          <TestimonialForm />
+        </div>
       </header>
 
       {testimonials.length === 0 ? (

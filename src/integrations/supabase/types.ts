@@ -187,6 +187,8 @@ export type Database = {
           published: boolean;
           quote: string;
           sort_order: number;
+          status: string;
+          source: string;
           updated_at: string;
           video_url: string | null;
         };
@@ -200,6 +202,8 @@ export type Database = {
           published?: boolean;
           quote?: string;
           sort_order?: number;
+          status?: string;
+          source?: string;
           updated_at?: string;
           video_url?: string | null;
         };
@@ -213,6 +217,8 @@ export type Database = {
           published?: boolean;
           quote?: string;
           sort_order?: number;
+          status?: string;
+          source?: string;
           updated_at?: string;
           video_url?: string | null;
         };

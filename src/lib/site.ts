@@ -45,10 +45,12 @@ export type Testimonial = {
   sort_order: number;
   featured: boolean;
   published: boolean;
+  status: "pending" | "approved";
+  source: string;
 };
 
 export const TESTIMONIAL_COLUMNS =
-  "id, author_name, author_context, quote, photo_url, video_url, sort_order, featured, published";
+  "id, author_name, author_context, quote, photo_url, video_url, sort_order, featured, published, status, source";
 
 export const SETTINGS_COLUMNS =
   "brand_name, brand_tagline, headline, bio, avatar_url, whatsapp, whatsapp_message, email, address, maps_url, hours, instagram_url, youtube_url, intro_video_url, color_background, color_surface, color_accent, color_foreground";
@@ -66,6 +68,7 @@ export const PAGES = [
 ] as const;
 
 export const MAX_TESTIMONIAL_QUOTE = 600;
+export const MIN_TESTIMONIAL_QUOTE = 20;
 
 export const KINDS = [
   { value: "link", label: "Link / botão" },
