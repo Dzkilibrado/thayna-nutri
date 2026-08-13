@@ -1,6 +1,20 @@
 import { useEffect, useMemo, useState } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { ArrowDown, ArrowUp, Eye, EyeOff, Pencil, Plus, Trash2 } from "lucide-react";
+import {
+  AlignLeft,
+  ArrowDown,
+  ArrowUp,
+  Eye,
+  EyeOff,
+  FileText,
+  Image as ImageIcon,
+  MousePointerClick,
+  Pencil,
+  PlayCircle,
+  Plus,
+  Trash2,
+  type LucideIcon,
+} from "lucide-react";
 import { toast } from "sonner";
 
 import { FileField } from "@/components/admin/file-field";
@@ -65,6 +79,25 @@ function mismatchMessage(page: string, kind: string): string | null {
   const suggestion = KINDS.find((k) => rule.kinds.includes(k.value))?.label ?? "";
   return `A página ${pageLabel} mostra apenas ${rule.says}. Este item é do tipo "${kindLabel}", então ele não vai aparecer no site. Troque o tipo para "${suggestion}" ou escolha outra página.`;
 }
+
+/**
+ * O que cada tipo faz, na linguagem de quem edita. O nome sozinho não diz o
+ * suficiente — "Texto" e "Link / botão" parecem intercambiáveis para quem não
+ * construiu o site.
+ */
+const KIND_HELP: Record<string, { help: string; Icon: LucideIcon }> = {
+  link: {
+    help: "Botão que leva a outro lugar: WhatsApp, Instagram ou outra página do site.",
+    Icon: MousePointerClick,
+  },
+  video: {
+    help: "Vídeo do YouTube, do Instagram ou arquivo enviado por você.",
+    Icon: PlayCircle,
+  },
+  image: { help: "Foto exibida no meio da página.", Icon: ImageIcon },
+  file: { help: "PDF ou documento que o visitante pode baixar.", Icon: FileText },
+  text: { help: "Parágrafo de texto na página.", Icon: AlignLeft },
+};
 
 const LINK_SHORTCUTS = [
   { label: "WhatsApp", value: "whatsapp" },
@@ -195,6 +228,87 @@ export function ContentEditor({ blocks }: { blocks: ContentBlock[] }) {
           onSaved={refresh}
         />
       ) : null}
+    </div>
+  );
+}
+
+/**
+ * Só oferece os tipos que a página realmente exibe. Antes a lista mostrava os
+ * cinco sempre, e escolher um tipo incompatível criava um item que salvava sem
+ * erro e não aparecia em lugar nenhum.
+ */
+function KindPicker({
+  page,
+  value,
+  onChange,
+}: {
+  page: string;
+  value: string;
+  onChange: (kind: string) => void;
+}) {
+  const allowed = PAGE_ACCEPTS[page]?.kinds ?? ALL_KINDS;
+  const options = KINDS.filter((k) => allowed.includes(k.value));
+  const pageLabel = PAGES.find((p) => p.value === page)?.label ?? page;
+
+  if (options.length <= 1) {
+    const only = options[0];
+    return (
+      <div className="rounded-xl border border-border bg-surface-2 px-4 py-3 text-sm text-muted-foreground">
+        Na página {pageLabel}, todo item é do tipo{" "}
+        <strong className="text-foreground">{only?.label ?? value}</strong>.{" "}
+        {only ? KIND_HELP[only.value]?.help : null}
+      </div>
+    );
+  }
+
+  return (
+    <div className="space-y-2">
+      <Label className="text-xs uppercase tracking-wide text-muted-foreground">
+        O que é este item
+      </Label>
+      <div className="grid gap-2 sm:grid-cols-2">
+        {options.map((k) => {
+          const info = KIND_HELP[k.value];
+          const Icon = info?.Icon;
+          const active = value === k.value;
+          return (
+            <button
+              key={k.value}
+              type="button"
+              onClick={() => onChange(k.value)}
+              aria-pressed={active}
+              className={cn(
+                "flex items-start gap-3 rounded-xl border px-3 py-3 text-left transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
+                active
+                  ? "border-primary bg-primary/10"
+                  : "border-border bg-surface-2 hover:border-primary/40",
+              )}
+            >
+              {Icon ? (
+                <Icon
+                  className={cn(
+                    "mt-0.5 size-[18px] shrink-0",
+                    active ? "text-primary" : "text-muted-foreground",
+                  )}
+                />
+              ) : null}
+              <span className="min-w-0">
+                <span
+                  className={cn(
+                    "block text-sm font-medium",
+                    active ? "text-foreground" : "text-muted-foreground",
+                  )}
+                >
+                  {k.label}
+                </span>
+                <span className="mt-0.5 block text-[11px] leading-snug text-muted-foreground">
+                  {info?.help}
+                </span>
+              </span>
+            </button>
+          );
+        })}
+      </div>
     </div>
   );
 }
@@ -434,20 +548,7 @@ function BlockDialog({
                 </SelectContent>
               </Select>
             </Field>
-            <Field label="Tipo">
-              <Select value={form.kind} onValueChange={(v) => set("kind", v)}>
-                <SelectTrigger>
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  {KINDS.map((k) => (
-                    <SelectItem key={k.value} value={k.value}>
-                      {k.label}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </Field>
+
             <Field label="Título">
               <Input
                 value={form.title}
@@ -463,6 +564,8 @@ function BlockDialog({
               />
             </Field>
           </div>
+
+          <KindPicker page={form.page} value={form.kind} onChange={(v) => set("kind", v)} />
 
           {mismatch ? (
             <p
