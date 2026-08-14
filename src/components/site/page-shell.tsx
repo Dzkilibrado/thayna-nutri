@@ -1,4 +1,4 @@
-import { Link, useRouterState } from "@tanstack/react-router";
+import { Link } from "@tanstack/react-router";
 import { useState } from "react";
 import {
   Calculator,
@@ -6,6 +6,7 @@ import {
   Link as LinkIcon,
   MapPin,
   Menu,
+  MessageCircle,
   PlayCircle,
   Star,
   User,
@@ -27,9 +28,11 @@ const NAV_ITEMS = [
 ];
 
 /**
- * O menu do celular é a única navegação nas páginas internas, então ele mantém
- * os itens que saíram da barra do topo — Sobre e Como chegar, que já aparecem
- * na lista da página inicial com melhor posicionamento.
+ * O menu do celular é a única navegação nas páginas internas, então ele
+ * concentra tudo: os itens que saíram da barra do topo — Sobre e Como chegar,
+ * que já aparecem na lista da página inicial com melhor posicionamento — e
+ * "Agendar consulta", que saiu do cabeçalho fixo mas precisa continuar a um
+ * toque em qualquer página, já que é a ação principal do site.
  */
 const MENU_ITEMS = [
   { to: "/", label: "Início", icon: Home, exact: true },
@@ -45,12 +48,6 @@ export function PageShell({
   settings: SiteSettings | null;
   children: ReactNode;
 }) {
-  // Na página inicial a lista já tem "Agendar consulta" logo abaixo: repetir
-  // no topo é redundante. Nas páginas internas o botão é o único caminho
-  // direto para agendar sem voltar ao início.
-  const pathname = useRouterState({ select: (state) => state.location.pathname });
-  const isHome = pathname === "/";
-
   const [menuOpen, setMenuOpen] = useState(false);
   return (
     <div className="min-h-screen bg-background">
@@ -78,32 +75,10 @@ export function PageShell({
                 {item.label}
               </Link>
             ))}
-            {isHome ? null : (
-              <a
-                {...externalLinkProps(
-                  whatsappLink(settings?.whatsapp ?? "", settings?.whatsapp_message ?? ""),
-                )}
-                translate="no"
-                className="shrink-0 whitespace-nowrap rounded-full bg-primary px-4 py-1.5 font-medium text-primary-foreground transition-opacity hover:opacity-90"
-              >
-                Agendar
-              </a>
-            )}
           </nav>
 
-          {/* Celular: Agendar continua à vista, o resto vai para o painel. */}
+          {/* Celular: só o botão de menu no cabeçalho — Agendar mora dentro dele. */}
           <div className="ml-auto flex items-center gap-2 sm:hidden">
-            {isHome ? null : (
-              <a
-                {...externalLinkProps(
-                  whatsappLink(settings?.whatsapp ?? "", settings?.whatsapp_message ?? ""),
-                )}
-                translate="no"
-                className="shrink-0 whitespace-nowrap rounded-full bg-primary px-4 py-1.5 text-sm font-medium text-primary-foreground transition-opacity hover:opacity-90"
-              >
-                Agendar
-              </a>
-            )}
             <Sheet open={menuOpen} onOpenChange={setMenuOpen}>
               <SheetTrigger asChild>
                 <button
@@ -121,6 +96,20 @@ export function PageShell({
                   </SheetTitle>
                 </SheetHeader>
                 <nav className="mt-6 flex flex-col gap-1.5">
+                  <a
+                    {...externalLinkProps(
+                      whatsappLink(settings?.whatsapp ?? "", settings?.whatsapp_message ?? ""),
+                    )}
+                    onClick={() => setMenuOpen(false)}
+                    translate="no"
+                    className="flex items-center gap-3 rounded-xl bg-primary px-3 py-3 text-base font-medium text-primary-foreground transition-opacity hover:opacity-90"
+                  >
+                    <span className="flex size-9 shrink-0 items-center justify-center rounded-lg bg-primary-foreground/15">
+                      <MessageCircle className="size-[18px]" />
+                    </span>
+                    <span className="truncate">Agendar consulta</span>
+                  </a>
+
                   {MENU_ITEMS.map((item) => (
                     <Link
                       key={item.to}
