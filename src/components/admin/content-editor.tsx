@@ -147,7 +147,7 @@ export function ContentEditor({ blocks }: { blocks: ContentBlock[] }) {
   return (
     <div className="space-y-5">
       <div className="flex flex-wrap items-end justify-between gap-3">
-        <div className="w-64">
+        <div className="w-full sm:w-64">
           <Field label="Página que você quer organizar">
             <Select value={page} onValueChange={setPage}>
               <SelectTrigger>

@@ -154,12 +154,22 @@ function AdminPage() {
 
       <main className="mx-auto max-w-4xl px-5 py-8">
         <Tabs defaultValue="conteudo">
-          <TabsList>
-            <TabsTrigger value="conteudo">Conteúdo</TabsTrigger>
-            <TabsTrigger value="depoimentos">Depoimentos</TabsTrigger>
-            <TabsTrigger value="perfil">Perfil & contato</TabsTrigger>
-            <TabsTrigger value="cores">Cores</TabsTrigger>
-            <TabsTrigger value="acessos">Acessos</TabsTrigger>
+          <TabsList className="grid h-auto w-full grid-cols-2 gap-1 sm:flex sm:w-auto">
+            <TabsTrigger value="conteudo" className="w-full sm:w-auto">
+              Conteúdo
+            </TabsTrigger>
+            <TabsTrigger value="depoimentos" className="w-full sm:w-auto">
+              Depoimentos
+            </TabsTrigger>
+            <TabsTrigger value="perfil" className="w-full sm:w-auto">
+              Perfil &amp; contato
+            </TabsTrigger>
+            <TabsTrigger value="cores" className="w-full sm:w-auto">
+              Cores
+            </TabsTrigger>
+            <TabsTrigger value="acessos" className="w-full sm:w-auto">
+              Acessos
+            </TabsTrigger>
           </TabsList>
 
           <TabsContent value="conteudo" className="mt-6">

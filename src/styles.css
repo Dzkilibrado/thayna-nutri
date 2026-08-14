@@ -191,3 +191,10 @@ blockquote,
 figcaption {
   overflow-wrap: anywhere;
 }
+
+/* Tabelas de resultado rolam dentro da própria moldura, nunca empurrando a
+   página. Vale para as calculadoras, onde a Dieta Avançada tem colunas demais
+   para caber num celular. */
+table {
+  min-width: max-content;
+}

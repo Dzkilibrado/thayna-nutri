@@ -104,7 +104,7 @@ export function AccessEditor() {
         </div>
 
         <div className="flex flex-wrap items-end gap-3">
-          <div className="min-w-[260px] flex-1 space-y-1.5">
+          <div className="w-full space-y-1.5 sm:min-w-[260px] sm:flex-1">
             <Label className="text-xs uppercase tracking-wide text-muted-foreground">E-mail</Label>
             <Input
               type="email"
