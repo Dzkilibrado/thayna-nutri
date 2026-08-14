@@ -1,3 +1,5 @@
+import type { ComponentType } from "react";
+
 import {
   Building2,
   Calculator,
@@ -7,7 +9,6 @@ import {
   HeartPulse,
   Instagram,
   Mail,
-  MapPin,
   MessageCircle,
   MessageSquareQuote,
   Phone,
@@ -19,8 +20,9 @@ import {
   User,
   Link as LinkIcon,
   Youtube,
-  type LucideIcon,
 } from "lucide-react";
+
+import { GoogleMapsIcon } from "@/components/site/brand-icons";
 
 /**
  * Catálogo de ícones do site.
@@ -29,7 +31,12 @@ import {
  * desenho. Cada ícone tem um papel distinto — nada de duas opções para a mesma
  * ideia, que só fazia a pessoa hesitar na hora de escolher.
  */
-export type IconOption = { id: string; label: string; Icon: LucideIcon };
+/**
+ * Todo ícone do catálogo aceita `className` — o suficiente para os dois casos:
+ * os ícones da lucide-react (que têm mais props, mas são compatíveis) e as
+ * marcas próprias como GoogleMapsIcon, que só recebem essa prop.
+ */
+export type IconOption = { id: string; label: string; Icon: ComponentType<{ className?: string }> };
 
 export const ICON_GROUPS: { group: string; options: IconOption[] }[] = [
   {
@@ -48,7 +55,7 @@ export const ICON_GROUPS: { group: string; options: IconOption[] }[] = [
       { id: "calendar", label: "Agendar", Icon: Calendar },
       { id: "stethoscope", label: "Consulta presencial", Icon: Stethoscope },
       { id: "monitor", label: "Consulta online", Icon: Monitor },
-      { id: "map-pin", label: "Como chegar", Icon: MapPin },
+      { id: "map-pin", label: "Como chegar", Icon: GoogleMapsIcon },
       { id: "building", label: "Consultório", Icon: Building2 },
     ],
   },
@@ -86,13 +93,13 @@ const LEGACY: Record<string, string> = {
   video: "monitor", // usado em consulta online; o presencial deve trocar para stethoscope
 };
 
-export const ICONS: Record<string, LucideIcon> = Object.fromEntries(
+export const ICONS: Record<string, ComponentType<{ className?: string }>> = Object.fromEntries(
   ICON_OPTIONS.map((o) => [o.id, o.Icon]),
 );
 
 export const DEFAULT_ICON = LinkIcon;
 
-export function iconFor(id: string | null | undefined): LucideIcon {
+export function iconFor(id: string | null | undefined): ComponentType<{ className?: string }> {
   const key = id ?? "";
   return ICONS[key] ?? ICONS[LEGACY[key] ?? ""] ?? DEFAULT_ICON;
 }

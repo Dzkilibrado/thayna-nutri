@@ -1,5 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { MapPin, Clock, Phone, Navigation as NavIcon, Car } from "lucide-react";
+import { MapPin, Clock, Phone } from "lucide-react";
+
+import { GoogleMapsIcon, WazeIcon } from "@/components/site/brand-icons";
 
 import { BackButton } from "@/components/site/back-button";
 import { PageShell } from "@/components/site/page-shell";
@@ -93,14 +95,14 @@ function ComoChegarPage() {
             {...externalLinkProps(mapsUrl)}
             className="flex items-center justify-center gap-3 rounded-2xl border border-border bg-surface px-5 py-4 text-center font-display text-lg uppercase tracking-wide transition-colors hover:border-primary/60"
           >
-            <NavIcon className="size-5 text-primary" />
+            <GoogleMapsIcon className="size-5 text-primary" />
             Google Maps
           </a>
           <a
             {...externalLinkProps(WAZE_URL)}
             className="flex items-center justify-center gap-3 rounded-2xl border border-border bg-surface px-5 py-4 text-center font-display text-lg uppercase tracking-wide transition-colors hover:border-primary/60"
           >
-            <Car className="size-5 text-primary" />
+            <WazeIcon className="size-5 text-primary" />
             Waze
           </a>
         </div>
