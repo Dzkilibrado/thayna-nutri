@@ -9,9 +9,22 @@ import { TestimonialsEditor } from "@/components/admin/testimonials-editor";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useEffect, useMemo, useState } from "react";
 import { toast } from "sonner";
-import { Plus, Trash2, ArrowUp, ArrowDown, LogOut, ExternalLink } from "lucide-react";
+import {
+  ArrowDown,
+  ArrowUp,
+  ExternalLink,
+  LayoutList,
+  LogOut,
+  MessageSquareQuote,
+  Palette,
+  Plus,
+  ShieldCheck,
+  Trash2,
+  UserCog,
+} from "lucide-react";
 
 import { supabase } from "@/integrations/supabase/client";
+import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -49,6 +62,14 @@ export const Route = createFileRoute("/_authenticated/admin")({
   }),
   component: AdminPage,
 });
+
+const ADMIN_TABS = [
+  { value: "conteudo", label: "Conteúdo", Icon: LayoutList },
+  { value: "depoimentos", label: "Depoimentos", Icon: MessageSquareQuote },
+  { value: "perfil", label: "Perfil & contato", Icon: UserCog },
+  { value: "cores", label: "Cores", Icon: Palette },
+  { value: "acessos", label: "Acessos", Icon: ShieldCheck },
+] as const;
 
 function AdminPage() {
   const navigate = useNavigate();
@@ -154,22 +175,25 @@ function AdminPage() {
 
       <main className="mx-auto max-w-4xl px-5 py-8">
         <Tabs defaultValue="conteudo">
-          <TabsList className="grid h-auto w-full grid-cols-2 gap-1 sm:flex sm:w-auto">
-            <TabsTrigger value="conteudo" className="w-full sm:w-auto">
-              Conteúdo
-            </TabsTrigger>
-            <TabsTrigger value="depoimentos" className="w-full sm:w-auto">
-              Depoimentos
-            </TabsTrigger>
-            <TabsTrigger value="perfil" className="w-full sm:w-auto">
-              Perfil &amp; contato
-            </TabsTrigger>
-            <TabsTrigger value="cores" className="w-full sm:w-auto">
-              Cores
-            </TabsTrigger>
-            <TabsTrigger value="acessos" className="w-full sm:w-auto">
-              Acessos
-            </TabsTrigger>
+          <TabsList className="grid h-auto w-full grid-cols-2 gap-2 bg-transparent p-0 sm:flex sm:w-auto">
+            {ADMIN_TABS.map(({ value, label, Icon }, i) => (
+              <TabsTrigger
+                key={value}
+                value={value}
+                className={cn(
+                  "flex w-full items-center justify-center gap-2 rounded-xl border border-border bg-surface-2 px-4 py-2.5 text-sm text-muted-foreground transition-colors",
+                  "hover:border-primary/40 hover:text-foreground",
+                  "data-[state=active]:border-primary data-[state=active]:bg-primary/10 data-[state=active]:text-foreground data-[state=active]:shadow-none",
+                  // com cinco abas, a última fica sozinha na terceira linha do
+                  // celular; ocupando as duas colunas o bloco fecha certinho
+                  i === ADMIN_TABS.length - 1 && "col-span-2 sm:col-span-1",
+                  "sm:w-auto",
+                )}
+              >
+                <Icon className="size-4 shrink-0" />
+                {label}
+              </TabsTrigger>
+            ))}
           </TabsList>
 
           <TabsContent value="conteudo" className="mt-6">
