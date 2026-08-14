@@ -1,12 +1,11 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { MapPin, Clock, Phone, Navigation as NavIcon, Car, MessageCircle } from "lucide-react";
+import { MapPin, Clock, Phone, Navigation as NavIcon, Car } from "lucide-react";
 
 import { BackButton } from "@/components/site/back-button";
 import { PageShell } from "@/components/site/page-shell";
 import { loadSiteData } from "@/lib/site-data";
 import { pageUrlHead } from "@/lib/seo";
 import { externalLinkProps } from "@/lib/external";
-import { whatsappLink } from "@/lib/site";
 
 const DEFAULT_MAPS_URL =
   "https://www.google.com/maps/place/Cl%C3%ADnica+Overall/@-20.1954098,-40.2573663,17z/data=!4m10!1m2!2m1!1sCentro+Empresarial+da+Serra+Cl%C3%ADnica+Overall!3m6!1s0xb81f005d842e3b:0x70d701d9d07f7bf1!8m2!3d-20.1951652!4d-40.2543406!16s%2Fg%2F11wy7jjxcl";
@@ -35,35 +34,6 @@ export const Route = createFileRoute("/como-chegar")({
       },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
-    ],
-    scripts: [
-      {
-        type: "application/ld+json",
-        children: JSON.stringify({
-          "@context": "https://schema.org",
-          "@type": "MedicalClinic",
-          name: "Clínica Overall — Thaynan Nutricionista Esportivo",
-          url: "https://thayna-nutri.lovable.app/como-chegar",
-          telephone: "+55 27 99665-7309",
-          address: {
-            "@type": "PostalAddress",
-            streetAddress: "Centro Empresarial da Serra, sala 718 — Parque Residencial Laranjeiras",
-            addressLocality: "Serra",
-            addressRegion: "ES",
-            postalCode: "29165-612",
-            addressCountry: "BR",
-          },
-          geo: { "@type": "GeoCoordinates", latitude: -20.1951652, longitude: -40.2543406 },
-          openingHoursSpecification: [
-            {
-              "@type": "OpeningHoursSpecification",
-              dayOfWeek: ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"],
-              opens: "09:00",
-              closes: "20:00",
-            },
-          ],
-        }),
-      },
     ],
   }),
   component: ComoChegarPage,
@@ -134,16 +104,6 @@ function ComoChegarPage() {
             Waze
           </a>
         </div>
-
-        <a
-          {...externalLinkProps(
-            whatsappLink(settings?.whatsapp ?? "", settings?.whatsapp_message ?? ""),
-          )}
-          className="accent-glow flex items-center justify-center gap-3 rounded-2xl bg-primary px-5 py-4 text-center font-display text-lg uppercase tracking-wide text-primary-foreground transition-opacity hover:opacity-90"
-        >
-          <MessageCircle className="size-5" />
-          Agendar consulta no WhatsApp
-        </a>
       </div>
     </PageShell>
   );
