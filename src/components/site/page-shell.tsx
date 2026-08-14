@@ -1,4 +1,4 @@
-import { Link } from "@tanstack/react-router";
+import { Link, useRouterState } from "@tanstack/react-router";
 import { useState } from "react";
 import {
   Calculator,
@@ -45,6 +45,12 @@ export function PageShell({
   settings: SiteSettings | null;
   children: ReactNode;
 }) {
+  // Na página inicial a lista já tem "Agendar consulta" logo abaixo: repetir
+  // no topo é redundante. Nas páginas internas o botão é o único caminho
+  // direto para agendar sem voltar ao início.
+  const pathname = useRouterState({ select: (state) => state.location.pathname });
+  const isHome = pathname === "/";
+
   const [menuOpen, setMenuOpen] = useState(false);
   return (
     <div className="min-h-screen bg-background">
@@ -72,28 +78,32 @@ export function PageShell({
                 {item.label}
               </Link>
             ))}
-            <a
-              {...externalLinkProps(
-                whatsappLink(settings?.whatsapp ?? "", settings?.whatsapp_message ?? ""),
-              )}
-              translate="no"
-              className="shrink-0 whitespace-nowrap rounded-full bg-primary px-4 py-1.5 font-medium text-primary-foreground transition-opacity hover:opacity-90"
-            >
-              Agendar
-            </a>
+            {isHome ? null : (
+              <a
+                {...externalLinkProps(
+                  whatsappLink(settings?.whatsapp ?? "", settings?.whatsapp_message ?? ""),
+                )}
+                translate="no"
+                className="shrink-0 whitespace-nowrap rounded-full bg-primary px-4 py-1.5 font-medium text-primary-foreground transition-opacity hover:opacity-90"
+              >
+                Agendar
+              </a>
+            )}
           </nav>
 
           {/* Celular: Agendar continua à vista, o resto vai para o painel. */}
           <div className="ml-auto flex items-center gap-2 sm:hidden">
-            <a
-              {...externalLinkProps(
-                whatsappLink(settings?.whatsapp ?? "", settings?.whatsapp_message ?? ""),
-              )}
-              translate="no"
-              className="shrink-0 whitespace-nowrap rounded-full bg-primary px-4 py-1.5 text-sm font-medium text-primary-foreground transition-opacity hover:opacity-90"
-            >
-              Agendar
-            </a>
+            {isHome ? null : (
+              <a
+                {...externalLinkProps(
+                  whatsappLink(settings?.whatsapp ?? "", settings?.whatsapp_message ?? ""),
+                )}
+                translate="no"
+                className="shrink-0 whitespace-nowrap rounded-full bg-primary px-4 py-1.5 text-sm font-medium text-primary-foreground transition-opacity hover:opacity-90"
+              >
+                Agendar
+              </a>
+            )}
             <Sheet open={menuOpen} onOpenChange={setMenuOpen}>
               <SheetTrigger asChild>
                 <button
