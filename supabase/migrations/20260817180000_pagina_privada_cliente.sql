@@ -11,6 +11,10 @@
 -- devolver qualquer dado. Isso impede alguém de consultar a tabela pela
 -- chave pública do site e listar todos os links e telefones de clientes.
 
+-- gen_random_bytes() vem da extensão pgcrypto. Garante que existe antes de
+-- usá-la na coluna abaixo — sem isso, a criação da tabela falha inteira.
+CREATE EXTENSION IF NOT EXISTS pgcrypto;
+
 CREATE TABLE public.client_access_links (
   id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
   client_name text,
@@ -152,7 +156,7 @@ BEGIN
     token = new_token,
     duration_hours = _duration_hours,
     expires_at = CASE WHEN _duration_hours IS NULL THEN NULL
-                       ELSE now() + (_duration_hours || ' hours')::interval END,
+                       ELSE now() + (_duration_hours::text || ' hours')::interval END,
     revoked = false,
     view_count = 0,
     last_viewed_at = NULL
