@@ -58,7 +58,7 @@ export function PageShell({
             to="/"
             aria-label="Ir para a página inicial"
             translate="no"
-            className="shrink-0 rounded-md font-display text-xl uppercase leading-tight tracking-wider transition-colors hover:text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+            className="order-2 shrink-0 rounded-md font-display text-xl uppercase leading-tight tracking-wider transition-colors hover:text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring sm:order-none"
           >
             {settings?.brand_name ?? "Thaynan"}
           </Link>
@@ -77,8 +77,9 @@ export function PageShell({
             ))}
           </nav>
 
-          {/* Celular: só o botão de menu no cabeçalho — Agendar mora dentro dele. */}
-          <div className="ml-auto flex items-center gap-2 sm:hidden">
+          {/* Celular: botão de menu antes da marca, os dois à esquerda — mesmo
+              lado em que o painel abre, para o alcance ficar consistente. */}
+          <div className="order-1 flex items-center gap-2 sm:hidden">
             <Sheet open={menuOpen} onOpenChange={setMenuOpen}>
               <SheetTrigger asChild>
                 <button
