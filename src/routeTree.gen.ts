@@ -22,6 +22,7 @@ import { Route as VideosRouteImport } from './routes/videos'
 import { Route as AuthenticatedAdminRouteImport } from './routes/_authenticated/admin'
 import { Route as CalculadorasIndexRouteImport } from './routes/calculadoras/index'
 import { Route as CalculadorasSlugRouteImport } from './routes/calculadoras/$slug'
+import { Route as InformacoesTokenRouteImport } from './routes/informacoes/$token'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -87,6 +88,11 @@ const CalculadorasSlugRoute = CalculadorasSlugRouteImport.update({
   path: '/calculadoras/$slug',
   getParentRoute: () => rootRouteImport,
 } as any)
+const InformacoesTokenRoute = InformacoesTokenRouteImport.update({
+  id: '/informacoes/$token',
+  path: '/informacoes/$token',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -100,6 +106,7 @@ export interface FileRoutesByFullPath {
   '/videos': typeof VideosRoute
   '/admin': typeof AuthenticatedAdminRoute
   '/calculadoras/$slug': typeof CalculadorasSlugRoute
+  '/informacoes/$token': typeof InformacoesTokenRoute
   '/calculadoras/': typeof CalculadorasIndexRoute
 }
 export interface FileRoutesByTo {
@@ -114,6 +121,7 @@ export interface FileRoutesByTo {
   '/videos': typeof VideosRoute
   '/admin': typeof AuthenticatedAdminRoute
   '/calculadoras/$slug': typeof CalculadorasSlugRoute
+  '/informacoes/$token': typeof InformacoesTokenRoute
   '/calculadoras': typeof CalculadorasIndexRoute
 }
 export interface FileRoutesById {
@@ -130,6 +138,7 @@ export interface FileRoutesById {
   '/videos': typeof VideosRoute
   '/_authenticated/admin': typeof AuthenticatedAdminRoute
   '/calculadoras/$slug': typeof CalculadorasSlugRoute
+  '/informacoes/$token': typeof InformacoesTokenRoute
   '/calculadoras/': typeof CalculadorasIndexRoute
 }
 export interface FileRouteTypes {
@@ -146,6 +155,7 @@ export interface FileRouteTypes {
     | '/videos'
     | '/admin'
     | '/calculadoras/$slug'
+    | '/informacoes/$token'
     | '/calculadoras/'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -160,6 +170,7 @@ export interface FileRouteTypes {
     | '/videos'
     | '/admin'
     | '/calculadoras/$slug'
+    | '/informacoes/$token'
     | '/calculadoras'
   id:
     | '__root__'
@@ -175,6 +186,7 @@ export interface FileRouteTypes {
     | '/videos'
     | '/_authenticated/admin'
     | '/calculadoras/$slug'
+    | '/informacoes/$token'
     | '/calculadoras/'
   fileRoutesById: FileRoutesById
 }
@@ -190,6 +202,7 @@ export interface RootRouteChildren {
   SobreRoute: typeof SobreRoute
   VideosRoute: typeof VideosRoute
   CalculadorasSlugRoute: typeof CalculadorasSlugRoute
+  InformacoesTokenRoute: typeof InformacoesTokenRoute
   CalculadorasIndexRoute: typeof CalculadorasIndexRoute
 }
 
@@ -286,6 +299,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof CalculadorasSlugRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/informacoes/$token': {
+      id: '/informacoes/$token'
+      path: '/informacoes/$token'
+      fullPath: '/informacoes/$token'
+      preLoaderRoute: typeof InformacoesTokenRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -312,6 +332,7 @@ const rootRouteChildren: RootRouteChildren = {
   SobreRoute: SobreRoute,
   VideosRoute: VideosRoute,
   CalculadorasSlugRoute: CalculadorasSlugRoute,
+  InformacoesTokenRoute: InformacoesTokenRoute,
   CalculadorasIndexRoute: CalculadorasIndexRoute,
 }
 export const routeTree = rootRouteImport

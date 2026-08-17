@@ -6,6 +6,8 @@ import { FileField } from "@/components/admin/file-field";
 import { AccessEditor } from "@/components/admin/access-editor";
 import { ContentEditor } from "@/components/admin/content-editor";
 import { TestimonialsEditor } from "@/components/admin/testimonials-editor";
+import { AccessLinksEditor } from "@/components/admin/access-links-editor";
+import { PricingEditor } from "@/components/admin/pricing-editor";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useEffect, useMemo, useState } from "react";
 import { toast } from "sonner";
@@ -13,6 +15,7 @@ import {
   ArrowDown,
   ArrowUp,
   ExternalLink,
+  KeyRound,
   LayoutList,
   LogOut,
   MessageSquareQuote,
@@ -21,6 +24,7 @@ import {
   ShieldCheck,
   Trash2,
   UserCog,
+  Wallet,
 } from "lucide-react";
 
 import { supabase } from "@/integrations/supabase/client";
@@ -66,6 +70,8 @@ export const Route = createFileRoute("/_authenticated/admin")({
 const ADMIN_TABS = [
   { value: "conteudo", label: "Conteúdo", Icon: LayoutList },
   { value: "depoimentos", label: "Depoimentos", Icon: MessageSquareQuote },
+  { value: "privado", label: "Links privados", Icon: KeyRound },
+  { value: "valores", label: "Valores", Icon: Wallet },
   { value: "perfil", label: "Perfil & contato", Icon: UserCog },
   { value: "cores", label: "Cores", Icon: Palette },
   { value: "acessos", label: "Acessos", Icon: ShieldCheck },
@@ -202,6 +208,18 @@ function AdminPage() {
 
           <TabsContent value="depoimentos" className="mt-6">
             <TestimonialsEditor />
+          </TabsContent>
+
+          <TabsContent value="privado" className="mt-6">
+            <AccessLinksEditor />
+          </TabsContent>
+
+          <TabsContent value="valores" className="mt-6">
+            {settingsQuery.data ? (
+              <PricingEditor settings={settingsQuery.data} />
+            ) : (
+              <p>Carregando…</p>
+            )}
           </TabsContent>
 
           <TabsContent value="perfil" className="mt-6">

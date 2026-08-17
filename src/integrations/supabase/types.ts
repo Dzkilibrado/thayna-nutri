@@ -8,6 +8,81 @@ export type Database = {
   };
   public: {
     Tables: {
+      client_access_links: {
+        Row: {
+          id: string;
+          client_name: string | null;
+          client_phone: string | null;
+          token: string;
+          duration_hours: number | null;
+          expires_at: string | null;
+          revoked: boolean;
+          created_at: string;
+          last_viewed_at: string | null;
+          view_count: number;
+        };
+        Insert: {
+          id?: string;
+          client_name?: string | null;
+          client_phone?: string | null;
+          token?: string;
+          duration_hours?: number | null;
+          expires_at?: string | null;
+          revoked?: boolean;
+          created_at?: string;
+          last_viewed_at?: string | null;
+          view_count?: number;
+        };
+        Update: {
+          id?: string;
+          client_name?: string | null;
+          client_phone?: string | null;
+          token?: string;
+          duration_hours?: number | null;
+          expires_at?: string | null;
+          revoked?: boolean;
+          created_at?: string;
+          last_viewed_at?: string | null;
+          view_count?: number;
+        };
+        Relationships: [];
+      };
+      pricing_items: {
+        Row: {
+          id: string;
+          section: string;
+          title: string;
+          description: string | null;
+          price: number;
+          sort_order: number;
+          published: boolean;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: {
+          id?: string;
+          section: string;
+          title?: string;
+          description?: string | null;
+          price?: number;
+          sort_order?: number;
+          published?: boolean;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Update: {
+          id?: string;
+          section?: string;
+          title?: string;
+          description?: string | null;
+          price?: number;
+          sort_order?: number;
+          published?: boolean;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Relationships: [];
+      };
       admin_invites: {
         Row: {
           accepted_at: string | null;
@@ -125,6 +200,8 @@ export type Database = {
           instagram_url: string | null;
           intro_video_url: string | null;
           maps_url: string | null;
+          pricing_note_presencial: string | null;
+          pricing_note_online: string | null;
           updated_at: string;
           whatsapp: string;
           whatsapp_message: string;
@@ -147,6 +224,8 @@ export type Database = {
           instagram_url?: string | null;
           intro_video_url?: string | null;
           maps_url?: string | null;
+          pricing_note_presencial?: string | null;
+          pricing_note_online?: string | null;
           updated_at?: string;
           whatsapp?: string;
           whatsapp_message?: string;
@@ -169,6 +248,8 @@ export type Database = {
           instagram_url?: string | null;
           intro_video_url?: string | null;
           maps_url?: string | null;
+          pricing_note_presencial?: string | null;
+          pricing_note_online?: string | null;
           updated_at?: string;
           whatsapp?: string;
           whatsapp_message?: string;
@@ -250,6 +331,11 @@ export type Database = {
       [_ in never]: never;
     };
     Functions: {
+      get_private_page: { Args: { _token: string }; Returns: Json };
+      renew_client_access: {
+        Args: { _id: string; _duration_hours: number | null };
+        Returns: string;
+      };
       admin_access_revoke: { Args: { _user_id: string }; Returns: undefined };
       admin_invite_create: { Args: { _email: string }; Returns: undefined };
       admin_invite_revoke: { Args: { _email: string }; Returns: undefined };

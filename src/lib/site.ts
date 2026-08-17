@@ -17,6 +17,8 @@ export type SiteSettings = {
   color_surface: string;
   color_accent: string;
   color_foreground: string;
+  pricing_note_presencial: string | null;
+  pricing_note_online: string | null;
 };
 
 export type ContentBlock = {
@@ -53,7 +55,7 @@ export const TESTIMONIAL_COLUMNS =
   "id, author_name, author_context, quote, photo_url, video_url, sort_order, featured, published, status, source";
 
 export const SETTINGS_COLUMNS =
-  "brand_name, brand_tagline, headline, bio, avatar_url, whatsapp, whatsapp_message, email, address, maps_url, hours, instagram_url, youtube_url, intro_video_url, color_background, color_surface, color_accent, color_foreground";
+  "brand_name, brand_tagline, headline, bio, avatar_url, whatsapp, whatsapp_message, email, address, maps_url, hours, instagram_url, youtube_url, intro_video_url, color_background, color_surface, color_accent, color_foreground, pricing_note_presencial, pricing_note_online";
 
 export const BLOCK_COLUMNS =
   "id, page, kind, title, subtitle, body, url, icon, sort_order, published, featured, category, cover_url";
@@ -65,6 +67,7 @@ export const PAGES = [
   { value: "sobre", label: "Sobre mim" },
   { value: "presencial", label: "Consulta presencial" },
   { value: "online", label: "Consulta online" },
+  { value: "privado", label: "Página privada (só quem tem o link)" },
 ] as const;
 
 export const MAX_TESTIMONIAL_QUOTE = 600;
@@ -199,3 +202,64 @@ export const SOURCE_HAS_AUTO_COVER: Record<VideoSource, boolean> = {
   file: false,
   other: false,
 };
+
+export type ClientAccessLink = {
+  id: string;
+  client_name: string | null;
+  client_phone: string | null;
+  token: string;
+  duration_hours: number | null;
+  expires_at: string | null;
+  revoked: boolean;
+  created_at: string;
+  last_viewed_at: string | null;
+  view_count: number;
+};
+
+export const ACCESS_LINK_COLUMNS =
+  "id, client_name, client_phone, token, duration_hours, expires_at, revoked, created_at, last_viewed_at, view_count";
+
+export const DURATION_OPTIONS: { value: number | null; label: string }[] = [
+  { value: 24, label: "24 horas" },
+  { value: 48, label: "48 horas" },
+  { value: 72, label: "72 horas" },
+  { value: 168, label: "7 dias" },
+  { value: null, label: "Sem validade" },
+];
+
+export type PricingSection = "presencial" | "online";
+
+export type PricingItem = {
+  id: string;
+  section: PricingSection;
+  title: string;
+  description: string | null;
+  price: number;
+  sort_order: number;
+  published: boolean;
+};
+
+export const PRICING_COLUMNS = "id, section, title, description, price, sort_order, published";
+
+export function formatBRL(value: number) {
+  return value.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
+}
+
+/**
+ * Mensagem padrão de abertura enviada junto com o link privado. O nome do
+ * cliente, quando informado, entra como primeira linha; sem nome, a mensagem
+ * começa direto na saudação.
+ */
+export function buildClientAccessMessage(clientName: string | null, link: string) {
+  const greeting = clientName?.trim() ? `${clientName.trim()}!\n\n` : "";
+  return (
+    `${greeting}Oi! Tudo bem?\n\n` +
+    "Aqui é a Carla, assistente do Dr. Thaynan Pablo.\n" +
+    "Que bom que você nos procurou!\n" +
+    "Estou aqui para tirar suas dúvidas e já deixar tudo pronto para sua consulta.\n" +
+    "Me conta seu nome pra gente começar?\n" +
+    "Após dar uma olhada, posso verificar os melhores horários disponíveis e já deixar seu agendamento encaminhado.\n" +
+    "Fico à disposição para dar continuidade 😊\n\n" +
+    `📎 Aqui estão os detalhes do atendimento e os valores:\n${link}`
+  );
+}

@@ -68,6 +68,7 @@ const PAGE_ACCEPTS: Record<string, { kinds: string[]; says: string }> = {
   sobre: { kinds: ALL_KINDS, says: "qualquer tipo" },
   presencial: { kinds: ALL_KINDS, says: "qualquer tipo" },
   online: { kinds: ALL_KINDS, says: "qualquer tipo" },
+  privado: { kinds: ALL_KINDS, says: "qualquer tipo" },
 };
 
 function mismatchMessage(page: string, kind: string): string | null {
