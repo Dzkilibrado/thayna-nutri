@@ -89,7 +89,7 @@ export function PageShell({
                   <Menu className="size-5" />
                 </button>
               </SheetTrigger>
-              <SheetContent side="right" className="w-[85vw] max-w-xs border-border bg-surface">
+              <SheetContent side="left" className="w-[85vw] max-w-xs border-border bg-surface">
                 <SheetHeader>
                   <SheetTitle translate="no" className="font-display uppercase tracking-wider">
                     {settings?.brand_name ?? "Thaynan"}
