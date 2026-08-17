@@ -58,7 +58,7 @@ export function PageShell({
             to="/"
             aria-label="Ir para a página inicial"
             translate="no"
-            className="shrink-0 rounded-md font-display text-xl uppercase leading-tight tracking-wider transition-colors hover:text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+            className="order-2 shrink-0 rounded-md font-display text-xl uppercase leading-tight tracking-wider transition-colors hover:text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring sm:order-none"
           >
             {settings?.brand_name ?? "Thaynan"}
           </Link>
@@ -77,10 +77,10 @@ export function PageShell({
             ))}
           </nav>
 
-          {/* Celular: botão de menu no lado direito do cabeçalho — mesmo lado em
-              que o painel abre, para o alcance ficar consistente com quem usa
-              o polegar direito. */}
-          <div className="ml-auto flex items-center gap-2 sm:hidden">
+          {/* Celular: botão de menu antes da marca, os dois à esquerda — mesmo
+              lado em que o painel abre, para o alcance ficar consistente com
+              quem usa o polegar esquerdo. */}
+          <div className="order-1 flex items-center gap-2 sm:hidden">
             <Sheet open={menuOpen} onOpenChange={setMenuOpen}>
               <SheetTrigger asChild>
                 <button
@@ -91,7 +91,7 @@ export function PageShell({
                   <Menu className="size-5" />
                 </button>
               </SheetTrigger>
-              <SheetContent side="right" className="w-[85vw] max-w-xs border-border bg-surface">
+              <SheetContent side="left" className="w-[85vw] max-w-xs border-border bg-surface">
                 <SheetHeader>
                   <SheetTitle translate="no" className="font-display uppercase tracking-wider">
                     {settings?.brand_name ?? "Thaynan"}
