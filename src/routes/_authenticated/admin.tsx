@@ -10,6 +10,7 @@ import { PricingEditor } from "@/components/admin/pricing-editor";
 import { RegistryEditor } from "@/components/admin/registry-editor";
 import { VisitorsPanel } from "@/components/admin/visitors-panel";
 import { MessagesEditor } from "@/components/admin/messages-editor";
+import { IndicatorsPanel } from "@/components/admin/indicators-panel";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useEffect, useMemo, useState } from "react";
 import { toast } from "sonner";
@@ -25,6 +26,7 @@ import {
   Plus,
   ShieldCheck,
   Trash2,
+  TrendingUp,
   Users,
   UserCog,
   UsersRound,
@@ -78,6 +80,7 @@ const ADMIN_TABS = [
   { value: "valores", label: "Valores", Icon: Wallet },
   { value: "mensagens", label: "Mensagens", Icon: MessageSquare },
   { value: "visitantes", label: "Visitantes", Icon: UsersRound },
+  { value: "indicadores", label: "Indicadores", Icon: TrendingUp },
   { value: "perfil", label: "Perfil & contato", Icon: UserCog },
   { value: "cores", label: "Cores", Icon: Palette },
   { value: "acessos", label: "Acessos", Icon: ShieldCheck },
@@ -234,6 +237,10 @@ function AdminPage() {
 
           <TabsContent value="visitantes" className="mt-6">
             <VisitorsPanel />
+          </TabsContent>
+
+          <TabsContent value="indicadores" className="mt-6">
+            <IndicatorsPanel />
           </TabsContent>
 
           <TabsContent value="perfil" className="mt-6">
