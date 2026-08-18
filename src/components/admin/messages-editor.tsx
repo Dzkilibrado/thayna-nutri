@@ -265,6 +265,8 @@ function MessageDialog({
   const set = <K extends keyof MessageTemplate>(key: K, value: MessageTemplate[K]) =>
     setForm((prev) => ({ ...prev, [key]: value }));
 
+  // Texto é sempre opcional para vídeo e link — só é obrigatório quando a
+  // mensagem inteira É o texto (kind "text"), onde não existe outro conteúdo.
   const canSave =
     form.title.trim().length > 0 &&
     (form.kind === "text"
@@ -337,15 +339,22 @@ function MessageDialog({
             </Select>
           </Field>
 
-          {form.kind === "text" ? (
-            <Field label="Texto">
-              <Textarea
-                rows={6}
-                value={form.body ?? ""}
-                onChange={(e) => set("body", e.target.value)}
-              />
-            </Field>
-          ) : (
+          <Field
+            label="Texto"
+            hint={
+              form.kind === "text"
+                ? undefined
+                : "Opcional. Aparece junto do vídeo ou do link, como uma introdução."
+            }
+          >
+            <Textarea
+              rows={5}
+              value={form.body ?? ""}
+              onChange={(e) => set("body", e.target.value)}
+            />
+          </Field>
+
+          {form.kind !== "text" ? (
             <Field
               label={form.kind === "video" ? "Link do vídeo" : "Link de destino"}
               hint={
@@ -360,7 +369,7 @@ function MessageDialog({
                 placeholder="https://…"
               />
             </Field>
-          )}
+          ) : null}
         </div>
 
         <DialogFooter>

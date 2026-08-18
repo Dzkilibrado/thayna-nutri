@@ -131,9 +131,20 @@ function InformacoesPage() {
 }
 
 function MessageView({ message }: { message: MessageContent }) {
+  // O texto acompanha o vídeo ou o link como introdução — o mesmo campo que,
+  // no tipo "Texto", é a mensagem inteira.
+  const hasIntro = message.kind !== "text" && (message.body ?? "").trim().length > 0;
+
   return (
     <section className="space-y-3">
       <h1 className="text-2xl">{message.title}</h1>
+
+      {hasIntro ? (
+        <p className="whitespace-pre-line break-words leading-relaxed text-muted-foreground">
+          {message.body}
+        </p>
+      ) : null}
+
       {message.kind === "text" ? (
         <p className="whitespace-pre-line break-words leading-relaxed text-muted-foreground">
           {message.body}
