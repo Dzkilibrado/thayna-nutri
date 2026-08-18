@@ -8,6 +8,7 @@ import { ContentEditor } from "@/components/admin/content-editor";
 import { TestimonialsEditor } from "@/components/admin/testimonials-editor";
 import { PricingEditor } from "@/components/admin/pricing-editor";
 import { RegistryEditor } from "@/components/admin/registry-editor";
+import { VisitorsPanel } from "@/components/admin/visitors-panel";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useEffect, useMemo, useState } from "react";
 import { toast } from "sonner";
@@ -24,6 +25,7 @@ import {
   Trash2,
   Users,
   UserCog,
+  UsersRound,
   Wallet,
 } from "lucide-react";
 
@@ -72,6 +74,7 @@ const ADMIN_TABS = [
   { value: "depoimentos", label: "Depoimentos", Icon: MessageSquareQuote },
   { value: "cadastros", label: "Cadastros", Icon: Users },
   { value: "valores", label: "Valores", Icon: Wallet },
+  { value: "visitantes", label: "Visitantes", Icon: UsersRound },
   { value: "perfil", label: "Perfil & contato", Icon: UserCog },
   { value: "cores", label: "Cores", Icon: Palette },
   { value: "acessos", label: "Acessos", Icon: ShieldCheck },
@@ -220,6 +223,10 @@ function AdminPage() {
             ) : (
               <p>Carregando…</p>
             )}
+          </TabsContent>
+
+          <TabsContent value="visitantes" className="mt-6">
+            <VisitorsPanel />
           </TabsContent>
 
           <TabsContent value="perfil" className="mt-6">

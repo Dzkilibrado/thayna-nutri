@@ -8,6 +8,24 @@ export type Database = {
   };
   public: {
     Tables: {
+      site_visits: {
+        Row: {
+          id: number;
+          visited_at: string;
+          path: string | null;
+        };
+        Insert: {
+          id?: number;
+          visited_at?: string;
+          path?: string | null;
+        };
+        Update: {
+          id?: number;
+          visited_at?: string;
+          path?: string | null;
+        };
+        Relationships: [];
+      };
       athletes: {
         Row: {
           id: string;

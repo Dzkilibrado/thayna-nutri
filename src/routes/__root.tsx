@@ -12,6 +12,7 @@ import { useEffect, type ReactNode } from "react";
 import { Toaster } from "@/components/ui/sonner";
 
 import { SITE_URL } from "@/lib/seo";
+import { trackVisit } from "@/lib/track-visit";
 import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
 
@@ -159,6 +160,10 @@ function useCanonicalHostRedirect() {
 function RootComponent() {
   const { queryClient } = Route.useRouteContext();
   useCanonicalHostRedirect();
+
+  useEffect(() => {
+    trackVisit();
+  }, []);
 
   return (
     <QueryClientProvider client={queryClient}>
