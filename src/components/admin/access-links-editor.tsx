@@ -1,6 +1,17 @@
-import { useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { Copy, Eye, MessageCircle, Plus, RefreshCcw, ShieldOff, Trash2 } from "lucide-react";
+import {
+  Copy,
+  Eye,
+  Filter,
+  MessageCircle,
+  Pencil,
+  Plus,
+  RefreshCcw,
+  RotateCcw,
+  ShieldOff,
+  Trash2,
+} from "lucide-react";
 import { toast } from "sonner";
 
 import {
@@ -31,14 +42,21 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { Switch } from "@/components/ui/switch";
 import { supabase } from "@/integrations/supabase/client";
 import { absoluteUrl } from "@/lib/seo";
 import {
   ACCESS_LINK_COLUMNS,
+  ATHLETE_COLUMNS,
+  ATTENDANCE_OPTIONS,
+  CONTACT_STATUS_OPTIONS,
   DURATION_OPTIONS,
   buildClientAccessMessage,
   whatsappLink,
+  type Athlete,
+  type AttendanceType,
   type ClientAccessLink,
+  type ContactStatus,
 } from "@/lib/site";
 import { cn } from "@/lib/utils";
 
@@ -68,11 +86,23 @@ const formatDateTime = (iso: string) =>
     minute: "2-digit",
   });
 
+const formatDate = (iso: string) =>
+  new Date(`${iso}T00:00:00`).toLocaleDateString("pt-BR", {
+    day: "2-digit",
+    month: "2-digit",
+    year: "numeric",
+  });
+
+function daysSince(dateStr: string) {
+  const ms = Date.now() - new Date(`${dateStr}T00:00:00`).getTime();
+  return Math.max(0, Math.floor(ms / 86_400_000));
+}
+
 function linkFor(token: string) {
   return absoluteUrl(`/informacoes/${token}`);
 }
 
-function statusOf(item: ClientAccessLink): { label: string; tone: "ok" | "warn" | "off" } {
+function linkStatusOf(item: ClientAccessLink): { label: string; tone: "ok" | "warn" | "off" } {
   if (item.revoked) return { label: "Revogado", tone: "off" };
   if (item.expires_at && new Date(item.expires_at).getTime() < Date.now()) {
     return { label: "Expirado", tone: "warn" };
@@ -81,9 +111,46 @@ function statusOf(item: ClientAccessLink): { label: string; tone: "ok" | "warn" 
   return { label: `Ativo até ${formatDateTime(item.expires_at)}`, tone: "ok" };
 }
 
+const contactStatusLabel = (v: ContactStatus) =>
+  CONTACT_STATUS_OPTIONS.find((o) => o.value === v)?.label ?? v;
+const attendanceLabel = (v: AttendanceType | null) =>
+  v ? (ATTENDANCE_OPTIONS.find((o) => o.value === v)?.label ?? v) : null;
+
+const ALL = "all";
+const NO_RETURN_OPTIONS = [
+  { value: ALL, label: "Qualquer período" },
+  { value: "30", label: "30 dias ou mais" },
+  { value: "60", label: "60 dias ou mais" },
+  { value: "90", label: "90 dias ou mais" },
+];
+const LINK_STATUS_OPTIONS = [
+  { value: ALL, label: "Qualquer status" },
+  { value: "ok", label: "Ativo" },
+  { value: "warn", label: "Expirado" },
+  { value: "off", label: "Revogado" },
+];
+const YES_NO = [
+  { value: ALL, label: "Tanto faz" },
+  { value: "yes", label: "Sim" },
+  { value: "no", label: "Não" },
+];
+
+/* ------------------------------------------------------------------ *
+ * Tela principal: filtros por seleção, resultado só depois de buscar.
+ * ------------------------------------------------------------------ */
+
 export function AccessLinksEditor() {
   const queryClient = useQueryClient();
   const [creating, setCreating] = useState(false);
+  const [editing, setEditing] = useState<ClientAccessLink | null>(null);
+
+  const [attendance, setAttendance] = useState(ALL);
+  const [status, setStatus] = useState(ALL);
+  const [isAthlete, setIsAthlete] = useState(ALL);
+  const [sponsored, setSponsored] = useState(ALL);
+  const [noReturn, setNoReturn] = useState(ALL);
+  const [linkStatus, setLinkStatus] = useState(ALL);
+  const [searched, setSearched] = useState(false);
 
   const query = useQuery({
     queryKey: ["admin-access-links"],
@@ -97,49 +164,217 @@ export function AccessLinksEditor() {
     },
   });
 
-  const items = query.data ?? [];
+  const athletesQuery = useQuery({
+    queryKey: ["admin-athletes"],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("athletes")
+        .select(ATHLETE_COLUMNS)
+        .order("name", { ascending: true });
+      if (error) throw error;
+      return (data ?? []) as Athlete[];
+    },
+  });
+
+  const athleteName = useMemo(() => {
+    const map = new Map<string, string>();
+    for (const a of athletesQuery.data ?? []) map.set(a.id, a.name);
+    return map;
+  }, [athletesQuery.data]);
+
+  const items = useMemo(() => query.data ?? [], [query.data]);
   const refresh = () => void queryClient.invalidateQueries({ queryKey: ["admin-access-links"] });
+
+  const results = useMemo(() => {
+    return items.filter((item) => {
+      if (attendance !== ALL && item.attendance_type !== attendance) return false;
+      if (status !== ALL && item.contact_status !== status) return false;
+      if (isAthlete !== ALL && item.is_athlete !== (isAthlete === "yes")) return false;
+      if (sponsored !== ALL && item.sponsored !== (sponsored === "yes")) return false;
+      if (noReturn !== ALL) {
+        if (!item.last_appointment_date) return false;
+        if (daysSince(item.last_appointment_date) < Number(noReturn)) return false;
+      }
+      if (linkStatus !== ALL && linkStatusOf(item).tone !== linkStatus) return false;
+      return true;
+    });
+  }, [items, attendance, status, isAthlete, sponsored, noReturn, linkStatus]);
+
+  function resetFilters() {
+    setAttendance(ALL);
+    setStatus(ALL);
+    setIsAthlete(ALL);
+    setSponsored(ALL);
+    setNoReturn(ALL);
+    setLinkStatus(ALL);
+    setSearched(false);
+  }
 
   return (
     <div className="space-y-5">
       <div className="flex flex-wrap items-start justify-between gap-3">
         <p className="max-w-md text-sm text-muted-foreground">
-          Cada link é único e só existe aqui — não fica visível em nenhum menu do site. Quem tiver o
-          endereço consegue abrir a página; não é pedida nenhuma senha.
+          Cada link é único e só existe aqui — não aparece em nenhum menu do site. Use os filtros
+          abaixo para localizar um cliente; a lista começa vazia.
         </p>
         <Button onClick={() => setCreating(true)}>
-          <Plus className="size-4" /> Novo link
+          <Plus className="size-4" /> Novo cliente
         </Button>
       </div>
 
-      <p className="rounded-xl border border-primary/40 bg-primary/10 px-4 py-3 text-sm">
-        O conteúdo mostrado (apresentação e valores) é editado na aba Conteúdo, escolhendo a página
-        &ldquo;Página privada&rdquo;. Aqui você só controla quem recebe o link e por quanto tempo.
-      </p>
+      <div className="grid gap-3 rounded-2xl border border-border bg-surface p-4 sm:grid-cols-2 lg:grid-cols-3">
+        <Field label="Atendimento">
+          <Select value={attendance} onValueChange={setAttendance}>
+            <SelectTrigger>
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value={ALL}>Todos</SelectItem>
+              {ATTENDANCE_OPTIONS.map((o) => (
+                <SelectItem key={o.value} value={o.value}>
+                  {o.label}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </Field>
+        <Field label="Status do contato">
+          <Select value={status} onValueChange={setStatus}>
+            <SelectTrigger>
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value={ALL}>Todos</SelectItem>
+              {CONTACT_STATUS_OPTIONS.map((o) => (
+                <SelectItem key={o.value} value={o.value}>
+                  {o.label}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </Field>
+        <Field label="É atleta">
+          <Select value={isAthlete} onValueChange={setIsAthlete}>
+            <SelectTrigger>
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              {YES_NO.map((o) => (
+                <SelectItem key={o.value} value={o.value}>
+                  {o.label}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </Field>
+        <Field label="Patrocinado">
+          <Select value={sponsored} onValueChange={setSponsored}>
+            <SelectTrigger>
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              {YES_NO.map((o) => (
+                <SelectItem key={o.value} value={o.value}>
+                  {o.label}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </Field>
+        <Field label="Sem retorno há">
+          <Select value={noReturn} onValueChange={setNoReturn}>
+            <SelectTrigger>
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              {NO_RETURN_OPTIONS.map((o) => (
+                <SelectItem key={o.value} value={o.value}>
+                  {o.label}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </Field>
+        <Field label="Status do link">
+          <Select value={linkStatus} onValueChange={setLinkStatus}>
+            <SelectTrigger>
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              {LINK_STATUS_OPTIONS.map((o) => (
+                <SelectItem key={o.value} value={o.value}>
+                  {o.label}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </Field>
 
-      {query.isLoading ? <p className="text-sm">Carregando…</p> : null}
+        <div className="flex items-end gap-2 sm:col-span-2 lg:col-span-3">
+          <Button onClick={() => setSearched(true)}>
+            <Filter className="size-4" /> Buscar
+          </Button>
+          <Button variant="ghost" onClick={resetFilters}>
+            <RotateCcw className="size-4" /> Limpar filtros
+          </Button>
+        </div>
+      </div>
 
-      {!query.isLoading && items.length === 0 ? (
-        <p className="rounded-2xl border border-dashed border-border p-8 text-center text-sm text-muted-foreground">
-          Nenhum link criado ainda. Clique em &ldquo;Novo link&rdquo; para gerar o primeiro.
+      {!searched ? (
+        <p className="rounded-2xl border border-dashed border-border p-10 text-center text-sm text-muted-foreground">
+          Ajuste os filtros acima e clique em &ldquo;Buscar&rdquo; para ver os clientes.
         </p>
-      ) : null}
-
-      <ul className="space-y-2">
-        {items.map((item) => (
-          <AccessLinkRow key={item.id} item={item} onChanged={refresh} />
-        ))}
-      </ul>
+      ) : query.isLoading ? (
+        <p className="text-sm">Carregando…</p>
+      ) : results.length === 0 ? (
+        <p className="rounded-2xl border border-dashed border-border p-10 text-center text-sm text-muted-foreground">
+          Nenhum cliente encontrado com esses filtros.
+        </p>
+      ) : (
+        <ul className="space-y-2">
+          {results.map((item) => (
+            <AccessLinkRow
+              key={item.id}
+              item={item}
+              referredByName={
+                item.referred_by_athlete_id
+                  ? athleteName.get(item.referred_by_athlete_id)
+                  : undefined
+              }
+              onEdit={() => setEditing(item)}
+              onChanged={refresh}
+            />
+          ))}
+        </ul>
+      )}
 
       {creating ? <CreateDialog onClose={() => setCreating(false)} onSaved={refresh} /> : null}
+      {editing ? (
+        <EditDialog
+          item={editing}
+          athletes={athletesQuery.data ?? []}
+          onClose={() => setEditing(null)}
+          onSaved={refresh}
+        />
+      ) : null}
     </div>
   );
 }
 
-function AccessLinkRow({ item, onChanged }: { item: ClientAccessLink; onChanged: () => void }) {
+function AccessLinkRow({
+  item,
+  referredByName,
+  onEdit,
+  onChanged,
+}: {
+  item: ClientAccessLink;
+  referredByName: string | undefined;
+  onEdit: () => void;
+  onChanged: () => void;
+}) {
   const [confirmDelete, setConfirmDelete] = useState(false);
   const [renewing, setRenewing] = useState(false);
-  const status = statusOf(item);
+  const status = linkStatusOf(item);
   const link = linkFor(item.token);
 
   const revoke = useMutation({
@@ -163,7 +398,7 @@ function AccessLinkRow({ item, onChanged }: { item: ClientAccessLink; onChanged:
       if (error) throw error;
     },
     onSuccess: () => {
-      toast.success("Link excluído.");
+      toast.success("Cliente excluído.");
       setConfirmDelete(false);
       onChanged();
     },
@@ -207,6 +442,22 @@ function AccessLinkRow({ item, onChanged }: { item: ClientAccessLink; onChanged:
         </span>
       </div>
 
+      <div className="flex flex-wrap gap-1.5">
+        <Badge>{contactStatusLabel(item.contact_status)}</Badge>
+        {attendanceLabel(item.attendance_type) ? (
+          <Badge>{attendanceLabel(item.attendance_type)}</Badge>
+        ) : null}
+        {item.is_athlete ? <Badge>Atleta</Badge> : null}
+        {item.sponsored ? <Badge>Patrocinado</Badge> : null}
+        {referredByName ? <Badge>Indicado por {referredByName}</Badge> : null}
+        {item.last_appointment_date ? (
+          <Badge tone={daysSince(item.last_appointment_date) >= 30 ? "warn" : undefined}>
+            Última consulta em {formatDate(item.last_appointment_date)} · há{" "}
+            {daysSince(item.last_appointment_date)} dias
+          </Badge>
+        ) : null}
+      </div>
+
       <div className="flex items-center gap-2 rounded-lg bg-surface-2 px-3 py-2">
         <code className="min-w-0 flex-1 truncate text-xs text-muted-foreground">{link}</code>
         <Button variant="ghost" size="icon" onClick={copyLink} aria-label="Copiar link">
@@ -225,6 +476,9 @@ function AccessLinkRow({ item, onChanged }: { item: ClientAccessLink; onChanged:
       <div className="flex flex-wrap gap-2">
         <Button size="sm" onClick={sendWhatsApp} disabled={!item.client_phone}>
           <MessageCircle className="size-4" /> Enviar no WhatsApp
+        </Button>
+        <Button size="sm" variant="secondary" onClick={onEdit}>
+          <Pencil className="size-4" /> Editar dados
         </Button>
         <Button size="sm" variant="secondary" onClick={() => setRenewing(true)}>
           <RefreshCcw className="size-4" /> Renovar
@@ -249,10 +503,10 @@ function AccessLinkRow({ item, onChanged }: { item: ClientAccessLink; onChanged:
       <AlertDialog open={confirmDelete} onOpenChange={setConfirmDelete}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Excluir este link?</AlertDialogTitle>
+            <AlertDialogTitle>Excluir este cliente?</AlertDialogTitle>
             <AlertDialogDescription>
-              O link para de funcionar na hora e não tem como desfazer. Se for só por um tempo, use
-              &ldquo;Revogar&rdquo; em vez de excluir.
+              O link para de funcionar na hora e todo o histórico deste cadastro é apagado. Não tem
+              como desfazer. Se for só por um tempo, use &ldquo;Revogar&rdquo; em vez de excluir.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
@@ -269,6 +523,21 @@ function AccessLinkRow({ item, onChanged }: { item: ClientAccessLink; onChanged:
         </AlertDialogContent>
       </AlertDialog>
     </li>
+  );
+}
+
+function Badge({ children, tone }: { children: React.ReactNode; tone?: "warn" | undefined }) {
+  return (
+    <span
+      className={cn(
+        "rounded-full px-2.5 py-1 text-[11px]",
+        tone === "warn"
+          ? "bg-destructive/20 text-foreground"
+          : "bg-surface-2 text-muted-foreground",
+      )}
+    >
+      {children}
+    </span>
   );
 }
 
@@ -290,7 +559,7 @@ function CreateDialog({ onClose, onSaved }: { onClose: () => void; onSaved: () =
       if (error) throw error;
     },
     onSuccess: () => {
-      toast.success("Link criado.");
+      toast.success("Cliente cadastrado.");
       onSaved();
       onClose();
     },
@@ -301,10 +570,10 @@ function CreateDialog({ onClose, onSaved }: { onClose: () => void; onSaved: () =
     <Dialog open onOpenChange={(open) => !open && onClose()}>
       <DialogContent className="border-border bg-surface">
         <DialogHeader>
-          <DialogTitle>Novo link para cliente</DialogTitle>
+          <DialogTitle>Novo cliente</DialogTitle>
           <DialogDescription>
-            Nome e telefone são só para você identificar o link depois — não bloqueiam nem liberam o
-            acesso.
+            Só o essencial para gerar o link. Status, atendimento e os demais dados de
+            acompanhamento ficam em &ldquo;Editar dados&rdquo;, depois de criado.
           </DialogDescription>
         </DialogHeader>
 
@@ -312,17 +581,14 @@ function CreateDialog({ onClose, onSaved }: { onClose: () => void; onSaved: () =
           <Field label="Nome do cliente" hint="Opcional.">
             <Input value={name} onChange={(e) => setName(e.target.value)} autoFocus />
           </Field>
-          <Field
-            label="Telefone (WhatsApp)"
-            hint="Opcional, mas necessário para usar o botão de enviar por aqui."
-          >
+          <Field label="Telefone (WhatsApp)" hint="Opcional, mas necessário para enviar por aqui.">
             <Input
               value={phone}
               onChange={(e) => setPhone(e.target.value)}
               placeholder="27996657309"
             />
           </Field>
-          <Field label="Validade">
+          <Field label="Validade do link">
             <Select value={duration} onValueChange={setDuration}>
               <SelectTrigger>
                 <SelectValue />
@@ -343,7 +609,7 @@ function CreateDialog({ onClose, onSaved }: { onClose: () => void; onSaved: () =
             Cancelar
           </Button>
           <Button onClick={() => create.mutate()} disabled={create.isPending}>
-            {create.isPending ? "Criando…" : "Criar link"}
+            {create.isPending ? "Criando…" : "Criar cliente"}
           </Button>
         </DialogFooter>
       </DialogContent>
@@ -413,6 +679,187 @@ function RenewDialog({
           </Button>
           <Button onClick={() => renew.mutate()} disabled={renew.isPending}>
             {renew.isPending ? "Renovando…" : "Renovar"}
+          </Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
+  );
+}
+
+/* ------------------------------------------------------------------ *
+ * Janela de edição: status, atendimento, última consulta, atleta,
+ * patrocinado e indicação. Não mexe em token nem validade — isso fica
+ * em "Renovar".
+ * ------------------------------------------------------------------ */
+
+const NONE_ATHLETE = "none";
+const NONE_ATTENDANCE = "none";
+
+function EditDialog({
+  item,
+  athletes,
+  onClose,
+  onSaved,
+}: {
+  item: ClientAccessLink;
+  athletes: Athlete[];
+  onClose: () => void;
+  onSaved: () => void;
+}) {
+  const [form, setForm] = useState(item);
+  useEffect(() => setForm(item), [item]);
+
+  const set = <K extends keyof ClientAccessLink>(key: K, value: ClientAccessLink[K]) =>
+    setForm((prev) => ({ ...prev, [key]: value }));
+
+  const save = useMutation({
+    mutationFn: async () => {
+      const { error } = await supabase
+        .from("client_access_links")
+        .update({
+          client_name: form.client_name,
+          client_phone: form.client_phone,
+          contact_status: form.contact_status,
+          attendance_type: form.attendance_type,
+          last_appointment_date: form.last_appointment_date,
+          is_athlete: form.is_athlete,
+          sponsored: form.sponsored,
+          referred_by_athlete_id: form.referred_by_athlete_id,
+        })
+        .eq("id", item.id);
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      toast.success("Dados salvos.");
+      onSaved();
+      onClose();
+    },
+    onError: (e: Error) => toast.error(e.message),
+  });
+
+  return (
+    <Dialog open onOpenChange={(open) => !open && onClose()}>
+      <DialogContent className="max-h-[90vh] max-w-lg overflow-y-auto border-border bg-surface">
+        <DialogHeader>
+          <DialogTitle>Editar dados de {item.client_name || "cliente"}</DialogTitle>
+          <DialogDescription>As alterações só valem depois de salvar.</DialogDescription>
+        </DialogHeader>
+
+        <div className="space-y-4">
+          <div className="grid gap-4 sm:grid-cols-2">
+            <Field label="Nome do cliente">
+              <Input
+                value={form.client_name ?? ""}
+                onChange={(e) => set("client_name", e.target.value || null)}
+              />
+            </Field>
+            <Field label="Telefone">
+              <Input
+                value={form.client_phone ?? ""}
+                onChange={(e) => set("client_phone", e.target.value || null)}
+              />
+            </Field>
+          </div>
+
+          <Field label="Status do contato">
+            <Select
+              value={form.contact_status}
+              onValueChange={(v) => set("contact_status", v as ContactStatus)}
+            >
+              <SelectTrigger>
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                {CONTACT_STATUS_OPTIONS.map((o) => (
+                  <SelectItem key={o.value} value={o.value}>
+                    {o.label}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </Field>
+
+          <Field label="Tipo de atendimento">
+            <Select
+              value={form.attendance_type ?? NONE_ATTENDANCE}
+              onValueChange={(v) =>
+                set("attendance_type", v === NONE_ATTENDANCE ? null : (v as AttendanceType))
+              }
+            >
+              <SelectTrigger>
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value={NONE_ATTENDANCE}>Ainda não definido</SelectItem>
+                {ATTENDANCE_OPTIONS.map((o) => (
+                  <SelectItem key={o.value} value={o.value}>
+                    {o.label}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </Field>
+
+          <Field
+            label="Data da última consulta"
+            hint="Usada para calcular há quantos dias o cliente está sem retornar."
+          >
+            <Input
+              type="date"
+              value={form.last_appointment_date ?? ""}
+              onChange={(e) => set("last_appointment_date", e.target.value || null)}
+            />
+          </Field>
+
+          <div className="space-y-3 rounded-xl border border-border bg-surface-2 p-4">
+            <div className="flex items-center justify-between gap-3">
+              <Label htmlFor="is-athlete" className="text-sm">
+                Este cliente é atleta
+              </Label>
+              <Switch
+                id="is-athlete"
+                checked={form.is_athlete}
+                onCheckedChange={(v) => set("is_athlete", v)}
+              />
+            </div>
+            <div className="flex items-center justify-between gap-3">
+              <Label htmlFor="sponsored" className="text-sm">
+                Patrocinado pelo Thaynan
+              </Label>
+              <Switch
+                id="sponsored"
+                checked={form.sponsored}
+                onCheckedChange={(v) => set("sponsored", v)}
+              />
+            </div>
+          </div>
+
+          <Field label="Indicado por" hint="Opcional. Cadastre o atleta em Cadastros → Atletas.">
+            <Select
+              value={form.referred_by_athlete_id ?? NONE_ATHLETE}
+              onValueChange={(v) => set("referred_by_athlete_id", v === NONE_ATHLETE ? null : v)}
+            >
+              <SelectTrigger>
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value={NONE_ATHLETE}>Nenhum</SelectItem>
+                {athletes.map((a) => (
+                  <SelectItem key={a.id} value={a.id}>
+                    {a.name}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </Field>
+        </div>
+
+        <DialogFooter>
+          <Button variant="ghost" onClick={onClose}>
+            Cancelar
+          </Button>
+          <Button onClick={() => save.mutate()} disabled={save.isPending}>
+            {save.isPending ? "Salvando…" : "Salvar alterações"}
           </Button>
         </DialogFooter>
       </DialogContent>

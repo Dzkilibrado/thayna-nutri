@@ -47,6 +47,12 @@ export type Database = {
           created_at: string;
           last_viewed_at: string | null;
           view_count: number;
+          contact_status: string;
+          attendance_type: string | null;
+          last_appointment_date: string | null;
+          is_athlete: boolean;
+          sponsored: boolean;
+          referred_by_athlete_id: string | null;
         };
         Insert: {
           id?: string;
@@ -59,6 +65,12 @@ export type Database = {
           created_at?: string;
           last_viewed_at?: string | null;
           view_count?: number;
+          contact_status?: string;
+          attendance_type?: string | null;
+          last_appointment_date?: string | null;
+          is_athlete?: boolean;
+          sponsored?: boolean;
+          referred_by_athlete_id?: string | null;
         };
         Update: {
           id?: string;
@@ -71,6 +83,12 @@ export type Database = {
           created_at?: string;
           last_viewed_at?: string | null;
           view_count?: number;
+          contact_status?: string;
+          attendance_type?: string | null;
+          last_appointment_date?: string | null;
+          is_athlete?: boolean;
+          sponsored?: boolean;
+          referred_by_athlete_id?: string | null;
         };
         Relationships: [];
       };

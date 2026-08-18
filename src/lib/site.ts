@@ -203,6 +203,23 @@ export const SOURCE_HAS_AUTO_COVER: Record<VideoSource, boolean> = {
   other: false,
 };
 
+export type ContactStatus =
+  "contato_inicial" | "em_negociacao" | "cliente_ativo" | "cliente_inativo";
+
+export const CONTACT_STATUS_OPTIONS: { value: ContactStatus; label: string }[] = [
+  { value: "contato_inicial", label: "Contato inicial" },
+  { value: "em_negociacao", label: "Em negociação" },
+  { value: "cliente_ativo", label: "Cliente ativo" },
+  { value: "cliente_inativo", label: "Cliente inativo" },
+];
+
+export type AttendanceType = "presencial" | "online";
+
+export const ATTENDANCE_OPTIONS: { value: AttendanceType; label: string }[] = [
+  { value: "presencial", label: "Presencial" },
+  { value: "online", label: "Online" },
+];
+
 export type ClientAccessLink = {
   id: string;
   client_name: string | null;
@@ -214,10 +231,16 @@ export type ClientAccessLink = {
   created_at: string;
   last_viewed_at: string | null;
   view_count: number;
+  contact_status: ContactStatus;
+  attendance_type: AttendanceType | null;
+  last_appointment_date: string | null;
+  is_athlete: boolean;
+  sponsored: boolean;
+  referred_by_athlete_id: string | null;
 };
 
 export const ACCESS_LINK_COLUMNS =
-  "id, client_name, client_phone, token, duration_hours, expires_at, revoked, created_at, last_viewed_at, view_count";
+  "id, client_name, client_phone, token, duration_hours, expires_at, revoked, created_at, last_viewed_at, view_count, contact_status, attendance_type, last_appointment_date, is_athlete, sponsored, referred_by_athlete_id";
 
 export const DURATION_OPTIONS: { value: number | null; label: string }[] = [
   { value: 24, label: "24 horas" },
