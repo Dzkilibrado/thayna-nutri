@@ -6,9 +6,8 @@ import { FileField } from "@/components/admin/file-field";
 import { AccessEditor } from "@/components/admin/access-editor";
 import { ContentEditor } from "@/components/admin/content-editor";
 import { TestimonialsEditor } from "@/components/admin/testimonials-editor";
-import { AccessLinksEditor } from "@/components/admin/access-links-editor";
 import { PricingEditor } from "@/components/admin/pricing-editor";
-import { AthletesEditor } from "@/components/admin/athletes-editor";
+import { RegistryEditor } from "@/components/admin/registry-editor";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useEffect, useMemo, useState } from "react";
 import { toast } from "sonner";
@@ -16,15 +15,14 @@ import {
   ArrowDown,
   ArrowUp,
   ExternalLink,
-  KeyRound,
   LayoutList,
   LogOut,
-  Medal,
   MessageSquareQuote,
   Palette,
   Plus,
   ShieldCheck,
   Trash2,
+  Users,
   UserCog,
   Wallet,
 } from "lucide-react";
@@ -72,9 +70,8 @@ export const Route = createFileRoute("/_authenticated/admin")({
 const ADMIN_TABS = [
   { value: "conteudo", label: "Conteúdo", Icon: LayoutList },
   { value: "depoimentos", label: "Depoimentos", Icon: MessageSquareQuote },
-  { value: "privado", label: "Links privados", Icon: KeyRound },
+  { value: "cadastros", label: "Cadastros", Icon: Users },
   { value: "valores", label: "Valores", Icon: Wallet },
-  { value: "atletas", label: "Atletas", Icon: Medal },
   { value: "perfil", label: "Perfil & contato", Icon: UserCog },
   { value: "cores", label: "Cores", Icon: Palette },
   { value: "acessos", label: "Acessos", Icon: ShieldCheck },
@@ -213,8 +210,8 @@ function AdminPage() {
             <TestimonialsEditor />
           </TabsContent>
 
-          <TabsContent value="privado" className="mt-6">
-            <AccessLinksEditor />
+          <TabsContent value="cadastros" className="mt-6">
+            <RegistryEditor />
           </TabsContent>
 
           <TabsContent value="valores" className="mt-6">
@@ -223,10 +220,6 @@ function AdminPage() {
             ) : (
               <p>Carregando…</p>
             )}
-          </TabsContent>
-
-          <TabsContent value="atletas" className="mt-6">
-            <AthletesEditor />
           </TabsContent>
 
           <TabsContent value="perfil" className="mt-6">
