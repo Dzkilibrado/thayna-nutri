@@ -9,6 +9,7 @@ import { TestimonialsEditor } from "@/components/admin/testimonials-editor";
 import { PricingEditor } from "@/components/admin/pricing-editor";
 import { RegistryEditor } from "@/components/admin/registry-editor";
 import { VisitorsPanel } from "@/components/admin/visitors-panel";
+import { MessagesEditor } from "@/components/admin/messages-editor";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useEffect, useMemo, useState } from "react";
 import { toast } from "sonner";
@@ -18,6 +19,7 @@ import {
   ExternalLink,
   LayoutList,
   LogOut,
+  MessageSquare,
   MessageSquareQuote,
   Palette,
   Plus,
@@ -74,6 +76,7 @@ const ADMIN_TABS = [
   { value: "depoimentos", label: "Depoimentos", Icon: MessageSquareQuote },
   { value: "cadastros", label: "Cadastros", Icon: Users },
   { value: "valores", label: "Valores", Icon: Wallet },
+  { value: "mensagens", label: "Mensagens", Icon: MessageSquare },
   { value: "visitantes", label: "Visitantes", Icon: UsersRound },
   { value: "perfil", label: "Perfil & contato", Icon: UserCog },
   { value: "cores", label: "Cores", Icon: Palette },
@@ -223,6 +226,10 @@ function AdminPage() {
             ) : (
               <p>Carregando…</p>
             )}
+          </TabsContent>
+
+          <TabsContent value="mensagens" className="mt-6">
+            <MessagesEditor />
           </TabsContent>
 
           <TabsContent value="visitantes" className="mt-6">

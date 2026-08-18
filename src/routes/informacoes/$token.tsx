@@ -19,13 +19,22 @@ import { VideoEmbed } from "@/components/site/video-embed";
  * nem indexação para esta rota; get_private_page() só devolve dado quando o
  * token confere com um link ativo, não expirado e não revogado.
  */
+type MessageContent = {
+  title: string;
+  kind: "text" | "video" | "link";
+  body: string | null;
+  url: string | null;
+};
+
 type PrivatePageData = {
   valid: boolean;
+  type?: "private_page" | "message";
   blocks?: ContentBlock[];
   pricing?: {
     presencial: { items: PricingItem[] };
     online: { items: PricingItem[] };
   };
+  message?: MessageContent;
   settings?: SiteSettings | null;
 };
 
@@ -53,6 +62,7 @@ function InformacoesPage() {
 
   const settings = data.settings ?? null;
   const blocks = (data.blocks ?? []).slice().sort((a, b) => a.sort_order - b.sort_order);
+  const isMessage = data.type === "message" && data.message;
 
   return (
     <div className="min-h-screen bg-background text-foreground">
@@ -69,24 +79,30 @@ function InformacoesPage() {
       </header>
 
       <main className="mx-auto max-w-2xl space-y-10 px-5 py-10 md:max-w-3xl">
-        {blocks.map((block) => (
-          <PrivateBlock key={block.id} block={block} />
-        ))}
-
-        {data.pricing ? (
+        {isMessage && data.message ? (
+          <MessageView message={data.message} />
+        ) : (
           <>
-            <PricingTable
-              title="Investimento — Consulta presencial ou on-line"
-              items={data.pricing.presencial.items}
-              note={settings?.pricing_note_presencial}
-            />
-            <PricingTable
-              title="Investimento — Consultoria on-line"
-              items={data.pricing.online.items}
-              note={settings?.pricing_note_online}
-            />
+            {blocks.map((block) => (
+              <PrivateBlock key={block.id} block={block} />
+            ))}
+
+            {data.pricing ? (
+              <>
+                <PricingTable
+                  title="Investimento — Consulta presencial ou on-line"
+                  items={data.pricing.presencial.items}
+                  note={settings?.pricing_note_presencial}
+                />
+                <PricingTable
+                  title="Investimento — Consultoria on-line"
+                  items={data.pricing.online.items}
+                  note={settings?.pricing_note_online}
+                />
+              </>
+            ) : null}
           </>
-        ) : null}
+        )}
 
         <div className="space-y-3">
           {settings?.whatsapp ? (
@@ -111,6 +127,28 @@ function InformacoesPage() {
         </div>
       </main>
     </div>
+  );
+}
+
+function MessageView({ message }: { message: MessageContent }) {
+  return (
+    <section className="space-y-3">
+      <h1 className="text-2xl">{message.title}</h1>
+      {message.kind === "text" ? (
+        <p className="whitespace-pre-line break-words leading-relaxed text-muted-foreground">
+          {message.body}
+        </p>
+      ) : message.kind === "video" ? (
+        <VideoEmbed url={message.url} title={message.title} />
+      ) : message.url ? (
+        <a
+          {...externalLinkProps(message.url)}
+          className="block rounded-2xl border border-border bg-surface px-4 py-4 text-center font-display uppercase tracking-wide hover:border-primary/60"
+        >
+          Abrir link
+        </a>
+      ) : null}
+    </section>
   );
 }
 

@@ -162,6 +162,7 @@ const EMPTY_CLIENT: ClientAccessLink = {
   instagram_url: null,
   facebook_url: null,
   youtube_url: null,
+  message_template_id: null,
 };
 
 /* ------------------------------------------------------------------ *
@@ -187,6 +188,7 @@ export function AccessLinksEditor() {
       const { data, error } = await supabase
         .from("client_access_links")
         .select(ACCESS_LINK_COLUMNS)
+        .is("message_template_id", null)
         .order("created_at", { ascending: false });
       if (error) throw error;
       return (data ?? []) as ClientAccessLink[];

@@ -240,6 +240,7 @@ export type ClientAccessLink = {
   instagram_url: string | null;
   facebook_url: string | null;
   youtube_url: string | null;
+  message_template_id: string | null;
 };
 
 export const ACCESS_LINK_COLUMNS =
@@ -303,3 +304,33 @@ export type Athlete = {
 
 export const ATHLETE_COLUMNS =
   "id, name, phone, sponsored, last_appointment_date, instagram_url, facebook_url, youtube_url";
+
+export type MessageKind = "text" | "video" | "link";
+
+export const MESSAGE_KIND_OPTIONS: { value: MessageKind; label: string }[] = [
+  { value: "text", label: "Texto" },
+  { value: "video", label: "Vídeo" },
+  { value: "link", label: "Link" },
+];
+
+export type MessageTemplate = {
+  id: string;
+  title: string;
+  description: string | null;
+  kind: MessageKind;
+  body: string | null;
+  url: string | null;
+};
+
+export const MESSAGE_COLUMNS = "id, title, description, kind, body, url";
+
+/** Texto curto enviado junto do link, quando a mensagem é uma da biblioteca
+ * (em vez do link fixo de apresentação e valores). */
+export function buildMessageSendText(
+  clientName: string | null,
+  messageTitle: string,
+  link: string,
+) {
+  const greeting = clientName?.trim() ? `${clientName.trim()}, tudo bem?` : "Oi, tudo bem?";
+  return `${greeting} Preparei isto para você: ${messageTitle}.\n\n📎 ${link}`;
+}

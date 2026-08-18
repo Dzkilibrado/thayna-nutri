@@ -8,6 +8,39 @@ export type Database = {
   };
   public: {
     Tables: {
+      message_templates: {
+        Row: {
+          id: string;
+          title: string;
+          description: string | null;
+          kind: string;
+          body: string | null;
+          url: string | null;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: {
+          id?: string;
+          title?: string;
+          description?: string | null;
+          kind: string;
+          body?: string | null;
+          url?: string | null;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Update: {
+          id?: string;
+          title?: string;
+          description?: string | null;
+          kind?: string;
+          body?: string | null;
+          url?: string | null;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Relationships: [];
+      };
       site_visits: {
         Row: {
           id: number;
@@ -86,6 +119,7 @@ export type Database = {
           instagram_url: string | null;
           facebook_url: string | null;
           youtube_url: string | null;
+          message_template_id: string | null;
         };
         Insert: {
           id?: string;
@@ -107,6 +141,7 @@ export type Database = {
           instagram_url?: string | null;
           facebook_url?: string | null;
           youtube_url?: string | null;
+          message_template_id?: string | null;
         };
         Update: {
           id?: string;
@@ -128,6 +163,7 @@ export type Database = {
           instagram_url?: string | null;
           facebook_url?: string | null;
           youtube_url?: string | null;
+          message_template_id?: string | null;
         };
         Relationships: [];
       };
