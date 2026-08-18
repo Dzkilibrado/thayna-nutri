@@ -1,5 +1,5 @@
-import { createFileRoute } from "@tanstack/react-router";
-import { AlertTriangle, MessageCircle } from "lucide-react";
+import { createFileRoute, Link } from "@tanstack/react-router";
+import { AlertTriangle, ExternalLink, MessageCircle } from "lucide-react";
 
 import { externalLinkProps } from "@/lib/external";
 import { supabase } from "@/integrations/supabase/client";
@@ -58,9 +58,13 @@ function InformacoesPage() {
     <div className="min-h-screen bg-background text-foreground">
       <header className="border-b border-border">
         <div className="mx-auto max-w-2xl px-5 py-4 md:max-w-3xl">
-          <p translate="no" className="font-display text-xl uppercase tracking-wider">
+          <Link
+            to="/"
+            translate="no"
+            className="font-display text-xl uppercase tracking-wider transition-colors hover:text-primary"
+          >
             {settings?.brand_name ?? "Thaynan Pablo"}
-          </p>
+          </Link>
         </div>
       </header>
 
@@ -84,17 +88,27 @@ function InformacoesPage() {
           </>
         ) : null}
 
-        {settings?.whatsapp ? (
-          <a
-            {...externalLinkProps(
-              whatsappLink(settings.whatsapp, "Olá! Vi as informações e gostaria de agendar."),
-            )}
-            className="accent-glow flex items-center justify-center gap-3 rounded-2xl bg-primary px-5 py-4 text-center font-display text-lg uppercase tracking-wide text-primary-foreground transition-opacity hover:opacity-90"
+        <div className="space-y-3">
+          {settings?.whatsapp ? (
+            <a
+              {...externalLinkProps(
+                whatsappLink(settings.whatsapp, "Olá! Vi as informações e gostaria de agendar."),
+              )}
+              className="accent-glow flex items-center justify-center gap-3 rounded-2xl bg-primary px-5 py-4 text-center font-display text-lg uppercase tracking-wide text-primary-foreground transition-opacity hover:opacity-90"
+            >
+              <MessageCircle className="size-5" />
+              Falar no WhatsApp
+            </a>
+          ) : null}
+
+          <Link
+            to="/"
+            className="flex items-center justify-center gap-2 rounded-2xl border border-border px-5 py-4 text-center text-sm text-muted-foreground transition-colors hover:border-primary/60 hover:text-foreground"
           >
-            <MessageCircle className="size-5" />
-            Falar no WhatsApp
-          </a>
-        ) : null}
+            <ExternalLink className="size-4" />
+            Conhecer o site completo
+          </Link>
+        </div>
       </main>
     </div>
   );
