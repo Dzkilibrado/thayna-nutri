@@ -3,7 +3,9 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import {
   Copy,
   Eye,
+  Facebook,
   Filter,
+  Instagram,
   MessageCircle,
   Pencil,
   Plus,
@@ -11,6 +13,7 @@ import {
   RotateCcw,
   ShieldOff,
   Trash2,
+  Youtube,
 } from "lucide-react";
 import { toast } from "sonner";
 
@@ -43,6 +46,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
+import { externalLinkProps } from "@/lib/external";
 import { supabase } from "@/integrations/supabase/client";
 import { absoluteUrl } from "@/lib/seo";
 import {
@@ -135,6 +139,31 @@ const YES_NO = [
   { value: "no", label: "Não" },
 ];
 
+const NONE_ATHLETE = "none";
+const NONE_ATTENDANCE = "none";
+
+const EMPTY_CLIENT: ClientAccessLink = {
+  id: "",
+  client_name: "",
+  client_phone: "",
+  token: "",
+  duration_hours: 48,
+  expires_at: null,
+  revoked: false,
+  created_at: "",
+  last_viewed_at: null,
+  view_count: 0,
+  contact_status: "contato_inicial",
+  attendance_type: null,
+  last_appointment_date: null,
+  is_athlete: false,
+  sponsored: false,
+  referred_by_athlete_id: null,
+  instagram_url: null,
+  facebook_url: null,
+  youtube_url: null,
+};
+
 /* ------------------------------------------------------------------ *
  * Tela principal: filtros por seleção, resultado só depois de buscar.
  * ------------------------------------------------------------------ */
@@ -176,11 +205,12 @@ export function AccessLinksEditor() {
     },
   });
 
+  const athletes = useMemo(() => athletesQuery.data ?? [], [athletesQuery.data]);
   const athleteName = useMemo(() => {
     const map = new Map<string, string>();
-    for (const a of athletesQuery.data ?? []) map.set(a.id, a.name);
+    for (const a of athletes) map.set(a.id, a.name);
     return map;
-  }, [athletesQuery.data]);
+  }, [athletes]);
 
   const items = useMemo(() => query.data ?? [], [query.data]);
   const refresh = () => void queryClient.invalidateQueries({ queryKey: ["admin-access-links"] });
@@ -348,11 +378,18 @@ export function AccessLinksEditor() {
         </ul>
       )}
 
-      {creating ? <CreateDialog onClose={() => setCreating(false)} onSaved={refresh} /> : null}
+      {creating ? (
+        <ClientDialog
+          item={EMPTY_CLIENT}
+          athletes={athletes}
+          onClose={() => setCreating(false)}
+          onSaved={refresh}
+        />
+      ) : null}
       {editing ? (
-        <EditDialog
+        <ClientDialog
           item={editing}
-          athletes={athletesQuery.data ?? []}
+          athletes={athletes}
           onClose={() => setEditing(null)}
           onSaved={refresh}
         />
@@ -442,7 +479,7 @@ function AccessLinkRow({
         </span>
       </div>
 
-      <div className="flex flex-wrap gap-1.5">
+      <div className="flex flex-wrap items-center gap-1.5">
         <Badge>{contactStatusLabel(item.contact_status)}</Badge>
         {attendanceLabel(item.attendance_type) ? (
           <Badge>{attendanceLabel(item.attendance_type)}</Badge>
@@ -455,6 +492,34 @@ function AccessLinkRow({
             Última consulta em {formatDate(item.last_appointment_date)} · há{" "}
             {daysSince(item.last_appointment_date)} dias
           </Badge>
+        ) : null}
+
+        {item.instagram_url ? (
+          <a
+            {...externalLinkProps(item.instagram_url)}
+            className="flex size-7 items-center justify-center rounded-full border border-border text-muted-foreground transition-colors hover:border-primary/60 hover:text-foreground"
+            aria-label="Abrir Instagram"
+          >
+            <Instagram className="size-3.5" />
+          </a>
+        ) : null}
+        {item.facebook_url ? (
+          <a
+            {...externalLinkProps(item.facebook_url)}
+            className="flex size-7 items-center justify-center rounded-full border border-border text-muted-foreground transition-colors hover:border-primary/60 hover:text-foreground"
+            aria-label="Abrir Facebook"
+          >
+            <Facebook className="size-3.5" />
+          </a>
+        ) : null}
+        {item.youtube_url ? (
+          <a
+            {...externalLinkProps(item.youtube_url)}
+            className="flex size-7 items-center justify-center rounded-full border border-border text-muted-foreground transition-colors hover:border-primary/60 hover:text-foreground"
+            aria-label="Abrir YouTube"
+          >
+            <Youtube className="size-3.5" />
+          </a>
         ) : null}
       </div>
 
@@ -478,7 +543,7 @@ function AccessLinkRow({
           <MessageCircle className="size-4" /> Enviar no WhatsApp
         </Button>
         <Button size="sm" variant="secondary" onClick={onEdit}>
-          <Pencil className="size-4" /> Editar dados
+          <Pencil className="size-4" /> Editar
         </Button>
         <Button size="sm" variant="secondary" onClick={() => setRenewing(true)}>
           <RefreshCcw className="size-4" /> Renovar
@@ -538,82 +603,6 @@ function Badge({ children, tone }: { children: React.ReactNode; tone?: "warn" | 
     >
       {children}
     </span>
-  );
-}
-
-function CreateDialog({ onClose, onSaved }: { onClose: () => void; onSaved: () => void }) {
-  const [name, setName] = useState("");
-  const [phone, setPhone] = useState("");
-  const [duration, setDuration] = useState<string>("48");
-
-  const create = useMutation({
-    mutationFn: async () => {
-      const hours = duration === "none" ? null : Number(duration);
-      const expires_at = hours ? new Date(Date.now() + hours * 3600 * 1000).toISOString() : null;
-      const { error } = await supabase.from("client_access_links").insert({
-        client_name: name.trim() || null,
-        client_phone: phone.trim() || null,
-        duration_hours: hours,
-        expires_at,
-      });
-      if (error) throw error;
-    },
-    onSuccess: () => {
-      toast.success("Cliente cadastrado.");
-      onSaved();
-      onClose();
-    },
-    onError: (e: Error) => toast.error(e.message),
-  });
-
-  return (
-    <Dialog open onOpenChange={(open) => !open && onClose()}>
-      <DialogContent className="border-border bg-surface">
-        <DialogHeader>
-          <DialogTitle>Novo cliente</DialogTitle>
-          <DialogDescription>
-            Só o essencial para gerar o link. Status, atendimento e os demais dados de
-            acompanhamento ficam em &ldquo;Editar dados&rdquo;, depois de criado.
-          </DialogDescription>
-        </DialogHeader>
-
-        <div className="space-y-4">
-          <Field label="Nome do cliente" hint="Opcional.">
-            <Input value={name} onChange={(e) => setName(e.target.value)} autoFocus />
-          </Field>
-          <Field label="Telefone (WhatsApp)" hint="Opcional, mas necessário para enviar por aqui.">
-            <Input
-              value={phone}
-              onChange={(e) => setPhone(e.target.value)}
-              placeholder="27996657309"
-            />
-          </Field>
-          <Field label="Validade do link">
-            <Select value={duration} onValueChange={setDuration}>
-              <SelectTrigger>
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                {DURATION_OPTIONS.map((o) => (
-                  <SelectItem key={o.label} value={o.value === null ? "none" : String(o.value)}>
-                    {o.label}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </Field>
-        </div>
-
-        <DialogFooter>
-          <Button variant="ghost" onClick={onClose}>
-            Cancelar
-          </Button>
-          <Button onClick={() => create.mutate()} disabled={create.isPending}>
-            {create.isPending ? "Criando…" : "Criar cliente"}
-          </Button>
-        </DialogFooter>
-      </DialogContent>
-    </Dialog>
   );
 }
 
@@ -687,15 +676,13 @@ function RenewDialog({
 }
 
 /* ------------------------------------------------------------------ *
- * Janela de edição: status, atendimento, última consulta, atleta,
- * patrocinado e indicação. Não mexe em token nem validade — isso fica
- * em "Renovar".
+ * Janela única de criação/edição, com todos os campos visíveis desde o
+ * início — a validade do link só aparece na criação; depois, mudar o
+ * prazo é uma ação separada e deliberada ("Renovar"), porque troca o
+ * endereço do link.
  * ------------------------------------------------------------------ */
 
-const NONE_ATHLETE = "none";
-const NONE_ATTENDANCE = "none";
-
-function EditDialog({
+function ClientDialog({
   item,
   athletes,
   onClose,
@@ -706,7 +693,9 @@ function EditDialog({
   onClose: () => void;
   onSaved: () => void;
 }) {
+  const isNew = item.id === "";
   const [form, setForm] = useState(item);
+  const [duration, setDuration] = useState<string>("48");
   useEffect(() => setForm(item), [item]);
 
   const set = <K extends keyof ClientAccessLink>(key: K, value: ClientAccessLink[K]) =>
@@ -714,23 +703,37 @@ function EditDialog({
 
   const save = useMutation({
     mutationFn: async () => {
-      const { error } = await supabase
-        .from("client_access_links")
-        .update({
-          client_name: form.client_name,
-          client_phone: form.client_phone,
-          contact_status: form.contact_status,
-          attendance_type: form.attendance_type,
-          last_appointment_date: form.last_appointment_date,
-          is_athlete: form.is_athlete,
-          sponsored: form.sponsored,
-          referred_by_athlete_id: form.referred_by_athlete_id,
-        })
-        .eq("id", item.id);
-      if (error) throw error;
+      const payload = {
+        client_name: form.client_name || null,
+        client_phone: form.client_phone || null,
+        contact_status: form.contact_status,
+        attendance_type: form.attendance_type,
+        last_appointment_date: form.last_appointment_date,
+        is_athlete: form.is_athlete,
+        sponsored: form.sponsored,
+        referred_by_athlete_id: form.referred_by_athlete_id,
+        instagram_url: form.instagram_url || null,
+        facebook_url: form.facebook_url || null,
+        youtube_url: form.youtube_url || null,
+      };
+
+      if (isNew) {
+        const hours = duration === "none" ? null : Number(duration);
+        const expires_at = hours ? new Date(Date.now() + hours * 3600 * 1000).toISOString() : null;
+        const { error } = await supabase
+          .from("client_access_links")
+          .insert({ ...payload, duration_hours: hours, expires_at });
+        if (error) throw error;
+      } else {
+        const { error } = await supabase
+          .from("client_access_links")
+          .update(payload)
+          .eq("id", item.id);
+        if (error) throw error;
+      }
     },
     onSuccess: () => {
-      toast.success("Dados salvos.");
+      toast.success(isNew ? "Cliente cadastrado." : "Dados salvos.");
       onSaved();
       onClose();
     },
@@ -741,25 +744,44 @@ function EditDialog({
     <Dialog open onOpenChange={(open) => !open && onClose()}>
       <DialogContent className="max-h-[90vh] max-w-lg overflow-y-auto border-border bg-surface">
         <DialogHeader>
-          <DialogTitle>Editar dados de {item.client_name || "cliente"}</DialogTitle>
+          <DialogTitle>{isNew ? "Novo cliente" : "Editar cliente"}</DialogTitle>
           <DialogDescription>As alterações só valem depois de salvar.</DialogDescription>
         </DialogHeader>
 
         <div className="space-y-4">
           <div className="grid gap-4 sm:grid-cols-2">
-            <Field label="Nome do cliente">
+            <Field label="Nome do cliente" hint="Opcional.">
               <Input
                 value={form.client_name ?? ""}
-                onChange={(e) => set("client_name", e.target.value || null)}
+                autoFocus
+                onChange={(e) => set("client_name", e.target.value)}
               />
             </Field>
-            <Field label="Telefone">
+            <Field label="Telefone (WhatsApp)" hint="Necessário para enviar por aqui.">
               <Input
                 value={form.client_phone ?? ""}
-                onChange={(e) => set("client_phone", e.target.value || null)}
+                onChange={(e) => set("client_phone", e.target.value)}
+                placeholder="27996657309"
               />
             </Field>
           </div>
+
+          {isNew ? (
+            <Field label="Validade do link">
+              <Select value={duration} onValueChange={setDuration}>
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  {DURATION_OPTIONS.map((o) => (
+                    <SelectItem key={o.label} value={o.value === null ? "none" : String(o.value)}>
+                      {o.label}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </Field>
+          ) : null}
 
           <Field label="Status do contato">
             <Select
@@ -852,6 +874,33 @@ function EditDialog({
               </SelectContent>
             </Select>
           </Field>
+
+          <div className="space-y-3 border-t border-border pt-4">
+            <p className="text-xs uppercase tracking-wide text-muted-foreground">
+              Redes sociais (opcional, só para registro)
+            </p>
+            <Field label="Instagram">
+              <Input
+                value={form.instagram_url ?? ""}
+                onChange={(e) => set("instagram_url", e.target.value || null)}
+                placeholder="https://instagram.com/..."
+              />
+            </Field>
+            <Field label="Facebook">
+              <Input
+                value={form.facebook_url ?? ""}
+                onChange={(e) => set("facebook_url", e.target.value || null)}
+                placeholder="https://facebook.com/..."
+              />
+            </Field>
+            <Field label="YouTube">
+              <Input
+                value={form.youtube_url ?? ""}
+                onChange={(e) => set("youtube_url", e.target.value || null)}
+                placeholder="https://youtube.com/..."
+              />
+            </Field>
+          </div>
         </div>
 
         <DialogFooter>
@@ -859,7 +908,7 @@ function EditDialog({
             Cancelar
           </Button>
           <Button onClick={() => save.mutate()} disabled={save.isPending}>
-            {save.isPending ? "Salvando…" : "Salvar alterações"}
+            {save.isPending ? "Salvando…" : isNew ? "Criar cliente" : "Salvar alterações"}
           </Button>
         </DialogFooter>
       </DialogContent>

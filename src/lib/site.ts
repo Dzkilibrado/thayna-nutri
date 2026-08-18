@@ -237,10 +237,13 @@ export type ClientAccessLink = {
   is_athlete: boolean;
   sponsored: boolean;
   referred_by_athlete_id: string | null;
+  instagram_url: string | null;
+  facebook_url: string | null;
+  youtube_url: string | null;
 };
 
 export const ACCESS_LINK_COLUMNS =
-  "id, client_name, client_phone, token, duration_hours, expires_at, revoked, created_at, last_viewed_at, view_count, contact_status, attendance_type, last_appointment_date, is_athlete, sponsored, referred_by_athlete_id";
+  "id, client_name, client_phone, token, duration_hours, expires_at, revoked, created_at, last_viewed_at, view_count, contact_status, attendance_type, last_appointment_date, is_athlete, sponsored, referred_by_athlete_id, instagram_url, facebook_url, youtube_url";
 
 export const DURATION_OPTIONS: { value: number | null; label: string }[] = [
   { value: 24, label: "24 horas" },
@@ -292,6 +295,11 @@ export type Athlete = {
   name: string;
   phone: string | null;
   sponsored: boolean;
+  last_appointment_date: string | null;
+  instagram_url: string | null;
+  facebook_url: string | null;
+  youtube_url: string | null;
 };
 
-export const ATHLETE_COLUMNS = "id, name, phone, sponsored";
+export const ATHLETE_COLUMNS =
+  "id, name, phone, sponsored, last_appointment_date, instagram_url, facebook_url, youtube_url";

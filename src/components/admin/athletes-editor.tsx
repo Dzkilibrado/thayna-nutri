@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { Medal, Pencil, Plus, Trash2 } from "lucide-react";
+import { Facebook, Instagram, Medal, Pencil, Plus, Trash2, Youtube } from "lucide-react";
 import { toast } from "sonner";
 
 import {
@@ -25,8 +25,10 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
+import { externalLinkProps } from "@/lib/external";
 import { supabase } from "@/integrations/supabase/client";
 import { ATHLETE_COLUMNS, type Athlete } from "@/lib/site";
+import { cn } from "@/lib/utils";
 
 function Field({
   label,
@@ -46,7 +48,28 @@ function Field({
   );
 }
 
-const EMPTY: Athlete = { id: "", name: "", phone: null, sponsored: false };
+const formatDate = (iso: string) =>
+  new Date(`${iso}T00:00:00`).toLocaleDateString("pt-BR", {
+    day: "2-digit",
+    month: "2-digit",
+    year: "numeric",
+  });
+
+function daysSince(dateStr: string) {
+  const ms = Date.now() - new Date(`${dateStr}T00:00:00`).getTime();
+  return Math.max(0, Math.floor(ms / 86_400_000));
+}
+
+const EMPTY: Athlete = {
+  id: "",
+  name: "",
+  phone: null,
+  sponsored: false,
+  last_appointment_date: null,
+  instagram_url: null,
+  facebook_url: null,
+  youtube_url: null,
+};
 
 export function AthletesEditor() {
   const queryClient = useQueryClient();
@@ -134,20 +157,67 @@ function AthleteRow({
   });
 
   return (
-    <li className="flex items-center gap-3 rounded-xl border border-border bg-surface px-3 py-3">
-      <span className="icon-tile flex size-10 shrink-0 items-center justify-center rounded-xl text-primary">
-        <Medal className="size-[18px]" />
-      </span>
-      <div className="min-w-0 flex-1">
-        <p className="truncate text-sm font-medium">{item.name}</p>
-        <p className="truncate text-xs text-muted-foreground">{item.phone || "Sem telefone"}</p>
-      </div>
-      {item.sponsored ? (
-        <span className="shrink-0 rounded-full bg-primary/15 px-2.5 py-1 text-[11px] text-primary">
-          Patrocinado
+    <li className="space-y-3 rounded-xl border border-border bg-surface p-4">
+      <div className="flex items-center gap-3">
+        <span className="icon-tile flex size-10 shrink-0 items-center justify-center rounded-xl text-primary">
+          <Medal className="size-[18px]" />
         </span>
-      ) : null}
-      <div className="flex shrink-0 items-center gap-1">
+        <div className="min-w-0 flex-1">
+          <p className="truncate text-sm font-medium">{item.name}</p>
+          <p className="truncate text-xs text-muted-foreground">{item.phone || "Sem telefone"}</p>
+        </div>
+        {item.sponsored ? (
+          <span className="shrink-0 rounded-full bg-primary/15 px-2.5 py-1 text-[11px] text-primary">
+            Patrocinado
+          </span>
+        ) : null}
+      </div>
+
+      <div className="flex flex-wrap items-center gap-1.5">
+        {item.last_appointment_date ? (
+          <span
+            className={cn(
+              "rounded-full px-2.5 py-1 text-[11px]",
+              daysSince(item.last_appointment_date) >= 30
+                ? "bg-destructive/20 text-foreground"
+                : "bg-surface-2 text-muted-foreground",
+            )}
+          >
+            Última consulta em {formatDate(item.last_appointment_date)} · há{" "}
+            {daysSince(item.last_appointment_date)} dias
+          </span>
+        ) : null}
+
+        {item.instagram_url ? (
+          <a
+            {...externalLinkProps(item.instagram_url)}
+            className="flex size-7 items-center justify-center rounded-full border border-border text-muted-foreground transition-colors hover:border-primary/60 hover:text-foreground"
+            aria-label="Abrir Instagram"
+          >
+            <Instagram className="size-3.5" />
+          </a>
+        ) : null}
+        {item.facebook_url ? (
+          <a
+            {...externalLinkProps(item.facebook_url)}
+            className="flex size-7 items-center justify-center rounded-full border border-border text-muted-foreground transition-colors hover:border-primary/60 hover:text-foreground"
+            aria-label="Abrir Facebook"
+          >
+            <Facebook className="size-3.5" />
+          </a>
+        ) : null}
+        {item.youtube_url ? (
+          <a
+            {...externalLinkProps(item.youtube_url)}
+            className="flex size-7 items-center justify-center rounded-full border border-border text-muted-foreground transition-colors hover:border-primary/60 hover:text-foreground"
+            aria-label="Abrir YouTube"
+          >
+            <Youtube className="size-3.5" />
+          </a>
+        ) : null}
+      </div>
+
+      <div className="flex justify-end gap-1">
         <Button variant="ghost" size="icon" onClick={onEdit} aria-label="Editar atleta">
           <Pencil className="size-4" />
         </Button>
@@ -223,7 +293,7 @@ function AthleteDialog({
 
   return (
     <Dialog open onOpenChange={(open) => !open && onClose()}>
-      <DialogContent className="border-border bg-surface">
+      <DialogContent className="max-h-[90vh] max-w-lg overflow-y-auto border-border bg-surface">
         <DialogHeader>
           <DialogTitle>{isNew ? "Novo atleta" : "Editar atleta"}</DialogTitle>
           <DialogDescription>As alterações só valem depois de salvar.</DialogDescription>
@@ -236,10 +306,22 @@ function AthleteDialog({
           <Field label="Telefone" hint="Opcional.">
             <Input
               value={form.phone ?? ""}
-              onChange={(e) => set("phone", e.target.value)}
+              onChange={(e) => set("phone", e.target.value || null)}
               placeholder="27996657309"
             />
           </Field>
+
+          <Field
+            label="Data da última consulta"
+            hint="Atleta também pode ficar sem retornar — use para acompanhar."
+          >
+            <Input
+              type="date"
+              value={form.last_appointment_date ?? ""}
+              onChange={(e) => set("last_appointment_date", e.target.value || null)}
+            />
+          </Field>
+
           <div className="flex items-center justify-between gap-3 rounded-xl border border-border bg-surface-2 px-4 py-3">
             <Label htmlFor="sponsored" className="text-sm">
               Patrocinado atualmente
@@ -249,6 +331,33 @@ function AthleteDialog({
               checked={form.sponsored}
               onCheckedChange={(v) => set("sponsored", v)}
             />
+          </div>
+
+          <div className="space-y-3 border-t border-border pt-4">
+            <p className="text-xs uppercase tracking-wide text-muted-foreground">
+              Redes sociais (opcional, só para registro)
+            </p>
+            <Field label="Instagram">
+              <Input
+                value={form.instagram_url ?? ""}
+                onChange={(e) => set("instagram_url", e.target.value || null)}
+                placeholder="https://instagram.com/..."
+              />
+            </Field>
+            <Field label="Facebook">
+              <Input
+                value={form.facebook_url ?? ""}
+                onChange={(e) => set("facebook_url", e.target.value || null)}
+                placeholder="https://facebook.com/..."
+              />
+            </Field>
+            <Field label="YouTube">
+              <Input
+                value={form.youtube_url ?? ""}
+                onChange={(e) => set("youtube_url", e.target.value || null)}
+                placeholder="https://youtube.com/..."
+              />
+            </Field>
           </div>
         </div>
 

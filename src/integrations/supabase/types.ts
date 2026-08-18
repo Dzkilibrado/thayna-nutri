@@ -14,6 +14,10 @@ export type Database = {
           name: string;
           phone: string | null;
           sponsored: boolean;
+          last_appointment_date: string | null;
+          instagram_url: string | null;
+          facebook_url: string | null;
+          youtube_url: string | null;
           created_at: string;
           updated_at: string;
         };
@@ -22,6 +26,10 @@ export type Database = {
           name: string;
           phone?: string | null;
           sponsored?: boolean;
+          last_appointment_date?: string | null;
+          instagram_url?: string | null;
+          facebook_url?: string | null;
+          youtube_url?: string | null;
           created_at?: string;
           updated_at?: string;
         };
@@ -30,6 +38,10 @@ export type Database = {
           name?: string;
           phone?: string | null;
           sponsored?: boolean;
+          last_appointment_date?: string | null;
+          instagram_url?: string | null;
+          facebook_url?: string | null;
+          youtube_url?: string | null;
           created_at?: string;
           updated_at?: string;
         };
@@ -53,6 +65,9 @@ export type Database = {
           is_athlete: boolean;
           sponsored: boolean;
           referred_by_athlete_id: string | null;
+          instagram_url: string | null;
+          facebook_url: string | null;
+          youtube_url: string | null;
         };
         Insert: {
           id?: string;
@@ -71,6 +86,9 @@ export type Database = {
           is_athlete?: boolean;
           sponsored?: boolean;
           referred_by_athlete_id?: string | null;
+          instagram_url?: string | null;
+          facebook_url?: string | null;
+          youtube_url?: string | null;
         };
         Update: {
           id?: string;
@@ -89,6 +107,9 @@ export type Database = {
           is_athlete?: boolean;
           sponsored?: boolean;
           referred_by_athlete_id?: string | null;
+          instagram_url?: string | null;
+          facebook_url?: string | null;
+          youtube_url?: string | null;
         };
         Relationships: [];
       };
