@@ -8,6 +8,33 @@ export type Database = {
   };
   public: {
     Tables: {
+      athletes: {
+        Row: {
+          id: string;
+          name: string;
+          phone: string | null;
+          sponsored: boolean;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: {
+          id?: string;
+          name: string;
+          phone?: string | null;
+          sponsored?: boolean;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Update: {
+          id?: string;
+          name?: string;
+          phone?: string | null;
+          sponsored?: boolean;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Relationships: [];
+      };
       client_access_links: {
         Row: {
           id: string;

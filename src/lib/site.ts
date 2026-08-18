@@ -263,3 +263,12 @@ export function buildClientAccessMessage(clientName: string | null, link: string
     `📎 Aqui estão os detalhes do atendimento e os valores:\n${link}`
   );
 }
+
+export type Athlete = {
+  id: string;
+  name: string;
+  phone: string | null;
+  sponsored: boolean;
+};
+
+export const ATHLETE_COLUMNS = "id, name, phone, sponsored";

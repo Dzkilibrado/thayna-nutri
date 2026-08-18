@@ -8,6 +8,7 @@ import { ContentEditor } from "@/components/admin/content-editor";
 import { TestimonialsEditor } from "@/components/admin/testimonials-editor";
 import { AccessLinksEditor } from "@/components/admin/access-links-editor";
 import { PricingEditor } from "@/components/admin/pricing-editor";
+import { AthletesEditor } from "@/components/admin/athletes-editor";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useEffect, useMemo, useState } from "react";
 import { toast } from "sonner";
@@ -18,6 +19,7 @@ import {
   KeyRound,
   LayoutList,
   LogOut,
+  Medal,
   MessageSquareQuote,
   Palette,
   Plus,
@@ -72,6 +74,7 @@ const ADMIN_TABS = [
   { value: "depoimentos", label: "Depoimentos", Icon: MessageSquareQuote },
   { value: "privado", label: "Links privados", Icon: KeyRound },
   { value: "valores", label: "Valores", Icon: Wallet },
+  { value: "atletas", label: "Atletas", Icon: Medal },
   { value: "perfil", label: "Perfil & contato", Icon: UserCog },
   { value: "cores", label: "Cores", Icon: Palette },
   { value: "acessos", label: "Acessos", Icon: ShieldCheck },
@@ -220,6 +223,10 @@ function AdminPage() {
             ) : (
               <p>Carregando…</p>
             )}
+          </TabsContent>
+
+          <TabsContent value="atletas" className="mt-6">
+            <AthletesEditor />
           </TabsContent>
 
           <TabsContent value="perfil" className="mt-6">
