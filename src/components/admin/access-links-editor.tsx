@@ -901,6 +901,12 @@ function ClientDialog({
                 onCheckedChange={(v) => set("is_athlete", v)}
               />
             </div>
+            {form.is_athlete ? (
+              <p className="text-[11px] text-muted-foreground">
+                Ligado, este cliente também aparece em Cadastros → Atletas, mantido sozinho a partir
+                daqui — não precisa cadastrar de novo lá.
+              </p>
+            ) : null}
             <div className="flex items-center justify-between gap-3">
               <Label htmlFor="sponsored" className="text-sm">
                 Patrocinado pelo Thaynan

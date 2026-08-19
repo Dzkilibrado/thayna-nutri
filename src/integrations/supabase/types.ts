@@ -69,6 +69,7 @@ export type Database = {
           instagram_url: string | null;
           facebook_url: string | null;
           youtube_url: string | null;
+          client_link_id: string | null;
           created_at: string;
           updated_at: string;
         };
@@ -81,6 +82,7 @@ export type Database = {
           instagram_url?: string | null;
           facebook_url?: string | null;
           youtube_url?: string | null;
+          client_link_id?: string | null;
           created_at?: string;
           updated_at?: string;
         };
@@ -93,6 +95,7 @@ export type Database = {
           instagram_url?: string | null;
           facebook_url?: string | null;
           youtube_url?: string | null;
+          client_link_id?: string | null;
           created_at?: string;
           updated_at?: string;
         };

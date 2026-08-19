@@ -69,6 +69,7 @@ const EMPTY: Athlete = {
   instagram_url: null,
   facebook_url: null,
   youtube_url: null,
+  client_link_id: null,
 };
 
 export function AthletesEditor() {
@@ -169,6 +170,14 @@ function AthleteRow({
         {item.sponsored ? (
           <span className="shrink-0 rounded-full bg-primary/15 px-2.5 py-1 text-[11px] text-primary">
             Patrocinado
+          </span>
+        ) : null}
+        {item.client_link_id ? (
+          <span
+            className="shrink-0 rounded-full bg-surface-2 px-2.5 py-1 text-[11px] text-muted-foreground"
+            title="Nome, telefone, patrocínio e última consulta vêm do cadastro de cliente"
+          >
+            Sincronizado
           </span>
         ) : null}
       </div>
@@ -298,6 +307,14 @@ function AthleteDialog({
           <DialogTitle>{isNew ? "Novo atleta" : "Editar atleta"}</DialogTitle>
           <DialogDescription>As alterações só valem depois de salvar.</DialogDescription>
         </DialogHeader>
+
+        {item.client_link_id ? (
+          <p className="rounded-xl border border-primary/40 bg-primary/10 px-4 py-3 text-sm">
+            Este atleta é sincronizado a partir de um cadastro em Cadastros → Clientes. Nome,
+            telefone, patrocínio e última consulta são atualizados sozinhos de lá — o que você mudar
+            aqui pode ser sobrescrito na próxima vez que aquele cliente for salvo.
+          </p>
+        ) : null}
 
         <div className="space-y-4">
           <Field label="Nome">

@@ -300,10 +300,14 @@ export type Athlete = {
   instagram_url: string | null;
   facebook_url: string | null;
   youtube_url: string | null;
+  /** Preenchido sozinho quando este atleta veio de um cliente marcado como
+   * atleta em Cadastros → Clientes — nome, telefone, patrocínio e última
+   * consulta são atualizados a partir de lá. */
+  client_link_id: string | null;
 };
 
 export const ATHLETE_COLUMNS =
-  "id, name, phone, sponsored, last_appointment_date, instagram_url, facebook_url, youtube_url";
+  "id, name, phone, sponsored, last_appointment_date, instagram_url, facebook_url, youtube_url, client_link_id";
 
 export type MessageKind = "text" | "video" | "link";
 
