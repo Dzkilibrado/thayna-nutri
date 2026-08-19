@@ -456,6 +456,10 @@ function AccessLinkRow({
       toast.error("Informe o telefone do cliente para enviar por aqui.");
       return;
     }
+    if (status.tone !== "ok") {
+      toast.error('Gere um link antes de enviar — use o botão "Gerar link".');
+      return;
+    }
     const message = buildClientAccessMessage(item.client_name, link);
     window.open(whatsappLink(item.client_phone, message), "_blank", "noreferrer");
   }
@@ -525,12 +529,19 @@ function AccessLinkRow({
         ) : null}
       </div>
 
-      <div className="flex items-center gap-2 rounded-lg bg-surface-2 px-3 py-2">
-        <code className="min-w-0 flex-1 truncate text-xs text-muted-foreground">{link}</code>
-        <Button variant="ghost" size="icon" onClick={copyLink} aria-label="Copiar link">
-          <Copy className="size-4" />
-        </Button>
-      </div>
+      {status.tone === "ok" ? (
+        <div className="flex items-center gap-2 rounded-lg bg-surface-2 px-3 py-2">
+          <code className="min-w-0 flex-1 truncate text-xs text-muted-foreground">{link}</code>
+          <Button variant="ghost" size="icon" onClick={copyLink} aria-label="Copiar link">
+            <Copy className="size-4" />
+          </Button>
+        </div>
+      ) : (
+        <p className="rounded-lg bg-surface-2 px-3 py-2 text-xs text-muted-foreground">
+          Sem link ativo para este cliente — use &ldquo;Gerar link&rdquo; para criar um quando
+          precisar enviar.
+        </p>
+      )}
 
       {item.view_count > 0 ? (
         <p className="flex items-center gap-1.5 text-[11px] text-muted-foreground">
@@ -541,7 +552,11 @@ function AccessLinkRow({
       ) : null}
 
       <div className="flex flex-wrap gap-2">
-        <Button size="sm" onClick={sendWhatsApp} disabled={!item.client_phone}>
+        <Button
+          size="sm"
+          onClick={sendWhatsApp}
+          disabled={!item.client_phone || status.tone !== "ok"}
+        >
           <MessageCircle className="size-4" /> Enviar no WhatsApp
         </Button>
         <Button size="sm" variant="secondary" onClick={onEdit}>
@@ -550,14 +565,16 @@ function AccessLinkRow({
         <Button size="sm" variant="secondary" onClick={() => setRenewing(true)}>
           <RefreshCcw className="size-4" /> {item.revoked ? "Gerar link" : "Renovar"}
         </Button>
-        <Button
-          size="sm"
-          variant="ghost"
-          onClick={() => revoke.mutate()}
-          disabled={revoke.isPending}
-        >
-          <ShieldOff className="size-4" /> {item.revoked ? "Reativar" : "Revogar"}
-        </Button>
+        {!item.revoked ? (
+          <Button
+            size="sm"
+            variant="ghost"
+            onClick={() => revoke.mutate()}
+            disabled={revoke.isPending}
+          >
+            <ShieldOff className="size-4" /> Revogar
+          </Button>
+        ) : null}
         <Button size="sm" variant="ghost" onClick={() => setConfirmDelete(true)}>
           <Trash2 className="size-4 text-destructive" /> Excluir
         </Button>
