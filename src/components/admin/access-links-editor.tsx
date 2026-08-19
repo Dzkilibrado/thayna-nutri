@@ -548,7 +548,7 @@ function AccessLinkRow({
           <Pencil className="size-4" /> Editar
         </Button>
         <Button size="sm" variant="secondary" onClick={() => setRenewing(true)}>
-          <RefreshCcw className="size-4" /> Renovar
+          <RefreshCcw className="size-4" /> {item.revoked ? "Gerar link" : "Renovar"}
         </Button>
         <Button
           size="sm"
@@ -642,10 +642,11 @@ function RenewDialog({
     <Dialog open onOpenChange={(open) => !open && onClose()}>
       <DialogContent className="border-border bg-surface">
         <DialogHeader>
-          <DialogTitle>Renovar link</DialogTitle>
+          <DialogTitle>{item.revoked ? "Gerar link de acesso" : "Renovar link"}</DialogTitle>
           <DialogDescription>
-            Gera um endereço novo para {item.client_name || "este cliente"}. O link antigo para de
-            funcionar imediatamente.
+            {item.revoked
+              ? `Cria um link pessoal novo para ${item.client_name || "este cliente"}, com o prazo escolhido abaixo.`
+              : `Gera um endereço novo para ${item.client_name || "este cliente"}. O link antigo para de funcionar imediatamente.`}
           </DialogDescription>
         </DialogHeader>
 
@@ -669,7 +670,7 @@ function RenewDialog({
             Cancelar
           </Button>
           <Button onClick={() => renew.mutate()} disabled={renew.isPending}>
-            {renew.isPending ? "Renovando…" : "Renovar"}
+            {renew.isPending ? "Gerando…" : item.revoked ? "Gerar link" : "Renovar"}
           </Button>
         </DialogFooter>
       </DialogContent>
@@ -697,6 +698,7 @@ function ClientDialog({
 }) {
   const isNew = item.id === "";
   const [form, setForm] = useState(item);
+  const [generateLink, setGenerateLink] = useState(true);
   const [duration, setDuration] = useState<string>("48");
   useEffect(() => setForm(item), [item]);
 
@@ -720,12 +722,25 @@ function ClientDialog({
       };
 
       if (isNew) {
-        const hours = duration === "none" ? null : Number(duration);
-        const expires_at = hours ? new Date(Date.now() + hours * 3600 * 1000).toISOString() : null;
-        const { error } = await supabase
-          .from("client_access_links")
-          .insert({ ...payload, duration_hours: hours, expires_at });
-        if (error) throw error;
+        if (generateLink) {
+          const hours = duration === "none" ? null : Number(duration);
+          const expires_at = hours
+            ? new Date(Date.now() + hours * 3600 * 1000).toISOString()
+            : null;
+          const { error } = await supabase
+            .from("client_access_links")
+            .insert({ ...payload, duration_hours: hours, expires_at });
+          if (error) throw error;
+        } else {
+          // Sem link por enquanto: o cadastro é criado normalmente, mas com
+          // o acesso já revogado, para não sobrar um link válido sem que o
+          // administrador tenha decidido compartilhá-lo. "Gerar link" no
+          // cliente ativa isso depois, a qualquer momento.
+          const { error } = await supabase
+            .from("client_access_links")
+            .insert({ ...payload, revoked: true });
+          if (error) throw error;
+        }
       } else {
         const { error } = await supabase
           .from("client_access_links")
@@ -769,20 +784,43 @@ function ClientDialog({
           </div>
 
           {isNew ? (
-            <Field label="Validade do link">
-              <Select value={duration} onValueChange={setDuration}>
-                <SelectTrigger>
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  {DURATION_OPTIONS.map((o) => (
-                    <SelectItem key={o.label} value={o.value === null ? "none" : String(o.value)}>
-                      {o.label}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </Field>
+            <div className="space-y-3 rounded-xl border border-border bg-surface-2 p-4">
+              <div className="flex items-center justify-between gap-3">
+                <Label htmlFor="generate-link" className="text-sm">
+                  Gerar link de acesso agora
+                </Label>
+                <Switch
+                  id="generate-link"
+                  checked={generateLink}
+                  onCheckedChange={setGenerateLink}
+                />
+              </div>
+              <p className="text-[11px] text-muted-foreground">
+                {generateLink
+                  ? "O cliente recebe um link pessoal com o prazo escolhido abaixo."
+                  : "Só o cadastro é criado agora. Você pode gerar o link a qualquer momento depois, no botão \u201cGerar link\u201d do cliente — útil, por exemplo, para retomar contato com quem parou o atendimento."}
+              </p>
+
+              {generateLink ? (
+                <Field label="Validade do link">
+                  <Select value={duration} onValueChange={setDuration}>
+                    <SelectTrigger>
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {DURATION_OPTIONS.map((o) => (
+                        <SelectItem
+                          key={o.label}
+                          value={o.value === null ? "none" : String(o.value)}
+                        >
+                          {o.label}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </Field>
+              ) : null}
+            </div>
           ) : null}
 
           <Field label="Status do contato">
