@@ -901,12 +901,6 @@ function ClientDialog({
                 onCheckedChange={(v) => set("is_athlete", v)}
               />
             </div>
-            {form.is_athlete ? (
-              <p className="text-[11px] text-muted-foreground">
-                Ligado, este cliente também aparece em Cadastros → Atletas, mantido sozinho a partir
-                daqui — não precisa cadastrar de novo lá.
-              </p>
-            ) : null}
             <div className="flex items-center justify-between gap-3">
               <Label htmlFor="sponsored" className="text-sm">
                 Patrocinado pelo Thaynan
@@ -917,6 +911,18 @@ function ClientDialog({
                 onCheckedChange={(v) => set("sponsored", v)}
               />
             </div>
+            {form.is_athlete && form.sponsored ? (
+              <p className="text-[11px] text-muted-foreground">
+                Atleta e patrocinado juntos: este cliente também aparece em Cadastros → Atletas como
+                &ldquo;Atleta Patrocinado&rdquo;, mantido sozinho a partir daqui — não precisa
+                cadastrar de novo lá.
+              </p>
+            ) : form.is_athlete ? (
+              <p className="text-[11px] text-muted-foreground">
+                Atleta sem patrocínio não aparece em Cadastros → Atletas — só entra lá quando os
+                dois estão ligados juntos.
+              </p>
+            ) : null}
           </div>
 
           <Field label="Indicado por" hint="Opcional. Cadastre o atleta em Cadastros → Atletas.">

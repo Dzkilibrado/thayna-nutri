@@ -167,17 +167,16 @@ function AthleteRow({
           <p className="truncate text-sm font-medium">{item.name}</p>
           <p className="truncate text-xs text-muted-foreground">{item.phone || "Sem telefone"}</p>
         </div>
-        {item.sponsored ? (
-          <span className="shrink-0 rounded-full bg-primary/15 px-2.5 py-1 text-[11px] text-primary">
-            Patrocinado
-          </span>
-        ) : null}
         {item.client_link_id ? (
           <span
-            className="shrink-0 rounded-full bg-surface-2 px-2.5 py-1 text-[11px] text-muted-foreground"
-            title="Nome, telefone, patrocínio e última consulta vêm do cadastro de cliente"
+            className="shrink-0 rounded-full bg-primary/15 px-2.5 py-1 text-[11px] text-primary"
+            title="Sincronizado a partir de um cliente marcado como atleta e patrocinado"
           >
-            Sincronizado
+            Atleta Patrocinado
+          </span>
+        ) : item.sponsored ? (
+          <span className="shrink-0 rounded-full bg-primary/15 px-2.5 py-1 text-[11px] text-primary">
+            Patrocinado
           </span>
         ) : null}
       </div>
@@ -310,7 +309,8 @@ function AthleteDialog({
 
         {item.client_link_id ? (
           <p className="rounded-xl border border-primary/40 bg-primary/10 px-4 py-3 text-sm">
-            Este atleta é sincronizado a partir de um cadastro em Cadastros → Clientes. Nome,
+            Atleta Patrocinado, sincronizado a partir de um cadastro em Cadastros → Clientes (onde
+            &ldquo;é atleta&rdquo; e &ldquo;patrocinado&rdquo; estão ligados juntos). Nome,
             telefone, patrocínio e última consulta são atualizados sozinhos de lá — o que você mudar
             aqui pode ser sobrescrito na próxima vez que aquele cliente for salvo.
           </p>
