@@ -4,13 +4,9 @@ import { IconPicker } from "@/components/admin/icon-picker";
 import { VideoField } from "@/components/admin/video-field";
 import { FileField } from "@/components/admin/file-field";
 import { AccessEditor } from "@/components/admin/access-editor";
-import { ContentEditor } from "@/components/admin/content-editor";
-import { TestimonialsEditor } from "@/components/admin/testimonials-editor";
-import { PricingEditor } from "@/components/admin/pricing-editor";
-import { RegistryEditor } from "@/components/admin/registry-editor";
-import { VisitorsPanel } from "@/components/admin/visitors-panel";
-import { MessagesEditor } from "@/components/admin/messages-editor";
-import { IndicatorsPanel } from "@/components/admin/indicators-panel";
+import { ContentHub } from "@/components/admin/content-hub";
+import { ClientsHub } from "@/components/admin/clients-hub";
+import { SubNav } from "@/components/admin/sub-nav";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useEffect, useMemo, useState } from "react";
 import { toast } from "sonner";
@@ -18,19 +14,15 @@ import {
   ArrowDown,
   ArrowUp,
   ExternalLink,
-  LayoutList,
+  Globe,
   LogOut,
-  MessageSquare,
-  MessageSquareQuote,
   Palette,
   Plus,
+  Settings as SettingsIcon,
   ShieldCheck,
   Trash2,
-  TrendingUp,
   Users,
   UserCog,
-  UsersRound,
-  Wallet,
 } from "lucide-react";
 
 import { supabase } from "@/integrations/supabase/client";
@@ -74,13 +66,12 @@ export const Route = createFileRoute("/_authenticated/admin")({
 });
 
 const ADMIN_TABS = [
-  { value: "conteudo", label: "Conteúdo", Icon: LayoutList },
-  { value: "depoimentos", label: "Depoimentos", Icon: MessageSquareQuote },
-  { value: "cadastros", label: "Cadastros", Icon: Users },
-  { value: "valores", label: "Valores", Icon: Wallet },
-  { value: "mensagens", label: "Mensagens", Icon: MessageSquare },
-  { value: "visitantes", label: "Visitantes", Icon: UsersRound },
-  { value: "indicadores", label: "Indicadores", Icon: TrendingUp },
+  { value: "conteudo", label: "Conteúdo", Icon: Globe },
+  { value: "clientes", label: "Clientes", Icon: Users },
+  { value: "config", label: "Configurações", Icon: SettingsIcon },
+] as const;
+
+const CONFIG_SECTIONS = [
   { value: "perfil", label: "Perfil & contato", Icon: UserCog },
   { value: "cores", label: "Cores", Icon: Palette },
   { value: "acessos", label: "Acessos", Icon: ShieldCheck },
@@ -89,6 +80,8 @@ const ADMIN_TABS = [
 function AdminPage() {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
+  const [configSection, setConfigSection] =
+    useState<(typeof CONFIG_SECTIONS)[number]["value"]>("perfil");
 
   // A permissão é apenas lida. Antes, esta consulta CONCEDIA o papel de
   // administrador a quem chegasse primeiro — bastava criar uma conta e abrir
@@ -212,55 +205,33 @@ function AdminPage() {
           </TabsList>
 
           <TabsContent value="conteudo" className="mt-6">
-            {blocksQuery.data ? <ContentEditor blocks={blocksQuery.data} /> : <p>Carregando…</p>}
+            <ContentHub blocks={blocksQuery.data} settings={settingsQuery.data} />
           </TabsContent>
 
-          <TabsContent value="depoimentos" className="mt-6">
-            <TestimonialsEditor />
+          <TabsContent value="clientes" className="mt-6">
+            <ClientsHub />
           </TabsContent>
 
-          <TabsContent value="cadastros" className="mt-6">
-            <RegistryEditor />
-          </TabsContent>
+          <TabsContent value="config" className="mt-6">
+            <div className="space-y-6">
+              <SubNav items={CONFIG_SECTIONS} value={configSection} onChange={setConfigSection} />
 
-          <TabsContent value="valores" className="mt-6">
-            {settingsQuery.data ? (
-              <PricingEditor settings={settingsQuery.data} />
-            ) : (
-              <p>Carregando…</p>
-            )}
-          </TabsContent>
-
-          <TabsContent value="mensagens" className="mt-6">
-            <MessagesEditor />
-          </TabsContent>
-
-          <TabsContent value="visitantes" className="mt-6">
-            <VisitorsPanel />
-          </TabsContent>
-
-          <TabsContent value="indicadores" className="mt-6">
-            <IndicatorsPanel />
-          </TabsContent>
-
-          <TabsContent value="perfil" className="mt-6">
-            {settingsQuery.data ? (
-              <SettingsForm settings={settingsQuery.data} section="perfil" />
-            ) : (
-              <p>Carregando…</p>
-            )}
-          </TabsContent>
-
-          <TabsContent value="cores" className="mt-6">
-            {settingsQuery.data ? (
-              <SettingsForm settings={settingsQuery.data} section="cores" />
-            ) : (
-              <p>Carregando…</p>
-            )}
-          </TabsContent>
-
-          <TabsContent value="acessos" className="mt-6">
-            <AccessEditor />
+              {configSection === "perfil" ? (
+                settingsQuery.data ? (
+                  <SettingsForm settings={settingsQuery.data} section="perfil" />
+                ) : (
+                  <p>Carregando…</p>
+                )
+              ) : configSection === "cores" ? (
+                settingsQuery.data ? (
+                  <SettingsForm settings={settingsQuery.data} section="cores" />
+                ) : (
+                  <p>Carregando…</p>
+                )
+              ) : (
+                <AccessEditor />
+              )}
+            </div>
           </TabsContent>
         </Tabs>
       </main>
